@@ -50,16 +50,29 @@ export default function SwapPage() {
       }
       return await res.json();
     },
-    enabled: !!fromAmount && parseFloat(fromAmount) > 0 && 
+    enabled: !!fromAmount && fromAmount.trim() !== '' && parseFloat(fromAmount) > 0 && 
       (fromCurrency !== toCurrency || fromNetwork !== toNetwork),
   });
 
   // Poll exchange status
   const statusQueryEnabled = !!activeExchange?.id;
-  const { data: exchangeStatus } = useQuery<{ status?: string }>({
+  const { data: exchangeStatus, isError: statusError, refetch: refetchStatus } = useQuery<{ status?: string }>({
     queryKey: statusQueryEnabled ? ["/api/swap/status", activeExchange.id] : ["no-exchange"],
+    queryFn: async ({ queryKey }) => {
+      const exchangeId = queryKey[1] as string;
+      if (!exchangeId) {
+        throw new Error("No exchange ID");
+      }
+      const res = await fetch(`/api/swap/status/${exchangeId}`);
+      if (!res.ok) {
+        throw new Error("Failed to fetch exchange status");
+      }
+      return await res.json();
+    },
     enabled: statusQueryEnabled,
     refetchInterval: statusQueryEnabled && activeExchange?.status !== 'finished' ? 10000 : false,
+    retry: 3,
+    retryDelay: (attemptIndex) => Math.min(2000 * (attemptIndex + 1), 10000),
   });
 
   // Create exchange mutation
@@ -242,6 +255,17 @@ export default function SwapPage() {
     }
   }, [exchangeStatus?.status]);
 
+  // Handle status polling errors
+  useEffect(() => {
+    if (statusError && activeExchange) {
+      toast({
+        title: "Status Update Failed",
+        description: "Having trouble checking exchange status. Will retry automatically.",
+        variant: "destructive",
+      });
+    }
+  }, [statusError, activeExchange]);
+
   // Render exchange view
   if (activeExchange) {
     return (
@@ -273,24 +297,48 @@ export default function SwapPage() {
             {/* Timer */}
             <div className="flex items-center justify-center gap-3 mb-6 p-4 bg-accent/10 border border-accent/30 rounded-md">
               <Clock className="w-5 h-5 text-accent" />
-              <span className={`text-xl font-mono font-bold ${timeRemaining === 'Expired' ? 'text-destructive' : 'text-accent'}`}>
+              <span className={`text-xl font-mono font-bold ${timeRemaining === 'Expired' ? 'text-destructive' : 'text-accent'}`} data-testid="text-timer">
                 {timeRemaining}
               </span>
               <span className="text-sm text-muted-foreground">Time Remaining</span>
             </div>
+
+            {/* Status Polling Error Banner */}
+            {statusError && (
+              <div className="mb-6 p-4 bg-destructive/10 border-2 border-destructive/40 rounded-md">
+                <div className="flex items-start gap-3">
+                  <AlertCircle className="w-5 h-5 text-destructive mt-0.5 flex-shrink-0" />
+                  <div className="flex-1">
+                    <p className="text-sm font-bold text-destructive mb-1">Status Update Error</p>
+                    <p className="text-xs text-muted-foreground mb-3">
+                      Unable to fetch exchange status. Your transaction is still processing, but we can't display real-time updates.
+                    </p>
+                    <Button
+                      onClick={() => refetchStatus()}
+                      size="sm"
+                      variant="outline"
+                      className="border-destructive/40 text-destructive hover-elevate"
+                      data-testid="button-retry-status"
+                    >
+                      Retry Status Check
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Exchange Details */}
             <div className="space-y-4 mb-6">
               <div className="grid grid-cols-2 gap-4">
                 <div className="p-4 bg-muted/5 border border-border rounded-md">
                   <Label className="text-xs text-muted-foreground mb-1 uppercase tracking-wider">You Send</Label>
-                  <p className="text-lg font-bold font-mono text-foreground">
+                  <p className="text-lg font-bold font-mono text-foreground" data-testid="text-exchange-from-amount">
                     {activeExchange.fromAmount} {activeExchange.fromCurrency.toUpperCase()}
                   </p>
                 </div>
                 <div className="p-4 bg-muted/5 border border-primary/20 rounded-md">
                   <Label className="text-xs text-muted-foreground mb-1 uppercase tracking-wider">You Receive</Label>
-                  <p className="text-lg font-bold font-mono text-primary">
+                  <p className="text-lg font-bold font-mono text-primary" data-testid="text-exchange-to-amount">
                     {activeExchange.toAmount} {activeExchange.toCurrency.toUpperCase()}
                   </p>
                 </div>
@@ -303,9 +351,9 @@ export default function SwapPage() {
                   : activeExchange.status === 'failed' || activeExchange.status === 'refunded'
                   ? 'bg-destructive/10 border-destructive/30'
                   : 'bg-primary/10 border-primary/30'
-              }`}>
+              }`} data-testid="box-exchange-status">
                 <Label className="text-xs text-muted-foreground mb-1 uppercase tracking-wider">Status</Label>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2" data-testid="text-exchange-status">
                   {activeExchange.status === 'finished' ? (
                     <>
                       <Check className="w-4 h-4 text-green-500" />
@@ -453,52 +501,52 @@ export default function SwapPage() {
               </div>
 
               <div className="space-y-4 mb-8">
-                <div className="p-4 bg-gradient-to-r from-cyan-500/10 to-cyan-500/5 border border-cyan-500/30 rounded-md">
+                <div className="p-4 bg-gradient-to-r from-cyan-500/10 to-cyan-500/5 border border-cyan-500/30 rounded-md" data-testid="privacy-status-identity">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-sm font-semibold text-cyan-400 flex items-center gap-2">
                       <Shield className="w-4 h-4" /> IDENTITY SHIELDED
                     </span>
-                    <span className="px-2 py-0.5 bg-green-500/20 border border-green-500/50 rounded-full text-[10px] font-bold text-green-500">ACTIVE</span>
+                    <span className="px-2 py-0.5 bg-green-500/20 border border-green-500/50 rounded-full text-[10px] font-bold text-green-500" data-testid="badge-privacy-identity">ACTIVE</span>
                   </div>
                   <p className="text-xs text-muted-foreground">Your wallet identity is cryptographically protected</p>
                 </div>
 
-                <div className="p-4 bg-gradient-to-r from-purple-500/10 to-purple-500/5 border border-purple-500/30 rounded-md">
+                <div className="p-4 bg-gradient-to-r from-purple-500/10 to-purple-500/5 border border-purple-500/30 rounded-md" data-testid="privacy-status-transaction">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-sm font-semibold text-purple-400 flex items-center gap-2">
                       <Lock className="w-4 h-4" /> TRANSACTION OBFUSCATED
                     </span>
-                    <span className="px-2 py-0.5 bg-green-500/20 border border-green-500/50 rounded-full text-[10px] font-bold text-green-500">ACTIVE</span>
+                    <span className="px-2 py-0.5 bg-green-500/20 border border-green-500/50 rounded-full text-[10px] font-bold text-green-500" data-testid="badge-privacy-transaction">ACTIVE</span>
                   </div>
                   <p className="text-xs text-muted-foreground">Transaction details are encrypted end-to-end</p>
                 </div>
 
-                <div className="p-4 bg-gradient-to-r from-pink-500/10 to-pink-500/5 border border-pink-500/30 rounded-md">
+                <div className="p-4 bg-gradient-to-r from-pink-500/10 to-pink-500/5 border border-pink-500/30 rounded-md" data-testid="privacy-status-proof">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-sm font-semibold text-pink-400 flex items-center gap-2">
                       <Zap className="w-4 h-4" /> PROOF VERIFIED
                     </span>
-                    <span className="px-2 py-0.5 bg-green-500/20 border border-green-500/50 rounded-full text-[10px] font-bold text-green-500">ACTIVE</span>
+                    <span className="px-2 py-0.5 bg-green-500/20 border border-green-500/50 rounded-full text-[10px] font-bold text-green-500" data-testid="badge-privacy-proof">ACTIVE</span>
                   </div>
                   <p className="text-xs text-muted-foreground">Zero-knowledge proof validation complete</p>
                 </div>
 
-                <div className="p-4 bg-gradient-to-r from-orange-500/10 to-orange-500/5 border border-orange-500/30 rounded-md">
+                <div className="p-4 bg-gradient-to-r from-orange-500/10 to-orange-500/5 border border-orange-500/30 rounded-md" data-testid="privacy-status-routing">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-sm font-semibold text-orange-400 flex items-center gap-2">
                       <Globe className="w-4 h-4" /> ANONYMOUS ROUTING
                     </span>
-                    <span className="px-2 py-0.5 bg-green-500/20 border border-green-500/50 rounded-full text-[10px] font-bold text-green-500">ACTIVE</span>
+                    <span className="px-2 py-0.5 bg-green-500/20 border border-green-500/50 rounded-full text-[10px] font-bold text-green-500" data-testid="badge-privacy-routing">ACTIVE</span>
                   </div>
                   <p className="text-xs text-muted-foreground">Exchange routed through privacy network</p>
                 </div>
               </div>
 
-              <div className="p-6 bg-black/40 border border-primary/20 rounded-md mb-6">
+              <div className="p-6 bg-black/40 border border-primary/20 rounded-md mb-6" data-testid="box-zk-snark-circuit">
                 <h3 className="text-xs font-bold text-muted-foreground mb-4 uppercase tracking-wider text-center">
                   ZK-SNARK Circuit Active
                 </h3>
-                <div className="space-y-3">
+                <div className="space-y-3" data-testid="list-zk-snark-steps">
                   {[
                     { label: 'Witness Generation', delay: '0s' },
                     { label: 'Constraint System', delay: '0.3s' },
@@ -541,12 +589,12 @@ export default function SwapPage() {
                   activeExchange.status === 'finished' 
                     ? 'bg-green-500/10 border-green-500/30' 
                     : 'bg-black/40 border-primary/20'
-                }`}>
+                }`} data-testid="box-proof-hash">
                   <p className={`font-mono text-xs break-all text-center ${
                     activeExchange.status === 'finished'
                       ? 'text-green-400'
                       : 'text-primary/60 animate-pulse'
-                  }`}>
+                  }`} data-testid="text-proof-hash">
                     zk_0x{activeExchange.id.replace(/-/g, '').slice(0, 32).padEnd(32, '0')}
                   </p>
                 </div>
@@ -608,13 +656,13 @@ export default function SwapPage() {
         {/* Form */}
         <div className="space-y-4">
           {loadingCurrencies && (
-            <div className="flex items-center gap-2 p-3 bg-muted/10 border border-border rounded-md">
+            <div className="flex items-center gap-2 p-3 bg-muted/10 border border-border rounded-md" data-testid="banner-loading-currencies">
               <Loader2 className="w-4 h-4 animate-spin text-primary" />
               <span className="text-sm text-muted-foreground">Loading currencies...</span>
             </div>
           )}
           {currenciesError && (
-            <div className="flex items-center gap-2 p-3 bg-destructive/10 border border-destructive/20 rounded-md">
+            <div className="flex items-center gap-2 p-3 bg-destructive/10 border border-destructive/20 rounded-md" data-testid="banner-error-currencies">
               <AlertCircle className="w-4 h-4 text-destructive" />
               <span className="text-sm text-destructive">Failed to load currencies</span>
             </div>
@@ -762,18 +810,18 @@ export default function SwapPage() {
 
           {/* Live Conversion */}
           {loadingEstimation ? (
-            <div className="flex items-center justify-center gap-3 p-6 bg-gradient-to-r from-primary/10 to-secondary/10 border-2 border-primary/30 rounded-md">
+            <div className="flex items-center justify-center gap-3 p-6 bg-gradient-to-r from-primary/10 to-secondary/10 border-2 border-primary/30 rounded-md" data-testid="banner-loading-estimate">
               <Loader2 className="w-5 h-5 animate-spin text-primary" />
               <span className="text-sm font-medium text-foreground">Fetching live rates...</span>
             </div>
           ) : estimation && estimation.estimatedAmount ? (
-            <div className="p-5 bg-gradient-to-br from-primary/5 via-secondary/5 to-primary/10 border-2 border-primary/30 rounded-md space-y-3" data-testid="box-live-conversion">
+            <div className="p-5 bg-gradient-to-br from-primary/5 via-secondary/5 to-primary/10 border-2 border-primary/30 rounded-md space-y-3" data-testid="box-live-estimate">
               <div className="flex items-center justify-between">
                 <span className="text-xs text-muted-foreground uppercase tracking-wider">Live Estimate</span>
                 <span className="px-2 py-0.5 bg-green-500/20 border border-green-500/50 rounded-full text-[10px] font-bold text-green-500 animate-pulse">LIVE</span>
               </div>
               <div className="text-center">
-                <p className="text-3xl font-bold font-mono text-primary mb-1">
+                <p className="text-3xl font-bold font-mono text-primary mb-1" data-testid="text-estimated-amount">
                   ≈ {estimation.estimatedAmount}
                 </p>
                 <p className="text-sm text-muted-foreground font-mono">
@@ -789,7 +837,7 @@ export default function SwapPage() {
               )}
             </div>
           ) : estimationError ? (
-            <div className="p-4 bg-destructive/10 border border-destructive/20 rounded-md">
+            <div className="p-4 bg-destructive/10 border border-destructive/20 rounded-md" data-testid="banner-error-estimate">
               <p className="text-sm text-destructive text-center">Failed to fetch estimate</p>
             </div>
           ) : null}

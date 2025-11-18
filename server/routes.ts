@@ -49,13 +49,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Build currency codes with network if provided
+      // ChangeNOW uses format: ticker or ticker_network (e.g., usdt_erc20)
       let fromCurrency = String(from).toLowerCase();
       let toCurrency = String(to).toLowerCase();
 
-      if (fromNetwork) {
+      // Only append network if it exists AND is different from the ticker
+      // This prevents duplicates like "btc_btc"
+      if (fromNetwork && String(fromNetwork).toLowerCase() !== fromCurrency) {
         fromCurrency = `${fromCurrency}_${String(fromNetwork).toLowerCase()}`;
       }
-      if (toNetwork) {
+      if (toNetwork && String(toNetwork).toLowerCase() !== toCurrency) {
         toCurrency = `${toCurrency}_${String(toNetwork).toLowerCase()}`;
       }
 
@@ -103,13 +106,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { from, to, fromNetwork, toNetwork, amount, address } = validation.data;
 
       // Build currency codes with network if provided
+      // ChangeNOW uses format: ticker or ticker_network (e.g., usdt_erc20)
       let fromCurrency = from.toLowerCase();
       let toCurrency = to.toLowerCase();
 
-      if (fromNetwork) {
+      // Only append network if it exists AND is different from the ticker
+      // This prevents duplicates like "btc_btc"
+      if (fromNetwork && fromNetwork.toLowerCase() !== fromCurrency) {
         fromCurrency = `${fromCurrency}_${fromNetwork.toLowerCase()}`;
       }
-      if (toNetwork) {
+      if (toNetwork && toNetwork.toLowerCase() !== toCurrency) {
         toCurrency = `${toCurrency}_${toNetwork.toLowerCase()}`;
       }
 
