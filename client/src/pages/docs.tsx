@@ -313,7 +313,7 @@ export default function DocsPage() {
               {/* Footer */}
               <div className="mt-12 pt-6 border-t border-border text-center">
                 <p className="text-sm text-muted-foreground/70">
-                  Powered by ZK Enigma Link Network • Version 1.0 • November 2025
+                  Powered by Zk Ghost Swap • Version 1.0 • November 2025
                 </p>
                 <p className="text-xs text-muted-foreground/50 mt-2">
                   For the complete technical whitepaper, see WHITEPAPER.md in the project repository
