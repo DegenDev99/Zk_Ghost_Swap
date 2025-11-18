@@ -1,7 +1,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { Shield, Shuffle, Lock, Zap, Check } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 
 interface PrivacyVisualizationProps {
   isActive: boolean;
@@ -41,25 +41,55 @@ const privacyStages = [
   },
 ];
 
+function getAnimationState(status?: string, lastKnownState?: { score: number; activeStages: number }) {
+  if (!status) {
+    return { score: 0, activeStages: 0, animating: false, isComplete: false };
+  }
+
+  switch (status) {
+    case 'waiting':
+    case 'expired':
+    case 'failed':
+    case 'refunded':
+      return { score: 20, activeStages: 0, animating: false, isComplete: false };
+    
+    case 'confirming':
+      return { score: 40, activeStages: 1, animating: true, isComplete: false };
+    
+    case 'exchanging':
+      return { score: 60, activeStages: 2, animating: true, isComplete: false };
+    
+    case 'sending':
+      return { score: 80, activeStages: 3, animating: true, isComplete: false };
+    
+    case 'finished':
+      return { score: 100, activeStages: 4, animating: false, isComplete: true };
+    
+    default:
+      if (lastKnownState) {
+        return { ...lastKnownState, animating: false, isComplete: false };
+      }
+      return { score: 20, activeStages: 0, animating: false, isComplete: false };
+  }
+}
+
 export function PrivacyVisualization({ isActive, privacyScore = 0, exchangeId, exchangeStatus }: PrivacyVisualizationProps) {
-  const [currentStage, setCurrentStage] = useState(0);
   const [particles, setParticles] = useState<number[]>([]);
-
+  const [lastKnownState, setLastKnownState] = useState<{ score: number; activeStages: number } | undefined>();
+  
+  const rawAnimState = useMemo(() => getAnimationState(exchangeStatus, lastKnownState), [exchangeStatus, lastKnownState]);
+  
   useEffect(() => {
-    if (!isActive) {
-      setCurrentStage(0);
-      return;
+    if (rawAnimState.score > 0) {
+      setLastKnownState({ score: rawAnimState.score, activeStages: rawAnimState.activeStages });
     }
-
-    const interval = setInterval(() => {
-      setCurrentStage((prev) => (prev + 1) % privacyStages.length);
-    }, 2000);
-
-    return () => clearInterval(interval);
-  }, [isActive]);
+  }, [rawAnimState.score, rawAnimState.activeStages]);
+  
+  const animState = isActive ? rawAnimState : { score: 0, activeStages: 0, animating: false, isComplete: false };
+  const currentAnimatingStage = animState.animating ? animState.activeStages - 1 : -1;
 
   useEffect(() => {
-    if (!isActive) {
+    if (!animState.animating) {
       setParticles([]);
       return;
     }
@@ -69,7 +99,7 @@ export function PrivacyVisualization({ isActive, privacyScore = 0, exchangeId, e
     }, 300);
 
     return () => clearInterval(particleInterval);
-  }, [isActive]);
+  }, [animState.animating]);
 
   return (
     <Card className="h-full" data-testid="card-privacy-visualization">
@@ -88,14 +118,13 @@ export function PrivacyVisualization({ isActive, privacyScore = 0, exchangeId, e
           <div className="flex justify-between text-sm">
             <span className="text-muted-foreground">Privacy Score</span>
             <span className="text-primary font-mono font-semibold" data-testid="text-privacy-score">
-              {isActive ? Math.min(95 + privacyScore, 100) : 0}%
+              {animState.score}%
             </span>
           </div>
           <div className="h-2 bg-secondary rounded-full overflow-hidden">
             <motion.div
               className="h-full bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500"
-              initial={{ width: "0%" }}
-              animate={{ width: isActive ? `${Math.min(95 + privacyScore, 100)}%` : "0%" }}
+              animate={{ width: `${animState.score}%` }}
               transition={{ duration: 0.8, ease: "easeOut" }}
             />
           </div>
@@ -105,15 +134,15 @@ export function PrivacyVisualization({ isActive, privacyScore = 0, exchangeId, e
         <div className="space-y-4">
           {privacyStages.map((stage, index) => {
             const Icon = stage.icon;
-            const isActiveStage = isActive && index <= currentStage;
-            const isCurrentStage = isActive && index === currentStage;
+            const isLitUp = index < animState.activeStages;
+            const isCurrentlyAnimating = index === currentAnimatingStage;
 
             return (
               <motion.div
                 key={stage.id}
                 className="relative"
                 initial={{ opacity: 0.3 }}
-                animate={{ opacity: isActiveStage ? 1 : 0.3 }}
+                animate={{ opacity: isLitUp ? 1 : 0.3 }}
                 data-testid={`stage-${stage.id}`}
               >
                 <div className="flex items-center gap-4">
@@ -122,7 +151,7 @@ export function PrivacyVisualization({ isActive, privacyScore = 0, exchangeId, e
                     <motion.div
                       className={`w-12 h-12 rounded-lg bg-gradient-to-br ${stage.color} flex items-center justify-center`}
                       animate={
-                        isCurrentStage
+                        isCurrentlyAnimating
                           ? {
                               scale: [1, 1.1, 1],
                               boxShadow: [
@@ -133,14 +162,14 @@ export function PrivacyVisualization({ isActive, privacyScore = 0, exchangeId, e
                             }
                           : {}
                       }
-                      transition={{ duration: 2, repeat: Infinity }}
+                      transition={isCurrentlyAnimating ? { duration: 2, repeat: Infinity } : {}}
                     >
                       <Icon className="w-6 h-6 text-white" />
                     </motion.div>
 
                     {/* Particle Effect */}
                     <AnimatePresence>
-                      {isCurrentStage &&
+                      {isCurrentlyAnimating &&
                         particles.slice(-3).map((id) => (
                           <motion.div
                             key={id}
@@ -166,11 +195,11 @@ export function PrivacyVisualization({ isActive, privacyScore = 0, exchangeId, e
                   </div>
 
                   {/* Status Indicator */}
-                  {isActiveStage && (
+                  {isLitUp && (
                     <motion.div
                       className="w-2 h-2 rounded-full bg-primary"
-                      animate={{ opacity: [0.5, 1, 0.5] }}
-                      transition={{ duration: 1.5, repeat: Infinity }}
+                      animate={isCurrentlyAnimating ? { opacity: [0.5, 1, 0.5] } : { opacity: 1 }}
+                      transition={isCurrentlyAnimating ? { duration: 1.5, repeat: Infinity } : {}}
                       data-testid={`indicator-${stage.id}`}
                     />
                   )}
@@ -179,12 +208,12 @@ export function PrivacyVisualization({ isActive, privacyScore = 0, exchangeId, e
                 {/* Connecting Line */}
                 {index < privacyStages.length - 1 && (
                   <div className="ml-6 h-8 w-0.5 bg-border relative overflow-hidden">
-                    {isActiveStage && (
+                    {isLitUp && (
                       <motion.div
                         className="absolute inset-0 w-full bg-gradient-to-b from-primary to-transparent"
                         initial={{ y: "-100%" }}
-                        animate={{ y: "100%" }}
-                        transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+                        animate={isCurrentlyAnimating ? { y: "100%" } : { y: "0%" }}
+                        transition={isCurrentlyAnimating ? { duration: 1.5, repeat: Infinity, ease: "linear" } : {}}
                       />
                     )}
                   </div>
@@ -217,8 +246,8 @@ export function PrivacyVisualization({ isActive, privacyScore = 0, exchangeId, e
           </div>
         </div>
 
-        {/* Idle State Message */}
-        {!isActive && (
+        {/* Idle State Message - Only show when not active and no exchange status */}
+        {!isActive && !exchangeStatus && (
           <div className="text-center py-8 text-sm text-muted-foreground" data-testid="text-idle-message">
             Enter swap details to see privacy layers in action
           </div>
