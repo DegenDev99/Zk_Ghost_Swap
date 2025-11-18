@@ -37,9 +37,9 @@ export default function HistoryPage() {
       case "confirming":
         return <Badge className="bg-blue-500/20 text-blue-500 border-blue-500/50" data-testid={`badge-status-${status}`}>CONFIRMING</Badge>;
       case "exchanging":
-        return <Badge className="bg-purple-500/20 text-purple-500 border-purple-500/50" data-testid={`badge-status-${status}`}>EXCHANGING</Badge>;
+        return <Badge className="bg-secondary/20 text-secondary border-secondary/50" data-testid={`badge-status-${status}`}>EXCHANGING</Badge>;
       case "sending":
-        return <Badge className="bg-cyan-500/20 text-cyan-500 border-cyan-500/50" data-testid={`badge-status-${status}`}>SENDING</Badge>;
+        return <Badge className="bg-primary/20 text-primary border-primary/50" data-testid={`badge-status-${status}`}>SENDING</Badge>;
       default:
         return <Badge variant="secondary" data-testid={`badge-status-${status}`}>{status.toUpperCase()}</Badge>;
     }
@@ -50,7 +50,7 @@ export default function HistoryPage() {
       <div className="container mx-auto px-4 py-8 max-w-6xl">
         {/* Header */}
         <div className="mb-8 text-center">
-          <h1 className="text-4xl sm:text-5xl font-bold mb-3 bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent" data-testid="heading-history">
+          <h1 className="text-4xl sm:text-5xl font-bold mb-3 bg-gradient-to-r from-primary via-accent to-secondary bg-clip-text text-transparent" data-testid="heading-history">
             TRANSACTION HISTORY
           </h1>
           <p className="text-sm text-muted-foreground uppercase tracking-wider">

@@ -8,9 +8,9 @@ export default function DocsPage() {
       <div className="space-y-8">
         {/* Header */}
         <div className="text-center space-y-4">
-          <div className="inline-flex items-center gap-3 px-6 py-3 rounded-lg bg-gradient-to-r from-cyan-500/10 to-purple-500/10 border border-cyan-500/20">
-            <Shield className="w-6 h-6 text-cyan-400" />
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
+          <div className="inline-flex items-center gap-3 px-6 py-3 rounded-lg bg-gradient-to-r from-primary/10 to-secondary/10 border border-primary/20">
+            <Shield className="w-6 h-6 text-primary" />
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
               Privacy Whitepaper
             </h1>
           </div>
@@ -24,9 +24,9 @@ export default function DocsPage() {
 
         {/* Quick Features Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card className="p-6 border-cyan-500/20 bg-card/60 backdrop-blur">
+          <Card className="p-6 border-primary/20 bg-card/60 backdrop-blur">
             <div className="flex items-start gap-3">
-              <Lock className="w-5 h-5 text-cyan-400 mt-1" />
+              <Lock className="w-5 h-5 text-primary mt-1" />
               <div>
                 <h3 className="font-semibold mb-1">Zero KYC</h3>
                 <p className="text-sm text-muted-foreground">
@@ -36,9 +36,9 @@ export default function DocsPage() {
             </div>
           </Card>
           
-          <Card className="p-6 border-purple-500/20 bg-card/60 backdrop-blur">
+          <Card className="p-6 border-secondary/20 bg-card/60 backdrop-blur">
             <div className="flex items-start gap-3">
-              <Eye className="w-5 h-5 text-purple-400 mt-1" />
+              <Eye className="w-5 h-5 text-secondary mt-1" />
               <div>
                 <h3 className="font-semibold mb-1">Anonymous</h3>
                 <p className="text-sm text-muted-foreground">
@@ -48,9 +48,9 @@ export default function DocsPage() {
             </div>
           </Card>
           
-          <Card className="p-6 border-pink-500/20 bg-card/60 backdrop-blur">
+          <Card className="p-6 border-accent/20 bg-card/60 backdrop-blur">
             <div className="flex items-start gap-3">
-              <Globe className="w-5 h-5 text-pink-400 mt-1" />
+              <Globe className="w-5 h-5 text-accent mt-1" />
               <div>
                 <h3 className="font-semibold mb-1">Cross-Chain</h3>
                 <p className="text-sm text-muted-foreground">
@@ -69,7 +69,7 @@ export default function DocsPage() {
               {/* Abstract */}
               <section data-testid="section-abstract">
                 <h2 className="text-2xl font-bold text-foreground mb-4 flex items-center gap-2">
-                  <Zap className="w-6 h-6 text-cyan-400" />
+                  <Zap className="w-6 h-6 text-primary" />
                   Abstract
                 </h2>
                 <p className="text-muted-foreground leading-relaxed">
@@ -83,7 +83,7 @@ export default function DocsPage() {
               {/* Mission Statement */}
               <section data-testid="section-mission">
                 <h2 className="text-2xl font-bold text-foreground mb-4">Mission Statement</h2>
-                <div className="border-l-4 border-cyan-500 pl-4 py-2 bg-cyan-500/5 rounded-r">
+                <div className="border-l-4 border-primary pl-4 py-2 bg-primary/5 rounded-r">
                   <p className="text-lg italic text-foreground">
                     "Privacy is not a privilege. It's a fundamental human right."
                   </p>
@@ -134,27 +134,27 @@ export default function DocsPage() {
                 </p>
                 <ul className="space-y-2 text-muted-foreground">
                   <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-5 h-5 text-cyan-400 mt-0.5 flex-shrink-0" />
+                    <CheckCircle2 className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
                     <span><strong>Zero KYC/AML</strong> – No identity verification ever required</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-5 h-5 text-cyan-400 mt-0.5 flex-shrink-0" />
+                    <CheckCircle2 className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
                     <span><strong>No Account Creation</strong> – Ephemeral sessions only</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-5 h-5 text-cyan-400 mt-0.5 flex-shrink-0" />
+                    <CheckCircle2 className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
                     <span><strong>No Email/Password</strong> – Complete anonymity by default</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-5 h-5 text-cyan-400 mt-0.5 flex-shrink-0" />
+                    <CheckCircle2 className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
                     <span><strong>Non-Custodial</strong> – You control your assets at all times</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-5 h-5 text-cyan-400 mt-0.5 flex-shrink-0" />
+                    <CheckCircle2 className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
                     <span><strong>Cross-Chain Support</strong> – 1,200+ cryptocurrencies across all major blockchains</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-5 h-5 text-cyan-400 mt-0.5 flex-shrink-0" />
+                    <CheckCircle2 className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
                     <span><strong>ZK Privacy Tunnel</strong> – Visual cryptographic proof of privacy-preserving execution</span>
                   </li>
                 </ul>
@@ -192,15 +192,15 @@ export default function DocsPage() {
                 <h3 className="text-xl font-semibold text-foreground mb-3">What We Protect Against</h3>
                 <ul className="space-y-2 text-muted-foreground">
                   <li className="flex items-start gap-2">
-                    <span className="text-cyan-400 mt-1">•</span>
+                    <span className="text-primary mt-1">•</span>
                     <span><strong>Blockchain Analytics Firms</strong> – Cannot link swap transactions across chains or build transaction graphs</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <span className="text-cyan-400 mt-1">•</span>
+                    <span className="text-primary mt-1">•</span>
                     <span><strong>Government Surveillance</strong> – No KYC data to subpoena, no logs connecting users to transactions</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <span className="text-cyan-400 mt-1">•</span>
+                    <span className="text-primary mt-1">•</span>
                     <span><strong>Network Adversaries</strong> – No IP logging, encrypted connections, no tracking cookies</span>
                   </li>
                 </ul>
@@ -216,35 +216,35 @@ export default function DocsPage() {
                 <h2 className="text-2xl font-bold text-foreground mb-4">Use Cases</h2>
                 
                 <div className="space-y-4">
-                  <div className="border-l-2 border-cyan-500/50 pl-4">
+                  <div className="border-l-2 border-primary/50 pl-4">
                     <h3 className="text-lg font-semibold text-foreground mb-2">Privacy-Conscious Investors</h3>
                     <p className="text-muted-foreground text-sm">
                       Protect portfolio composition from public visibility. Swap between assets without identity linkage or aggregated portfolio tracking.
                     </p>
                   </div>
 
-                  <div className="border-l-2 border-purple-500/50 pl-4">
+                  <div className="border-l-2 border-secondary/50 pl-4">
                     <h3 className="text-lg font-semibold text-foreground mb-2">Cross-Border Remittances</h3>
                     <p className="text-muted-foreground text-sm">
                       Send money to family in countries with capital controls. Instant transfers with minimal fees, no identification requirements.
                     </p>
                   </div>
 
-                  <div className="border-l-2 border-pink-500/50 pl-4">
+                  <div className="border-l-2 border-accent/50 pl-4">
                     <h3 className="text-lg font-semibold text-foreground mb-2">Censorship Resistance</h3>
                     <p className="text-muted-foreground text-sm">
                       Support organizations without fear of retaliation. Permissionless transactions that cannot be blocked or frozen.
                     </p>
                   </div>
 
-                  <div className="border-l-2 border-cyan-500/50 pl-4">
+                  <div className="border-l-2 border-primary/50 pl-4">
                     <h3 className="text-lg font-semibold text-foreground mb-2">Commercial Privacy</h3>
                     <p className="text-muted-foreground text-sm">
                       Protect business supplier relationships and pricing strategies from competitors through unlinkable payment transactions.
                     </p>
                   </div>
 
-                  <div className="border-l-2 border-purple-500/50 pl-4">
+                  <div className="border-l-2 border-secondary/50 pl-4">
                     <h3 className="text-lg font-semibold text-foreground mb-2">Personal Safety</h3>
                     <p className="text-muted-foreground text-sm">
                       High-net-worth individuals can avoid targeted attacks by maintaining financial privacy and reducing attack surface.
@@ -259,7 +259,7 @@ export default function DocsPage() {
                 
                 <div className="space-y-4">
                   <div>
-                    <h3 className="text-lg font-semibold text-cyan-400 mb-2">Phase 1: Privacy Enhancements (Q2 2025)</h3>
+                    <h3 className="text-lg font-semibold text-primary mb-2">Phase 1: Privacy Enhancements (Q2 2025)</h3>
                     <ul className="text-muted-foreground text-sm space-y-1 ml-4">
                       <li>• Full ZK-SNARK integration with production proof circuits</li>
                       <li>• Native Tor hidden service (.onion address)</li>
@@ -268,7 +268,7 @@ export default function DocsPage() {
                   </div>
 
                   <div>
-                    <h3 className="text-lg font-semibold text-purple-400 mb-2">Phase 2: Decentralization (Q3 2025)</h3>
+                    <h3 className="text-lg font-semibold text-secondary mb-2">Phase 2: Decentralization (Q3 2025)</h3>
                     <ul className="text-muted-foreground text-sm space-y-1 ml-4">
                       <li>• Decentralized exchange network with P2P liquidity</li>
                       <li>• IPFS frontend hosting for censorship resistance</li>
@@ -277,7 +277,7 @@ export default function DocsPage() {
                   </div>
 
                   <div>
-                    <h3 className="text-lg font-semibold text-pink-400 mb-2">Phase 3: Advanced Features (Q4 2025)</h3>
+                    <h3 className="text-lg font-semibold text-accent mb-2">Phase 3: Advanced Features (Q4 2025)</h3>
                     <ul className="text-muted-foreground text-sm space-y-1 ml-4">
                       <li>• Lightning Network integration for instant BTC swaps</li>
                       <li>• Private stablecoin support</li>
@@ -297,7 +297,7 @@ export default function DocsPage() {
                 <p className="text-muted-foreground leading-relaxed mb-4">
                   In a world where financial transactions are increasingly monitored, tracked, and weaponized, Zk Ghost Swap stands as a testament to the original vision of cryptocurrency—permissionless, censorship-resistant, and private value transfer.
                 </p>
-                <div className="border-l-4 border-cyan-500 pl-4 py-2 bg-cyan-500/5 rounded-r mt-6">
+                <div className="border-l-4 border-primary pl-4 py-2 bg-primary/5 rounded-r mt-6">
                   <p className="text-foreground font-semibold">
                     Privacy is not about having something to hide. It's about having something to protect.
                   </p>

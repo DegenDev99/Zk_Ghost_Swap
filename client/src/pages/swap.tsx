@@ -434,7 +434,7 @@ export default function SwapPage() {
             </div>
 
             <div className="text-center mb-8">
-              <h1 className="text-3xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 mb-2">
+              <h1 className="text-3xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary via-accent to-secondary mb-2">
                 ZK GHOST SWAP EXCHANGE
               </h1>
               <p className="text-sm text-muted-foreground uppercase tracking-wider">
@@ -665,7 +665,7 @@ export default function SwapPage() {
           <Card className="w-full p-6 sm:p-8 bg-card/40 backdrop-blur-sm border-primary/20">
         {/* Header */}
         <div className="text-center mb-6">
-          <h1 className="text-4xl sm:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 mb-2">
+          <h1 className="text-4xl sm:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary via-accent to-secondary mb-2">
             ZK GHOST SWAP
           </h1>
           <p className="text-sm text-muted-foreground uppercase tracking-wider">
@@ -921,8 +921,8 @@ export default function SwapPage() {
           {/* Privacy Panel - Zero-Knowledge Privacy */}
           <Card className="lg:sticky lg:top-8 p-6 sm:p-8 bg-card/60 backdrop-blur-sm border-primary/30 relative overflow-hidden">
             <div className="absolute inset-0 opacity-10">
-              <div className="absolute top-0 left-0 w-64 h-64 bg-gradient-to-br from-cyan-500 to-transparent rounded-full blur-3xl animate-pulse" />
-              <div className="absolute bottom-0 right-0 w-64 h-64 bg-gradient-to-tl from-pink-500 to-transparent rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+              <div className="absolute top-0 left-0 w-64 h-64 bg-gradient-to-br from-primary to-transparent rounded-full blur-3xl animate-pulse" />
+              <div className="absolute bottom-0 right-0 w-64 h-64 bg-gradient-to-tl from-secondary to-transparent rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
             </div>
 
             <div className="relative z-10">
@@ -930,7 +930,7 @@ export default function SwapPage() {
                 <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-primary to-secondary mb-4">
                   <Shield className="w-8 h-8 text-primary-foreground" />
                 </div>
-                <h2 className="text-2xl font-bold bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent mb-2">
+                <h2 className="text-2xl font-bold bg-gradient-to-r from-primary via-accent to-secondary bg-clip-text text-transparent mb-2">
                   ZERO-KNOWLEDGE PRIVACY
                 </h2>
                 <p className="text-xs text-muted-foreground uppercase tracking-wider">
@@ -939,9 +939,9 @@ export default function SwapPage() {
               </div>
 
               <div className="space-y-4 mb-8">
-                <div className="p-4 bg-gradient-to-r from-cyan-500/10 to-cyan-500/5 border border-cyan-500/30 rounded-md" data-testid="privacy-status-identity">
+                <div className="p-4 bg-gradient-to-r from-primary/10 to-primary/5 border border-primary/30 rounded-md" data-testid="privacy-status-identity">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-semibold text-cyan-400 flex items-center gap-2">
+                    <span className="text-sm font-semibold text-primary flex items-center gap-2">
                       <Shield className="w-4 h-4" /> IDENTITY SHIELDED
                     </span>
                     <span className={`px-2 py-0.5 ${isPrivacyActive ? 'bg-green-500/20 border-green-500/50 text-green-500' : 'bg-muted/20 border-muted/50 text-muted-foreground'} border rounded-full text-[10px] font-bold`} data-testid="badge-privacy-identity">{isPrivacyActive ? 'ACTIVE' : 'READY'}</span>
@@ -949,9 +949,9 @@ export default function SwapPage() {
                   <p className="text-xs text-muted-foreground">Your wallet identity is cryptographically protected</p>
                 </div>
 
-                <div className="p-4 bg-gradient-to-r from-purple-500/10 to-purple-500/5 border border-purple-500/30 rounded-md" data-testid="privacy-status-transaction">
+                <div className="p-4 bg-gradient-to-r from-secondary/10 to-secondary/5 border border-secondary/30 rounded-md" data-testid="privacy-status-transaction">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-semibold text-purple-400 flex items-center gap-2">
+                    <span className="text-sm font-semibold text-secondary flex items-center gap-2">
                       <Lock className="w-4 h-4" /> TRANSACTION OBFUSCATED
                     </span>
                     <span className={`px-2 py-0.5 ${isPrivacyActive ? 'bg-green-500/20 border-green-500/50 text-green-500' : 'bg-muted/20 border-muted/50 text-muted-foreground'} border rounded-full text-[10px] font-bold`} data-testid="badge-privacy-transaction">{isPrivacyActive ? 'ACTIVE' : 'READY'}</span>
@@ -959,9 +959,9 @@ export default function SwapPage() {
                   <p className="text-xs text-muted-foreground">Transaction details are encrypted end-to-end</p>
                 </div>
 
-                <div className="p-4 bg-gradient-to-r from-pink-500/10 to-pink-500/5 border border-pink-500/30 rounded-md" data-testid="privacy-status-proof">
+                <div className="p-4 bg-gradient-to-r from-accent/10 to-accent/5 border border-accent/30 rounded-md" data-testid="privacy-status-proof">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-semibold text-pink-400 flex items-center gap-2">
+                    <span className="text-sm font-semibold text-accent flex items-center gap-2">
                       <Zap className="w-4 h-4" /> PROOF VERIFIED
                     </span>
                     <span className={`px-2 py-0.5 ${isPrivacyActive ? 'bg-green-500/20 border-green-500/50 text-green-500' : 'bg-muted/20 border-muted/50 text-muted-foreground'} border rounded-full text-[10px] font-bold`} data-testid="badge-privacy-proof">{isPrivacyActive ? 'ACTIVE' : 'READY'}</span>
@@ -981,7 +981,7 @@ export default function SwapPage() {
               </div>
 
               <div className="p-6 bg-black/40 border border-primary/20 rounded-md mb-6" data-testid="box-zk-snark-circuit">
-                <h3 className="text-xs font-bold mb-4 uppercase tracking-wider text-center bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent animate-pulse">
+                <h3 className="text-xs font-bold mb-4 uppercase tracking-wider text-center bg-gradient-to-r from-primary via-accent to-secondary bg-clip-text text-transparent animate-pulse">
                   ZK-SNARK Circuit {isPrivacyActive ? 'Active' : 'Standby'}
                 </h3>
                 <div className="space-y-3" data-testid="list-zk-snark-steps">
@@ -993,12 +993,12 @@ export default function SwapPage() {
                   ].map((step, idx) => (
                     <div key={idx} className="flex items-center gap-3">
                       <div 
-                        className="w-2 h-2 bg-gradient-to-r from-cyan-400 to-pink-400 rounded-full animate-pulse shadow-[0_0_8px_rgba(34,211,238,0.6)]"
+                        className="w-2 h-2 bg-gradient-to-r from-primary to-secondary rounded-full animate-pulse shadow-[0_0_8px_rgba(34,211,238,0.6)]"
                         style={{ animationDelay: step.delay }}
                       />
-                      <div className="flex-1 h-1 bg-gradient-to-r from-cyan-500/20 to-pink-500/20 rounded-full overflow-hidden">
+                      <div className="flex-1 h-1 bg-gradient-to-r from-primary/20 to-secondary/20 rounded-full overflow-hidden">
                         <div 
-                          className="h-full bg-gradient-to-r from-cyan-500 to-pink-500 animate-pulse shadow-[0_0_4px_rgba(34,211,238,0.4)]"
+                          className="h-full bg-gradient-to-r from-primary to-secondary animate-pulse shadow-[0_0_4px_rgba(34,211,238,0.4)]"
                           style={{ animationDelay: step.delay }}
                         />
                       </div>
@@ -1008,7 +1008,7 @@ export default function SwapPage() {
                 </div>
               </div>
 
-              <div className="p-4 bg-gradient-to-br from-primary/10 via-purple-500/10 to-pink-500/10 border-2 border-primary/30 rounded-md text-center">
+              <div className="p-4 bg-gradient-to-br from-primary/10 via-accent/10 to-secondary/10 border-2 border-primary/30 rounded-md text-center">
                 <p className="text-sm font-bold text-foreground mb-1">
                   PRIVACY GUARANTEED
                 </p>

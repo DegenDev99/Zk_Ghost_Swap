@@ -16,28 +16,28 @@ const privacyStages = [
     icon: Shield,
     title: "Identity Shield",
     description: "Wallet addresses obfuscated",
-    color: "from-cyan-500 to-blue-500",
+    color: "from-primary to-accent",
   },
   {
     id: "mixer",
     icon: Shuffle,
     title: "Mixing Relay",
     description: "Transaction amounts obscured",
-    color: "from-purple-500 to-pink-500",
+    color: "from-secondary to-accent",
   },
   {
     id: "zk-proof",
     icon: Lock,
     title: "ZK Proof Forge",
     description: "Zero-knowledge verification",
-    color: "from-pink-500 to-red-500",
+    color: "from-accent to-secondary",
   },
   {
     id: "quantum",
     icon: Zap,
     title: "Quantum Scrambler",
     description: "Network routing anonymized",
-    color: "from-cyan-500 to-purple-500",
+    color: "from-primary to-secondary",
   },
 ];
 
@@ -140,7 +140,7 @@ export function PrivacyVisualization({ isActive, privacyScore = 0, exchangeId, e
           </div>
           <div className="h-2 bg-secondary rounded-full overflow-hidden">
             <motion.div
-              className="h-full bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500"
+              className="h-full bg-gradient-to-r from-primary via-accent to-secondary"
               animate={{ width: `${animState.score}%` }}
               transition={{ duration: 0.8, ease: "easeOut" }}
             />
@@ -245,19 +245,19 @@ export function PrivacyVisualization({ isActive, privacyScore = 0, exchangeId, e
           <h4 className="text-sm font-semibold">Active Privacy Features:</h4>
           <div className="grid grid-cols-2 gap-2 text-xs">
             <div className="flex items-center gap-2">
-              <div className="w-1.5 h-1.5 rounded-full bg-cyan-500" />
+              <div className="w-1.5 h-1.5 rounded-full bg-primary" />
               <span className="text-muted-foreground">No KYC Required</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-1.5 h-1.5 rounded-full bg-purple-500" />
+              <div className="w-1.5 h-1.5 rounded-full bg-secondary" />
               <span className="text-muted-foreground">Address Mixing</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-1.5 h-1.5 rounded-full bg-pink-500" />
+              <div className="w-1.5 h-1.5 rounded-full bg-accent" />
               <span className="text-muted-foreground">ZK Proofs</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-1.5 h-1.5 rounded-full bg-cyan-500" />
+              <div className="w-1.5 h-1.5 rounded-full bg-primary" />
               <span className="text-muted-foreground">Tor Compatible</span>
             </div>
           </div>
@@ -321,7 +321,7 @@ export function PrivacyVisualization({ isActive, privacyScore = 0, exchangeId, e
                 </div>
               )}
 
-              <div className="mt-4 p-4 bg-gradient-to-br from-primary/10 via-purple-500/10 to-pink-500/10 border-2 border-primary/30 rounded-md text-center">
+              <div className="mt-4 p-4 bg-gradient-to-br from-primary/10 via-accent/10 to-secondary/10 border-2 border-primary/30 rounded-md text-center">
                 <p className="text-sm font-bold text-foreground mb-1">
                   PRIVACY GUARANTEED
                 </p>
