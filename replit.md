@@ -1,8 +1,8 @@
-# ZK Swap - Privacy-First Cryptocurrency Exchange
+# ZK NinjaSwap - Privacy-First Cryptocurrency Exchange
 
 ## Overview
 
-ZK Swap is a privacy-focused cryptocurrency exchange application that enables anonymous asset swapping without KYC requirements or user registration. The platform integrates with ChangeNOW API to facilitate cross-chain cryptocurrency exchanges while maintaining user privacy. Built with a cyberpunk/Matrix-inspired aesthetic, the application provides a streamlined interface for creating and tracking exchanges with real-time status updates and countdown timers.
+ZK NinjaSwap is a privacy-focused cryptocurrency exchange application that enables anonymous asset swapping without KYC requirements or user registration. The platform integrates with ChangeNOW API to facilitate cross-chain cryptocurrency exchanges while maintaining user privacy. Built with a cyberpunk/Matrix-inspired aesthetic, the application provides a streamlined interface for creating and tracking exchanges with real-time status updates and countdown timers.
 
 ## User Preferences
 
