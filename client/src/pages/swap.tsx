@@ -32,6 +32,7 @@ export default function SwapPage() {
   const [fromOpen, setFromOpen] = useState(false);
   const [toOpen, setToOpen] = useState(false);
   const sessionId = getOrCreateSessionId();
+  const autoClosedOrdersRef = useRef<Set<string>>(new Set());
 
   // Centralized function to clear active exchange
   const clearActiveExchange = async () => {
@@ -104,14 +105,67 @@ export default function SwapPage() {
       const res = await fetch(`/api/swap/active-order?sessionId=${sessionId}`);
       if (!res.ok) return null;
       const data = await res.json();
-      if (data) {
-        setManuallyDismissed(false);
-        setActiveExchange(data);
-      }
-      return data;
+      return data || null;
     },
     enabled: !!sessionId,
   });
+
+  // Auto-close expired orders when they're fetched
+  useEffect(() => {
+    const fetchedOrder = activeOrderQuery.data;
+    
+    // Don't process if no data (could be loading, error, or cache cleared)
+    if (!fetchedOrder || !fetchedOrder.id) return;
+
+    // Check if already auto-closed to prevent duplicates
+    // This ref persists across renders to prevent processing the same order multiple times
+    if (autoClosedOrdersRef.current.has(fetchedOrder.id)) return;
+
+    // Check if the order is expired (only if expiresAt exists)
+    const now = Date.now();
+    const expiresAtMs = typeof fetchedOrder.expiresAt === 'number' 
+      ? fetchedOrder.expiresAt 
+      : (typeof fetchedOrder.expiresAt === 'string' ? Date.parse(fetchedOrder.expiresAt) : null);
+
+    // Order is expired ONLY if expiresAt is valid and in the past
+    const isExpired = expiresAtMs !== null && !isNaN(expiresAtMs) && now > expiresAtMs;
+
+    if (isExpired) {
+      // Mark as auto-closed to prevent duplicate calls
+      // Keep this in ref permanently to prevent reprocessing even if query refetches
+      autoClosedOrdersRef.current.add(fetchedOrder.id);
+      
+      // IMMEDIATELY clear from cache and state before async call
+      queryClient.setQueryData(["/api/swap/active-order", sessionId], null);
+      setActiveExchange(null);
+      
+      // Auto-close the expired order in background
+      (async () => {
+        try {
+          await apiRequest("POST", `/api/swap/auto-close/${fetchedOrder.id}`, {});
+        } catch (error) {
+          console.error("Failed to auto-close expired order:", error);
+          // On failure, allow retry by removing from ref
+          autoClosedOrdersRef.current.delete(fetchedOrder.id);
+          toast({
+            title: "Cleanup Failed",
+            description: "Failed to archive expired order. Please refresh the page.",
+            variant: "destructive",
+          });
+        }
+      })();
+    } else {
+      // Order is NOT expired (or has no expiry), set it as active
+      // This ensures UI always updates for legitimate active orders
+      setManuallyDismissed(false);
+      setActiveExchange(fetchedOrder);
+    }
+  }, [activeOrderQuery.data, sessionId]);
+
+  // Clear auto-closed ref when session changes to allow fresh start
+  useEffect(() => {
+    autoClosedOrdersRef.current.clear();
+  }, [sessionId]);
 
   // Refetch when activeExchange is cleared (but not if manually dismissed)
   // Use a ref to track previous activeExchange to avoid refetch loops
