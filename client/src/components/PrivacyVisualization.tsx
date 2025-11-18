@@ -76,6 +76,7 @@ function getAnimationState(status?: string, lastKnownState?: { score: number; ac
 export function PrivacyVisualization({ isActive, privacyScore = 0, exchangeId, exchangeStatus }: PrivacyVisualizationProps) {
   const [particles, setParticles] = useState<number[]>([]);
   const [lastKnownState, setLastKnownState] = useState<{ score: number; activeStages: number } | undefined>();
+  const [scrambledHash, setScrambledHash] = useState<string>('');
   
   const rawAnimState = useMemo(() => getAnimationState(exchangeStatus, lastKnownState), [exchangeStatus, lastKnownState]);
   
@@ -87,6 +88,22 @@ export function PrivacyVisualization({ isActive, privacyScore = 0, exchangeId, e
   
   const animState = isActive ? rawAnimState : { score: 0, activeStages: 0, animating: false, isComplete: false };
   const currentAnimatingStage = animState.animating ? animState.activeStages - 1 : -1;
+
+  useEffect(() => {
+    if (exchangeStatus === 'finished' || !exchangeId) {
+      return;
+    }
+
+    const scrambleInterval = setInterval(() => {
+      const chars = '0123456789abcdef';
+      const scrambled = Array.from({ length: 32 }, () => 
+        chars[Math.floor(Math.random() * chars.length)]
+      ).join('');
+      setScrambledHash(scrambled);
+    }, 100);
+
+    return () => clearInterval(scrambleInterval);
+  }, [exchangeStatus, exchangeId]);
 
   useEffect(() => {
     if (!animState.animating) {
@@ -259,7 +276,7 @@ export function PrivacyVisualization({ isActive, privacyScore = 0, exchangeId, e
             <div className="pt-4 border-t mt-6">
               <div className="text-center mb-2">
                 <p className="text-[10px] text-muted-foreground uppercase tracking-wider">
-                  Proof Hash
+                  {exchangeStatus === 'finished' ? 'ZK Proof Hash' : 'Generating Proof Hash'}
                 </p>
               </div>
               <div className={`p-3 rounded-md border ${
@@ -267,14 +284,29 @@ export function PrivacyVisualization({ isActive, privacyScore = 0, exchangeId, e
                   ? 'bg-green-500/10 border-green-500/30' 
                   : 'bg-black/40 border-primary/20'
               }`} data-testid="box-proof-hash">
-                <p className={`font-mono text-xs break-all text-center ${
-                  exchangeStatus === 'finished'
-                    ? 'text-green-400'
-                    : 'text-primary/60 animate-pulse'
-                }`} data-testid="text-proof-hash">
-                  zk_0x{exchangeId.replace(/-/g, '').slice(0, 32).padEnd(32, '0')}
-                </p>
+                {exchangeStatus === 'finished' ? (
+                  <p className="font-mono text-xs break-all text-center text-green-400" data-testid="text-proof-hash">
+                    zk_0x{exchangeId.replace(/-/g, '').slice(0, 32).padEnd(32, '0')}
+                  </p>
+                ) : (
+                  <p className="font-mono text-xs break-all text-center text-primary/40 blur-[2px] select-none" data-testid="text-proof-hash-scrambled">
+                    zk_0x{scrambledHash}
+                  </p>
+                )}
               </div>
+              {exchangeStatus !== 'finished' && (
+                <div className="mt-3 p-3 bg-primary/5 border border-primary/20 rounded-md">
+                  <div className="flex items-start gap-2">
+                    <Lock className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
+                    <div className="text-xs">
+                      <p className="font-bold text-primary mb-1">PROOF GENERATION IN PROGRESS</p>
+                      <p className="text-muted-foreground">
+                        Hash will be revealed when transaction is 100% complete.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
               {exchangeStatus === 'finished' && (
                 <div className="mt-3 p-3 bg-green-500/10 border border-green-500/30 rounded-md">
                   <div className="flex items-start gap-2">
@@ -282,7 +314,7 @@ export function PrivacyVisualization({ isActive, privacyScore = 0, exchangeId, e
                     <div className="text-xs">
                       <p className="font-bold text-green-500 mb-1">PROOF FINALIZED</p>
                       <p className="text-muted-foreground">
-                        Save this proof hash for your records.
+                        <strong>Important:</strong> Save this ZK proof hash for your records. This cryptographic proof verifies your transaction's privacy guarantees.
                       </p>
                     </div>
                   </div>
