@@ -565,140 +565,13 @@ export default function SwapPage() {
             </Button>
           </Card>
 
-          {/* Privacy Panel */}
-          <Card className="lg:w-[420px] p-6 sm:p-8 bg-card/60 backdrop-blur-sm border-primary/30 relative overflow-hidden">
-            <div className="absolute inset-0 opacity-10">
-              <div className="absolute top-0 left-0 w-64 h-64 bg-gradient-to-br from-cyan-500 to-transparent rounded-full blur-3xl animate-pulse" />
-              <div className="absolute bottom-0 right-0 w-64 h-64 bg-gradient-to-tl from-pink-500 to-transparent rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
-            </div>
-
-            <div className="relative z-10">
-              <div className="text-center mb-8">
-                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-primary to-secondary mb-4">
-                  <Shield className="w-8 h-8 text-primary-foreground" />
-                </div>
-                <h2 className="text-2xl font-bold bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent mb-2">
-                  ZERO-KNOWLEDGE PRIVACY
-                </h2>
-                <p className="text-xs text-muted-foreground uppercase tracking-wider">
-                  Active Protection
-                </p>
-              </div>
-
-              <div className="space-y-4 mb-8">
-                <div className="p-4 bg-gradient-to-r from-cyan-500/10 to-cyan-500/5 border border-cyan-500/30 rounded-md" data-testid="privacy-status-identity">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-semibold text-cyan-400 flex items-center gap-2">
-                      <Shield className="w-4 h-4" /> IDENTITY SHIELDED
-                    </span>
-                    <span className="px-2 py-0.5 bg-green-500/20 border border-green-500/50 rounded-full text-[10px] font-bold text-green-500" data-testid="badge-privacy-identity">ACTIVE</span>
-                  </div>
-                  <p className="text-xs text-muted-foreground">Your wallet identity is cryptographically protected</p>
-                </div>
-
-                <div className="p-4 bg-gradient-to-r from-purple-500/10 to-purple-500/5 border border-purple-500/30 rounded-md" data-testid="privacy-status-transaction">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-semibold text-purple-400 flex items-center gap-2">
-                      <Lock className="w-4 h-4" /> TRANSACTION OBFUSCATED
-                    </span>
-                    <span className="px-2 py-0.5 bg-green-500/20 border border-green-500/50 rounded-full text-[10px] font-bold text-green-500" data-testid="badge-privacy-transaction">ACTIVE</span>
-                  </div>
-                  <p className="text-xs text-muted-foreground">Transaction details are encrypted end-to-end</p>
-                </div>
-
-                <div className="p-4 bg-gradient-to-r from-pink-500/10 to-pink-500/5 border border-pink-500/30 rounded-md" data-testid="privacy-status-proof">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-semibold text-pink-400 flex items-center gap-2">
-                      <Zap className="w-4 h-4" /> PROOF VERIFIED
-                    </span>
-                    <span className="px-2 py-0.5 bg-green-500/20 border border-green-500/50 rounded-full text-[10px] font-bold text-green-500" data-testid="badge-privacy-proof">ACTIVE</span>
-                  </div>
-                  <p className="text-xs text-muted-foreground">Zero-knowledge proof validation complete</p>
-                </div>
-
-                <div className="p-4 bg-gradient-to-r from-orange-500/10 to-orange-500/5 border border-orange-500/30 rounded-md" data-testid="privacy-status-routing">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-semibold text-orange-400 flex items-center gap-2">
-                      <Globe className="w-4 h-4" /> ANONYMOUS ROUTING
-                    </span>
-                    <span className="px-2 py-0.5 bg-green-500/20 border border-green-500/50 rounded-full text-[10px] font-bold text-green-500" data-testid="badge-privacy-routing">ACTIVE</span>
-                  </div>
-                  <p className="text-xs text-muted-foreground">Exchange routed through privacy network</p>
-                </div>
-              </div>
-
-              <div className="p-6 bg-black/40 border border-primary/20 rounded-md mb-6" data-testid="box-zk-snark-circuit">
-                <h3 className="text-xs font-bold text-muted-foreground mb-4 uppercase tracking-wider text-center">
-                  ZK-SNARK Circuit Active
-                </h3>
-                <div className="space-y-3" data-testid="list-zk-snark-steps">
-                  {[
-                    { label: 'Witness Generation', delay: '0s' },
-                    { label: 'Constraint System', delay: '0.3s' },
-                    { label: 'Proof Compilation', delay: '0.6s' },
-                    { label: 'Verification Layer', delay: '0.9s' },
-                  ].map((step, idx) => (
-                    <div key={idx} className="flex items-center gap-3">
-                      <div 
-                        className="w-2 h-2 bg-gradient-to-r from-cyan-400 to-pink-400 rounded-full animate-pulse"
-                        style={{ animationDelay: step.delay }}
-                      />
-                      <div className="flex-1 h-1 bg-gradient-to-r from-cyan-500/20 to-pink-500/20 rounded-full overflow-hidden">
-                        <div 
-                          className="h-full bg-gradient-to-r from-cyan-500 to-pink-500 animate-pulse"
-                          style={{ animationDelay: step.delay }}
-                        />
-                      </div>
-                      <span className="text-xs text-muted-foreground font-mono">{step.label}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="p-4 bg-gradient-to-br from-primary/10 via-purple-500/10 to-pink-500/10 border-2 border-primary/30 rounded-md text-center">
-                <p className="text-sm font-bold text-foreground mb-1">
-                  PRIVACY GUARANTEED
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  Your swap is protected by military-grade zero-knowledge cryptography.
-                </p>
-              </div>
-
-              <div className="mt-6">
-                <div className="text-center mb-2">
-                  <p className="text-[10px] text-muted-foreground uppercase tracking-wider">
-                    Proof Hash
-                  </p>
-                </div>
-                <div className={`p-3 rounded-md border ${
-                  activeExchange.status === 'finished' 
-                    ? 'bg-green-500/10 border-green-500/30' 
-                    : 'bg-black/40 border-primary/20'
-                }`} data-testid="box-proof-hash">
-                  <p className={`font-mono text-xs break-all text-center ${
-                    activeExchange.status === 'finished'
-                      ? 'text-green-400'
-                      : 'text-primary/60 animate-pulse'
-                  }`} data-testid="text-proof-hash">
-                    zk_0x{activeExchange.id.replace(/-/g, '').slice(0, 32).padEnd(32, '0')}
-                  </p>
-                </div>
-                {activeExchange.status === 'finished' && (
-                  <div className="mt-3 p-3 bg-green-500/10 border border-green-500/30 rounded-md">
-                    <div className="flex items-start gap-2">
-                      <Check className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-                      <div className="text-xs">
-                        <p className="font-bold text-green-500 mb-1">PROOF FINALIZED</p>
-                        <p className="text-muted-foreground">
-                          Save this proof hash for your records.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          </Card>
+          {/* Privacy Visualization - ZK Privacy Tunnel */}
+          <div className="lg:w-[420px] lg:sticky lg:top-8">
+            <PrivacyVisualization 
+              isActive={true}
+              privacyScore={activeExchange.status === 'finished' ? 5 : 3}
+            />
+          </div>
         </div>
       </div>
     );
@@ -980,13 +853,106 @@ export default function SwapPage() {
         </div>
       </Card>
 
-          {/* Privacy Visualization - Right Side */}
-          <div className="lg:sticky lg:top-8">
-            <PrivacyVisualization 
-              isActive={isPrivacyActive}
-              privacyScore={estimation ? 5 : 0}
-            />
-          </div>
+          {/* Privacy Panel - Zero-Knowledge Privacy */}
+          <Card className="lg:sticky lg:top-8 p-6 sm:p-8 bg-card/60 backdrop-blur-sm border-primary/30 relative overflow-hidden">
+            <div className="absolute inset-0 opacity-10">
+              <div className="absolute top-0 left-0 w-64 h-64 bg-gradient-to-br from-cyan-500 to-transparent rounded-full blur-3xl animate-pulse" />
+              <div className="absolute bottom-0 right-0 w-64 h-64 bg-gradient-to-tl from-pink-500 to-transparent rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+            </div>
+
+            <div className="relative z-10">
+              <div className="text-center mb-8">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-primary to-secondary mb-4">
+                  <Shield className="w-8 h-8 text-primary-foreground" />
+                </div>
+                <h2 className="text-2xl font-bold bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent mb-2">
+                  ZERO-KNOWLEDGE PRIVACY
+                </h2>
+                <p className="text-xs text-muted-foreground uppercase tracking-wider">
+                  {isPrivacyActive ? 'Active Protection' : 'Ready to Activate'}
+                </p>
+              </div>
+
+              <div className="space-y-4 mb-8">
+                <div className="p-4 bg-gradient-to-r from-cyan-500/10 to-cyan-500/5 border border-cyan-500/30 rounded-md" data-testid="privacy-status-identity">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-semibold text-cyan-400 flex items-center gap-2">
+                      <Shield className="w-4 h-4" /> IDENTITY SHIELDED
+                    </span>
+                    <span className={`px-2 py-0.5 ${isPrivacyActive ? 'bg-green-500/20 border-green-500/50 text-green-500' : 'bg-muted/20 border-muted/50 text-muted-foreground'} border rounded-full text-[10px] font-bold`} data-testid="badge-privacy-identity">{isPrivacyActive ? 'ACTIVE' : 'READY'}</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground">Your wallet identity is cryptographically protected</p>
+                </div>
+
+                <div className="p-4 bg-gradient-to-r from-purple-500/10 to-purple-500/5 border border-purple-500/30 rounded-md" data-testid="privacy-status-transaction">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-semibold text-purple-400 flex items-center gap-2">
+                      <Lock className="w-4 h-4" /> TRANSACTION OBFUSCATED
+                    </span>
+                    <span className={`px-2 py-0.5 ${isPrivacyActive ? 'bg-green-500/20 border-green-500/50 text-green-500' : 'bg-muted/20 border-muted/50 text-muted-foreground'} border rounded-full text-[10px] font-bold`} data-testid="badge-privacy-transaction">{isPrivacyActive ? 'ACTIVE' : 'READY'}</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground">Transaction details are encrypted end-to-end</p>
+                </div>
+
+                <div className="p-4 bg-gradient-to-r from-pink-500/10 to-pink-500/5 border border-pink-500/30 rounded-md" data-testid="privacy-status-proof">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-semibold text-pink-400 flex items-center gap-2">
+                      <Zap className="w-4 h-4" /> PROOF VERIFIED
+                    </span>
+                    <span className={`px-2 py-0.5 ${isPrivacyActive ? 'bg-green-500/20 border-green-500/50 text-green-500' : 'bg-muted/20 border-muted/50 text-muted-foreground'} border rounded-full text-[10px] font-bold`} data-testid="badge-privacy-proof">{isPrivacyActive ? 'ACTIVE' : 'READY'}</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground">Zero-knowledge proof validation complete</p>
+                </div>
+
+                <div className="p-4 bg-gradient-to-r from-orange-500/10 to-orange-500/5 border border-orange-500/30 rounded-md" data-testid="privacy-status-routing">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-semibold text-orange-400 flex items-center gap-2">
+                      <Globe className="w-4 h-4" /> ANONYMOUS ROUTING
+                    </span>
+                    <span className={`px-2 py-0.5 ${isPrivacyActive ? 'bg-green-500/20 border-green-500/50 text-green-500' : 'bg-muted/20 border-muted/50 text-muted-foreground'} border rounded-full text-[10px] font-bold`} data-testid="badge-privacy-routing">{isPrivacyActive ? 'ACTIVE' : 'READY'}</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground">Exchange routed through privacy network</p>
+                </div>
+              </div>
+
+              <div className="p-6 bg-black/40 border border-primary/20 rounded-md mb-6" data-testid="box-zk-snark-circuit">
+                <h3 className="text-xs font-bold text-muted-foreground mb-4 uppercase tracking-wider text-center">
+                  ZK-SNARK Circuit {isPrivacyActive ? 'Active' : 'Standby'}
+                </h3>
+                <div className="space-y-3" data-testid="list-zk-snark-steps">
+                  {[
+                    { label: 'Witness Generation', delay: '0s' },
+                    { label: 'Constraint System', delay: '0.3s' },
+                    { label: 'Proof Compilation', delay: '0.6s' },
+                    { label: 'Verification Layer', delay: '0.9s' },
+                  ].map((step, idx) => (
+                    <div key={idx} className="flex items-center gap-3">
+                      <div 
+                        className={`w-2 h-2 bg-gradient-to-r from-cyan-400 to-pink-400 rounded-full ${isPrivacyActive ? 'animate-pulse' : 'opacity-30'}`}
+                        style={{ animationDelay: step.delay }}
+                      />
+                      <div className="flex-1 h-1 bg-gradient-to-r from-cyan-500/20 to-pink-500/20 rounded-full overflow-hidden">
+                        <div 
+                          className={`h-full bg-gradient-to-r from-cyan-500 to-pink-500 ${isPrivacyActive ? 'animate-pulse' : 'opacity-0'}`}
+                          style={{ animationDelay: step.delay }}
+                        />
+                      </div>
+                      <span className={`text-xs font-mono ${isPrivacyActive ? 'text-muted-foreground' : 'text-muted-foreground/50'}`}>{step.label}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="p-4 bg-gradient-to-br from-primary/10 via-purple-500/10 to-pink-500/10 border-2 border-primary/30 rounded-md text-center">
+                <p className="text-sm font-bold text-foreground mb-1">
+                  PRIVACY GUARANTEED
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Your swap is protected by military-grade zero-knowledge cryptography.
+                </p>
+              </div>
+            </div>
+          </Card>
         </div>
       </div>
     </div>
