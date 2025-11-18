@@ -435,7 +435,7 @@ export default function SwapPage() {
 
             <div className="text-center mb-8">
               <h1 className="text-3xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 mb-2">
-                ZK NINJASWAP EXCHANGE
+                ZK GHOST SWAP EXCHANGE
               </h1>
               <p className="text-sm text-muted-foreground uppercase tracking-wider">
                 Privacy-First Asset Swapping
@@ -666,7 +666,7 @@ export default function SwapPage() {
         {/* Header */}
         <div className="text-center mb-6">
           <h1 className="text-4xl sm:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 mb-2">
-            ZK NINJASWAP
+            ZK GHOST SWAP
           </h1>
           <p className="text-sm text-muted-foreground uppercase tracking-wider">
             Privacy-First Asset Swapping

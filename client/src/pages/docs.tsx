@@ -15,7 +15,7 @@ export default function DocsPage() {
             </h1>
           </div>
           <p className="text-muted-foreground text-lg">
-            ZK NinjaSwap: Privacy-First Cross-Chain Asset Exchange
+            Zk Ghost Swap: Privacy-First Cross-Chain Asset Exchange
           </p>
           <p className="text-sm text-muted-foreground/70">
             Version 1.0 • Powered by ZK Enigma Link Network
@@ -73,10 +73,10 @@ export default function DocsPage() {
                   Abstract
                 </h2>
                 <p className="text-muted-foreground leading-relaxed">
-                  ZK NinjaSwap is a privacy-preserving cryptocurrency exchange protocol that enables truly anonymous cross-chain asset swaps without requiring Know-Your-Customer (KYC) procedures, user registration, or persistent identity tracking. By leveraging zero-knowledge cryptographic principles and ephemeral session architecture, ZK NinjaSwap provides financial sovereignty to users who value privacy as a fundamental right.
+                  Zk Ghost Swap is a privacy-preserving cryptocurrency exchange protocol that enables truly anonymous cross-chain asset swaps without requiring Know-Your-Customer (KYC) procedures, user registration, or persistent identity tracking. By leveraging zero-knowledge cryptographic principles and ephemeral session architecture, Zk Ghost Swap provides financial sovereignty to users who value privacy as a fundamental right.
                 </p>
                 <p className="text-muted-foreground leading-relaxed mt-4">
-                  In an era of increasing financial surveillance, ZK NinjaSwap stands as a bulwark against the erosion of transactional privacy, offering a decentralized alternative that doesn't compromise security for convenience.
+                  In an era of increasing financial surveillance, Zk Ghost Swap stands as a bulwark against the erosion of transactional privacy, offering a decentralized alternative that doesn't compromise security for convenience.
                 </p>
               </section>
 
@@ -89,7 +89,7 @@ export default function DocsPage() {
                   </p>
                 </div>
                 <p className="text-muted-foreground leading-relaxed mt-4">
-                  ZK NinjaSwap was built on the core belief that individuals should have the ability to transact freely without surveillance, data collection, or identity disclosure. We provide a trustless, anonymous gateway for cross-chain asset exchanges that respects user sovereignty.
+                  Zk Ghost Swap was built on the core belief that individuals should have the ability to transact freely without surveillance, data collection, or identity disclosure. We provide a trustless, anonymous gateway for cross-chain asset exchanges that respects user sovereignty.
                 </p>
               </section>
 
@@ -130,7 +130,7 @@ export default function DocsPage() {
               <section data-testid="section-solution">
                 <h2 className="text-2xl font-bold text-foreground mb-4">Our Solution</h2>
                 <p className="text-muted-foreground leading-relaxed mb-4">
-                  ZK NinjaSwap eliminates all identity requirements through:
+                  Zk Ghost Swap eliminates all identity requirements through:
                 </p>
                 <ul className="space-y-2 text-muted-foreground">
                   <li className="flex items-start gap-2">
@@ -292,10 +292,10 @@ export default function DocsPage() {
               <section data-testid="section-conclusion">
                 <h2 className="text-2xl font-bold text-foreground mb-4">Conclusion</h2>
                 <p className="text-muted-foreground leading-relaxed mb-4">
-                  ZK NinjaSwap represents a paradigm shift in cryptocurrency exchange philosophy. Where others have embraced surveillance capitalism and regulatory compliance, we've chosen a different path: <strong className="text-foreground">radical financial privacy as a default, not an option.</strong>
+                  Zk Ghost Swap represents a paradigm shift in cryptocurrency exchange philosophy. Where others have embraced surveillance capitalism and regulatory compliance, we've chosen a different path: <strong className="text-foreground">radical financial privacy as a default, not an option.</strong>
                 </p>
                 <p className="text-muted-foreground leading-relaxed mb-4">
-                  In a world where financial transactions are increasingly monitored, tracked, and weaponized, ZK NinjaSwap stands as a testament to the original vision of cryptocurrency—permissionless, censorship-resistant, and private value transfer.
+                  In a world where financial transactions are increasingly monitored, tracked, and weaponized, Zk Ghost Swap stands as a testament to the original vision of cryptocurrency—permissionless, censorship-resistant, and private value transfer.
                 </p>
                 <div className="border-l-4 border-cyan-500 pl-4 py-2 bg-cyan-500/5 rounded-r mt-6">
                   <p className="text-foreground font-semibold">
@@ -306,7 +306,7 @@ export default function DocsPage() {
                   </p>
                 </div>
                 <p className="text-foreground font-bold text-lg mt-6 text-center">
-                  Welcome to ZK NinjaSwap. Swap freely. Stay invisible.
+                  Welcome to Zk Ghost Swap. Swap freely. Stay invisible.
                 </p>
               </section>
 

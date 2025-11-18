@@ -1,4 +1,4 @@
-# ZK NinjaSwap: Privacy-First Cross-Chain Asset Exchange
+# Zk Ghost Swap: Privacy-First Cross-Chain Asset Exchange
 
 **Version 1.0**  
 **Powered by ZK Enigma Link Network**
@@ -7,9 +7,9 @@
 
 ## Abstract
 
-ZK NinjaSwap is a privacy-preserving cryptocurrency exchange protocol that enables truly anonymous cross-chain asset swaps without requiring Know-Your-Customer (KYC) procedures, user registration, or persistent identity tracking. By leveraging zero-knowledge cryptographic principles and ephemeral session architecture, ZK NinjaSwap provides financial sovereignty to users who value privacy as a fundamental right.
+Zk Ghost Swap is a privacy-preserving cryptocurrency exchange protocol that enables truly anonymous cross-chain asset swaps without requiring Know-Your-Customer (KYC) procedures, user registration, or persistent identity tracking. By leveraging zero-knowledge cryptographic principles and ephemeral session architecture, Zk Ghost Swap provides financial sovereignty to users who value privacy as a fundamental right.
 
-In an era of increasing financial surveillance, ZK NinjaSwap stands as a bulwark against the erosion of transactional privacy, offering a decentralized alternative that doesn't compromise security for convenience.
+In an era of increasing financial surveillance, Zk Ghost Swap stands as a bulwark against the erosion of transactional privacy, offering a decentralized alternative that doesn't compromise security for convenience.
 
 ---
 
@@ -35,7 +35,7 @@ In an era of increasing financial surveillance, ZK NinjaSwap stands as a bulwark
 
 **"Privacy is not a privilege. It's a fundamental human right."**
 
-ZK NinjaSwap was built on the core belief that individuals should have the ability to transact freely without surveillance, data collection, or identity disclosure. We provide a trustless, anonymous gateway for cross-chain asset exchanges that respects user sovereignty.
+Zk Ghost Swap was built on the core belief that individuals should have the ability to transact freely without surveillance, data collection, or identity disclosure. We provide a trustless, anonymous gateway for cross-chain asset exchanges that respects user sovereignty.
 
 ### The Problem
 
@@ -50,7 +50,7 @@ Traditional cryptocurrency exchanges require:
 
 ### Our Solution
 
-ZK NinjaSwap eliminates all identity requirements through:
+Zk Ghost Swap eliminates all identity requirements through:
 - ✅ **Zero KYC/AML** – No identity verification ever required
 - ✅ **No Account Creation** – Ephemeral sessions only
 - ✅ **No Email/Password** – Complete anonymity by default
@@ -107,7 +107,7 @@ The right to privacy in financial transactions is critical for:
 
 ### Core Principles
 
-ZK NinjaSwap implements privacy-preserving protocols inspired by zero-knowledge proof systems. While not implementing full ZK-SNARK circuits for every transaction, our architecture embodies the **zero-knowledge philosophy**:
+Zk Ghost Swap implements privacy-preserving protocols inspired by zero-knowledge proof systems. While not implementing full ZK-SNARK circuits for every transaction, our architecture embodies the **zero-knowledge philosophy**:
 
 **"Prove what's necessary, reveal nothing more."**
 
@@ -143,7 +143,7 @@ ZK NinjaSwap implements privacy-preserving protocols inspired by zero-knowledge 
 
 ### ZK-SNARK Circuit Visualization
 
-The ZK NinjaSwap interface features an **always-active ZK-SNARK circuit visualization** that represents the cryptographic foundation of privacy-preserving computation:
+The Zk Ghost Swap interface features an **always-active ZK-SNARK circuit visualization** that represents the cryptographic foundation of privacy-preserving computation:
 
 - **Continuous Animation**: Demonstrates ongoing privacy protection
 - **Circuit Topology**: Symbolizes zero-knowledge proof verification  
@@ -213,7 +213,7 @@ Cross-chain exchanges route through decentralized liquidity providers, ensuring 
 
 1. **Blockchain Analytics Firms** (Chainalysis, Elliptic)
    - Cannot link your swap transactions across chains
-   - Cannot build a transaction graph from ZK NinjaSwap activity
+   - Cannot build a transaction graph from Zk Ghost Swap activity
    - Cannot correlate on-chain activity with off-chain identity
 
 2. **Government Surveillance**
@@ -249,7 +249,7 @@ Cross-chain exchanges route through decentralized liquidity providers, ensuring 
 
 **Minimized Trust:**
 
-ZK NinjaSwap operates with minimal trust requirements:
+Zk Ghost Swap operates with minimal trust requirements:
 
 ✅ **Trustless Exchange Execution**
 - Exchanges are executed through decentralized protocols
@@ -291,7 +291,7 @@ ZK NinjaSwap operates with minimal trust requirements:
                  │ TLS 1.3 Encrypted
                  │
 ┌────────────────▼────────────────────────────────────────┐
-│              ZK NinjaSwap Frontend                       │
+│              Zk Ghost Swap Frontend                       │
 │         • No Tracking Scripts                            │
 │         • No Analytics                                   │
 │         • Client-Side Session Only                       │
@@ -300,7 +300,7 @@ ZK NinjaSwap operates with minimal trust requirements:
                  │ API Requests (No Identity Headers)
                  │
 ┌────────────────▼────────────────────────────────────────┐
-│           ZK NinjaSwap Backend (Stateless)               │
+│           Zk Ghost Swap Backend (Stateless)               │
 │         • No User Database                               │
 │         • No IP Logging                                  │
 │         • Ephemeral Exchange Records                     │
@@ -325,7 +325,7 @@ ZK NinjaSwap operates with minimal trust requirements:
 User → Email Signup → KYC Verification → Account Dashboard → Trading
 ```
 
-**ZK NinjaSwap:**
+**Zk Ghost Swap:**
 ```
 User → Create Exchange → Complete Swap → Exit (No Trace)
 ```
@@ -458,7 +458,7 @@ The proof hash serves as a cryptographic receipt without revealing user identity
 **Email-Free, Password-Free, KYC-Free**
 
 Start swapping in seconds:
-1. Visit ZK NinjaSwap
+1. Visit Zk Ghost Swap
 2. Select currencies
 3. Enter destination address
 4. Send funds
@@ -526,7 +526,7 @@ For anonymous users who want to track exchanges across sessions:
 Step 1: Complete exchange and receive Order ID
 Step 2: Manually save Order ID (e.g., password manager, encrypted note)
 Step 3: Close browser (session ends, no trace)
-Step 4: Return to ZK NinjaSwap later
+Step 4: Return to Zk Ghost Swap later
 Step 5: Manually enter Order ID to check status
 ```
 
@@ -546,7 +546,7 @@ Step 5: Manually enter Order ID to check status
 - Analytics firms build complete investment profiles
 - Competitors or malicious actors can track your strategy
 
-**ZK NinjaSwap Solution:**
+**Zk Ghost Swap Solution:**
 - Swap between assets without identity linkage
 - Each exchange is a fresh, anonymous transaction
 - No aggregated portfolio view exists anywhere
@@ -562,7 +562,7 @@ Step 5: Manually enter Order ID to check status
 - Delayed processing (3-7 business days)
 - Both sender and recipient identities collected
 
-**ZK NinjaSwap Solution:**
+**Zk Ghost Swap Solution:**
 - Instant cross-chain transfers (minutes, not days)
 - Minimal fees (< 1%)
 - No identification requirements
@@ -578,7 +578,7 @@ Step 5: Manually enter Order ID to check status
 - Public blockchain analysis reveals donor identities
 - Donors face retaliation or persecution
 
-**ZK NinjaSwap Solution:**
+**Zk Ghost Swap Solution:**
 - Permissionless transactions (no approval needed)
 - No account freezing possible (non-custodial)
 - Cross-chain swaps obscure donation trails
@@ -594,7 +594,7 @@ Step 5: Manually enter Order ID to check status
 - Pricing negotiations undermined by transparency
 - Strategic business relationships exposed
 
-**ZK NinjaSwap Solution:**
+**Zk Ghost Swap Solution:**
 - Unlinkable payment transactions
 - No centralized account linking purchases
 - Supplier relationships remain confidential
@@ -610,7 +610,7 @@ Step 5: Manually enter Order ID to check status
 - Physical security compromised by financial visibility
 - Risk of kidnapping, extortion, or theft
 
-**ZK NinjaSwap Solution:**
+**Zk Ghost Swap Solution:**
 - No public portfolio or transaction history
 - No correlation between exchanges and identity
 - Reduced attack surface for targeted threats
@@ -622,7 +622,7 @@ Step 5: Manually enter Order ID to check status
 
 ### Feature Matrix
 
-| Feature | Traditional CEX | DEX | ZK NinjaSwap |
+| Feature | Traditional CEX | DEX | Zk Ghost Swap |
 |---------|----------------|-----|--------------|
 | **KYC Required** | ✅ Required | ❌ Not Required | ❌ Never |
 | **Email/Account** | ✅ Required | ❌ Not Required | ❌ Never |
@@ -651,7 +651,7 @@ Step 5: Manually enter Order ID to check status
 - Limited to single blockchain (no cross-chain)
 - Front-running and MEV extraction risks
 
-**ZK NinjaSwap:**
+**Zk Ghost Swap:**
 - Zero identity requirements
 - Ephemeral session model (no persistent identity)
 - Cross-chain swaps obscure transaction graphs
@@ -726,9 +726,9 @@ BTC → XMR → ZEC → ETH
 
 ## Frequently Asked Questions
 
-### Is ZK NinjaSwap legal?
+### Is Zk Ghost Swap legal?
 
-**Yes.** Privacy is not a crime. ZK NinjaSwap operates as a non-custodial software tool, similar to how Tor Browser or Signal messenger are legal privacy-enhancing technologies. We do not facilitate illegal activities—we simply provide privacy-preserving infrastructure.
+**Yes.** Privacy is not a crime. Zk Ghost Swap operates as a non-custodial software tool, similar to how Tor Browser or Signal messenger are legal privacy-enhancing technologies. We do not facilitate illegal activities—we simply provide privacy-preserving infrastructure.
 
 **Legal Note:** Users are responsible for complying with their local regulations. We do not provide legal advice.
 
@@ -736,9 +736,9 @@ BTC → XMR → ZEC → ETH
 
 **Mixers/Tumblers:** Pool user funds together, then redistribute to break transaction trails. This involves custodial control and trusted third parties.
 
-**ZK NinjaSwap:** Non-custodial cross-chain exchange. We never hold your funds. Privacy comes from unlinkability between chains, not from mixing pools.
+**Zk Ghost Swap:** Non-custodial cross-chain exchange. We never hold your funds. Privacy comes from unlinkability between chains, not from mixing pools.
 
-### Can ZK NinjaSwap freeze my transaction?
+### Can Zk Ghost Swap freeze my transaction?
 
 **No.** We have zero ability to freeze, reverse, or block transactions. Once you send funds to the payin address, the decentralized exchange protocol executes automatically. We are merely a routing interface—we don't control the assets.
 
@@ -775,15 +775,15 @@ BTC → XMR → ZEC → ETH
 
 ## Conclusion
 
-ZK NinjaSwap represents a paradigm shift in cryptocurrency exchange philosophy. Where others have embraced surveillance capitalism and regulatory compliance, we've chosen a different path: **radical financial privacy as a default, not an option.**
+Zk Ghost Swap represents a paradigm shift in cryptocurrency exchange philosophy. Where others have embraced surveillance capitalism and regulatory compliance, we've chosen a different path: **radical financial privacy as a default, not an option.**
 
-In a world where financial transactions are increasingly monitored, tracked, and weaponized, ZK NinjaSwap stands as a testament to the original vision of cryptocurrency—permissionless, censorship-resistant, and private value transfer.
+In a world where financial transactions are increasingly monitored, tracked, and weaponized, Zk Ghost Swap stands as a testament to the original vision of cryptocurrency—permissionless, censorship-resistant, and private value transfer.
 
 **Privacy is not about having something to hide. It's about having something to protect.**
 
 Your financial freedom. Your personal safety. Your right to transact without permission.
 
-**Welcome to ZK NinjaSwap. Swap freely. Stay invisible.**
+**Welcome to Zk Ghost Swap. Swap freely. Stay invisible.**
 
 ---
 
@@ -797,18 +797,18 @@ Your financial freedom. Your personal safety. Your right to transact without per
 ### Security
 - Bug Bounty Program: `[Coming Soon]`
 - Security Audits: `[Planned Q2 2025]`
-- Responsible Disclosure: `security@zkninjaswap.org` (Coming Soon)
+- Responsible Disclosure: `security@zkghostswap.org` (Coming Soon)
 
 ### Community
 - Forum: `[Coming Soon]`
 - Discord: `[Coming Soon]`
-- Twitter: `@ZKNinjaSwap` (Coming Soon)
+- Twitter: `@ZkGhostSwap` (Coming Soon)
 
 ---
 
-**Disclaimer:** ZK NinjaSwap is experimental software provided "as is" without warranty. Users assume all risks. This document is for informational purposes only and does not constitute financial, legal, or investment advice. Cryptocurrency trading involves substantial risk. Consult professionals before making financial decisions.
+**Disclaimer:** Zk Ghost Swap is experimental software provided "as is" without warranty. Users assume all risks. This document is for informational purposes only and does not constitute financial, legal, or investment advice. Cryptocurrency trading involves substantial risk. Consult professionals before making financial decisions.
 
-**Privacy Notice:** By using ZK NinjaSwap, you acknowledge that while we implement extensive privacy protections, absolute anonymity cannot be guaranteed. Blockchain transactions are permanently recorded on public ledgers. Use privacy-enhancing tools (Tor, VPNs, privacy coins) in combination with ZK NinjaSwap for maximum protection.
+**Privacy Notice:** By using Zk Ghost Swap, you acknowledge that while we implement extensive privacy protections, absolute anonymity cannot be guaranteed. Blockchain transactions are permanently recorded on public ledgers. Use privacy-enhancing tools (Tor, VPNs, privacy coins) in combination with Zk Ghost Swap for maximum protection.
 
 ---
 

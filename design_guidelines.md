@@ -1,4 +1,4 @@
-# ZK NinjaSwap Design Guidelines
+# Zk Ghost Swap Design Guidelines
 
 ## Design Approach
 **Cyberpunk Matrix Aesthetic** - Drawing inspiration from crypto-native platforms like Uniswap, dYdX, and privacy tools like Tornado Cash, combined with Matrix/cyberpunk visual language. This creates a technical, anonymous, hacker-aesthetic that reinforces privacy and trustlessness.
@@ -8,7 +8,7 @@
 ### Font Families
 - **Primary**: Inter or Space Grotesk (clean, technical sans-serif)
 - **Monospace**: JetBrains Mono or Fira Code (for addresses, amounts, timers, order IDs)
-- **Display**: Orbitron or Rajdhana (cyberpunk accent for "ZK NINJASWAP" branding)
+- **Display**: Orbitron or Rajdhana (cyberpunk accent for "ZK GHOST SWAP" branding)
 
 ### Hierarchy
 - **Hero Title**: Display font, text-5xl to text-6xl, bold (700-800)
@@ -80,10 +80,10 @@ Use Tailwind units: **2, 4, 6, 8, 12, 16** for consistent rhythm
 - Grid patterns or subtle scan-line overlays in backgrounds
 - Terminal-style borders (dashed or dotted for accent areas)
 - Hexagonal or angular shapes for containers (optional accent)
-- Glitch effect on main "ZK NINJASWAP" title (subtle, static)
+- Glitch effect on main "ZK GHOST SWAP" title (subtle, static)
 
 ### Privacy Emphasis
-- Minimal branding, no logos beyond ZK NINJASWAP
+- Minimal branding, no logos beyond ZK GHOST SWAP
 - No user accounts, no personal data collection messaging
 - "Anonymous Exchange" subheading
 - Copy that emphasizes "No KYC", "Privacy-First", "Trustless"
@@ -105,7 +105,7 @@ Subtle grid pattern or matrix-style code rain effect (CSS/canvas background), ve
 ## Component Enrichment
 
 ### Swap Page Header
-- "ZK NINJASWAP" title with gradient text effect
+- "ZK GHOST SWAP" title with gradient text effect
 - Tagline: "Privacy-First Asset Swapping"
 - Network status indicator (subtle)
 
