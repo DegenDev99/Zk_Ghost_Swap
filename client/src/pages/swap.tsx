@@ -10,7 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import type { Currency, ExchangeAmount, Exchange } from "@shared/schema";
-import { RateChart } from "@/components/RateChart";
+import { PrivacyVisualization } from "@/components/PrivacyVisualization";
 
 export default function SwapPage() {
   const { toast } = useToast();
@@ -621,8 +621,10 @@ export default function SwapPage() {
   }
 
   // Render swap form
+  const isPrivacyActive = Boolean(fromAmount && parseFloat(fromAmount) > 0 && fromCurrency && toCurrency);
+
   return (
-    <div className="min-h-screen w-full flex items-center justify-center p-4 sm:p-6 relative overflow-hidden">
+    <div className="min-h-screen w-full p-4 sm:p-6 lg:p-8 relative overflow-hidden">
       {/* Matrix Background Effect */}
       <div className="absolute inset-0 opacity-5">
         <div className="absolute inset-0" style={{
@@ -635,7 +637,10 @@ export default function SwapPage() {
         }} />
       </div>
 
-      <Card className="w-full max-w-md p-6 sm:p-8 bg-card/40 backdrop-blur-sm border-primary/20 relative z-10">
+      <div className="max-w-7xl mx-auto relative z-10">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 items-start">
+          {/* Swap Form - Left Side */}
+          <Card className="w-full p-6 sm:p-8 bg-card/40 backdrop-blur-sm border-primary/20">
         {/* Header */}
         <div className="text-center mb-6">
           <h1 className="text-4xl sm:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 mb-2">
@@ -891,13 +896,15 @@ export default function SwapPage() {
         </div>
       </Card>
 
-      {/* Rate History Chart */}
-      <RateChart
-        from={fromCurrency}
-        to={toCurrency}
-        fromNetwork={fromNetwork}
-        toNetwork={toNetwork}
-      />
+          {/* Privacy Visualization - Right Side */}
+          <div className="lg:sticky lg:top-8">
+            <PrivacyVisualization 
+              isActive={isPrivacyActive}
+              privacyScore={estimation ? 5 : 0}
+            />
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
