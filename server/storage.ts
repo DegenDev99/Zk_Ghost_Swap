@@ -64,13 +64,22 @@ export class MemStorage implements IStorage {
   }
 
   async getAllExchanges(): Promise<Exchange[]> {
-    return Array.from(this.exchanges.values()).map(m => ({
-      ...m.exchange,
-      sessionId: m.sessionId,
-      walletAddress: m.walletAddress,
-      completedAt: m.completedAt?.toISOString(),
-      autoClosedAt: m.autoClosedAt?.toISOString(),
-    }));
+    const now = Date.now();
+    return Array.from(this.exchanges.values())
+      .filter(m => {
+        // Exclude expired unfunded orders (still in "waiting" status and past expiry time)
+        if (m.exchange.status === 'waiting' && m.exchange.expiresAt && now > m.exchange.expiresAt) {
+          return false;
+        }
+        return true;
+      })
+      .map(m => ({
+        ...m.exchange,
+        sessionId: m.sessionId,
+        walletAddress: m.walletAddress,
+        completedAt: m.completedAt?.toISOString(),
+        autoClosedAt: m.autoClosedAt?.toISOString(),
+      }));
   }
 
   async getActiveExchangeBySession(sessionId: string): Promise<Exchange | undefined> {
@@ -93,8 +102,19 @@ export class MemStorage implements IStorage {
   }
 
   async getExchangesByWallet(walletAddress: string): Promise<Exchange[]> {
+    const now = Date.now();
     return Array.from(this.exchanges.values())
-      .filter(m => m.walletAddress === walletAddress)
+      .filter(m => {
+        // Must match wallet address
+        if (m.walletAddress !== walletAddress) return false;
+        
+        // Exclude expired unfunded orders (still in "waiting" status and past expiry time)
+        if (m.exchange.status === 'waiting' && m.exchange.expiresAt && now > m.exchange.expiresAt) {
+          return false;
+        }
+        
+        return true;
+      })
       .map(m => ({
         ...m.exchange,
         sessionId: m.sessionId,
@@ -180,24 +200,33 @@ export class DbStorage implements IStorage {
 
   async getAllExchanges(): Promise<Exchange[]> {
     const result = await db.select().from(exchanges).orderBy(desc(exchanges.createdAt));
+    const now = Date.now();
     
-    return result.map((row) => ({
-      id: row.exchangeId,
-      provider: row.provider,
-      payinAddress: row.payinAddress,
-      payoutAddress: row.payoutAddress,
-      fromCurrency: row.fromCurrency,
-      toCurrency: row.toCurrency,
-      fromAmount: row.fromAmount,
-      toAmount: row.toAmount,
-      status: row.status,
-      validUntil: row.validUntil || undefined,
-      expiresAt: row.expiresAt ? parseInt(row.expiresAt) : undefined,
-      sessionId: row.sessionId || undefined,
-      walletAddress: row.walletAddress || undefined,
-      completedAt: row.completedAt?.toISOString(),
-      autoClosedAt: row.autoClosedAt?.toISOString(),
-    }));
+    return result
+      .filter((row) => {
+        // Exclude expired unfunded orders (still in "waiting" status and past expiry time)
+        if (row.status === 'waiting' && row.expiresAt && now > parseInt(row.expiresAt)) {
+          return false;
+        }
+        return true;
+      })
+      .map((row) => ({
+        id: row.exchangeId,
+        provider: row.provider,
+        payinAddress: row.payinAddress,
+        payoutAddress: row.payoutAddress,
+        fromCurrency: row.fromCurrency,
+        toCurrency: row.toCurrency,
+        fromAmount: row.fromAmount,
+        toAmount: row.toAmount,
+        status: row.status,
+        validUntil: row.validUntil || undefined,
+        expiresAt: row.expiresAt ? parseInt(row.expiresAt) : undefined,
+        sessionId: row.sessionId || undefined,
+        walletAddress: row.walletAddress || undefined,
+        completedAt: row.completedAt?.toISOString(),
+        autoClosedAt: row.autoClosedAt?.toISOString(),
+      }));
   }
 
   async getActiveExchangeBySession(sessionId: string): Promise<Exchange | undefined> {
@@ -242,23 +271,33 @@ export class DbStorage implements IStorage {
       .where(eq(exchanges.walletAddress, walletAddress))
       .orderBy(desc(exchanges.createdAt));
     
-    return result.map((row) => ({
-      id: row.exchangeId,
-      provider: row.provider,
-      payinAddress: row.payinAddress,
-      payoutAddress: row.payoutAddress,
-      fromCurrency: row.fromCurrency,
-      toCurrency: row.toCurrency,
-      fromAmount: row.fromAmount,
-      toAmount: row.toAmount,
-      status: row.status,
-      validUntil: row.validUntil || undefined,
-      expiresAt: row.expiresAt ? parseInt(row.expiresAt) : undefined,
-      sessionId: row.sessionId || undefined,
-      walletAddress: row.walletAddress || undefined,
-      completedAt: row.completedAt?.toISOString(),
-      autoClosedAt: row.autoClosedAt?.toISOString(),
-    }));
+    const now = Date.now();
+    
+    return result
+      .filter((row) => {
+        // Exclude expired unfunded orders (still in "waiting" status and past expiry time)
+        if (row.status === 'waiting' && row.expiresAt && now > parseInt(row.expiresAt)) {
+          return false;
+        }
+        return true;
+      })
+      .map((row) => ({
+        id: row.exchangeId,
+        provider: row.provider,
+        payinAddress: row.payinAddress,
+        payoutAddress: row.payoutAddress,
+        fromCurrency: row.fromCurrency,
+        toCurrency: row.toCurrency,
+        fromAmount: row.fromAmount,
+        toAmount: row.toAmount,
+        status: row.status,
+        validUntil: row.validUntil || undefined,
+        expiresAt: row.expiresAt ? parseInt(row.expiresAt) : undefined,
+        sessionId: row.sessionId || undefined,
+        walletAddress: row.walletAddress || undefined,
+        completedAt: row.completedAt?.toISOString(),
+        autoClosedAt: row.autoClosedAt?.toISOString(),
+      }));
   }
 
   async markExchangeCompleted(id: string): Promise<void> {
