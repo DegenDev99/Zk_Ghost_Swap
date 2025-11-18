@@ -53,13 +53,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let fromCurrency = String(from).toLowerCase();
       let toCurrency = String(to).toLowerCase();
 
+      // Normalize network names (ChangeNOW API inconsistency workaround)
+      const normalizeNetwork = (network: string): string => {
+        const normalized = network.toLowerCase();
+        // Map common blockchain names to ChangeNOW's expected format
+        if (normalized === 'eth' || normalized === 'ethereum') return 'erc20';
+        if (normalized === 'bsc' || normalized === 'bnb') return 'bep20';
+        if (normalized === 'trx' || normalized === 'tron') return 'trc20';
+        return normalized;
+      };
+
       // Only append network if it exists AND is different from the ticker
       // This prevents duplicates like "btc_btc"
       if (fromNetwork && String(fromNetwork).toLowerCase() !== fromCurrency) {
-        fromCurrency = `${fromCurrency}_${String(fromNetwork).toLowerCase()}`;
+        const normalizedNetwork = normalizeNetwork(String(fromNetwork));
+        fromCurrency = `${fromCurrency}_${normalizedNetwork}`;
       }
       if (toNetwork && String(toNetwork).toLowerCase() !== toCurrency) {
-        toCurrency = `${toCurrency}_${String(toNetwork).toLowerCase()}`;
+        const normalizedNetwork = normalizeNetwork(String(toNetwork));
+        toCurrency = `${toCurrency}_${normalizedNetwork}`;
       }
 
       console.log(`[ChangeNOW] Estimating: ${fromCurrency} -> ${toCurrency}, amount: ${amount}`);
@@ -110,13 +122,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let fromCurrency = from.toLowerCase();
       let toCurrency = to.toLowerCase();
 
+      // Normalize network names (ChangeNOW API inconsistency workaround)
+      const normalizeNetwork = (network: string): string => {
+        const normalized = network.toLowerCase();
+        // Map common blockchain names to ChangeNOW's expected format
+        if (normalized === 'eth' || normalized === 'ethereum') return 'erc20';
+        if (normalized === 'bsc' || normalized === 'bnb') return 'bep20';
+        if (normalized === 'trx' || normalized === 'tron') return 'trc20';
+        return normalized;
+      };
+
       // Only append network if it exists AND is different from the ticker
       // This prevents duplicates like "btc_btc"
       if (fromNetwork && fromNetwork.toLowerCase() !== fromCurrency) {
-        fromCurrency = `${fromCurrency}_${fromNetwork.toLowerCase()}`;
+        const normalizedNetwork = normalizeNetwork(fromNetwork);
+        fromCurrency = `${fromCurrency}_${normalizedNetwork}`;
       }
       if (toNetwork && toNetwork.toLowerCase() !== toCurrency) {
-        toCurrency = `${toCurrency}_${toNetwork.toLowerCase()}`;
+        const normalizedNetwork = normalizeNetwork(toNetwork);
+        toCurrency = `${toCurrency}_${normalizedNetwork}`;
       }
 
       console.log(`[ChangeNOW] Creating exchange: ${fromCurrency} -> ${toCurrency}, amount: ${amount}`);
@@ -174,6 +198,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error: any) {
       console.error("[ChangeNOW] Error creating exchange:", error);
       res.status(500).json({ message: error.message || "Failed to create exchange" });
+    }
+  });
+
+  // GET /api/swap/history - Get all exchanges
+  app.get("/api/swap/history", async (req, res) => {
+    try {
+      const exchanges = await storage.getAllExchanges();
+      res.json(exchanges);
+    } catch (error: any) {
+      console.error("[Storage] Error fetching exchange history:", error);
+      res.status(500).json({ message: error.message || "Failed to fetch exchange history" });
     }
   });
 

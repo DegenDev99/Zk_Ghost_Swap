@@ -1,4 +1,6 @@
 import { z } from "zod";
+import { pgTable, serial, varchar, text, timestamp } from "drizzle-orm/pg-core";
+import { createInsertSchema } from "drizzle-zod";
 
 // Currency interface from ChangeNOW API
 export interface Currency {
@@ -53,3 +55,29 @@ export interface ExchangeStatusResponse {
   amountFrom?: string;
   amountTo?: string;
 }
+
+// Database table for persisting exchanges
+export const exchanges = pgTable("exchanges", {
+  id: serial("id").primaryKey(),
+  exchangeId: varchar("exchange_id", { length: 255 }).notNull().unique(),
+  payinAddress: varchar("payin_address", { length: 255 }).notNull(),
+  payoutAddress: varchar("payout_address", { length: 255 }).notNull(),
+  fromCurrency: varchar("from_currency", { length: 50 }).notNull(),
+  toCurrency: varchar("to_currency", { length: 50 }).notNull(),
+  fromAmount: varchar("from_amount", { length: 100 }).notNull(),
+  toAmount: varchar("to_amount", { length: 100 }).notNull(),
+  status: varchar("status", { length: 50 }).notNull(),
+  validUntil: varchar("valid_until", { length: 100 }),
+  expiresAt: varchar("expires_at", { length: 100 }),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// Insert schema for exchanges
+export const insertExchangeSchema = createInsertSchema(exchanges).omit({
+  id: true,
+  createdAt: true,
+});
+
+// Types
+export type InsertExchange = z.infer<typeof insertExchangeSchema>;
+export type SelectExchange = typeof exchanges.$inferSelect;
