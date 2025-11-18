@@ -4,6 +4,11 @@
 
 ZK NinjaSwap is a privacy-focused cryptocurrency exchange application that enables anonymous asset swapping without KYC requirements or user registration. The platform integrates with ChangeNOW API to facilitate cross-chain cryptocurrency exchanges while maintaining user privacy. Built with a cyberpunk/Matrix-inspired aesthetic, the application provides a streamlined interface for creating and tracking exchanges with real-time status updates and countdown timers.
 
+**Key Privacy Features:**
+- Anonymous users: Orders expire and are deleted after timer runs out (no persistent history)
+- Wallet-connected users: Transaction history accessible only through wallet dropdown menu
+- Disconnect confirmation: Prevents accidental wallet disconnection with warning dialog
+
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
@@ -22,6 +27,8 @@ Preferred communication style: Simple, everyday language.
 - **Tailwind CSS** for utility-first styling with custom design tokens
 - **CSS Variables** approach for theming with dark mode as the primary (and only supported) theme
 - **Custom Design System**: Cyberpunk/Matrix aesthetic with specific typography hierarchy using Space Grotesk (primary), JetBrains Mono (monospace for addresses/amounts), and custom color scheme with HSL-based tokens
+- **Dropdown Menu**: Wallet address button opens menu with Transaction History and Disconnect options
+- **Alert Dialogs**: Confirmation dialogs for critical actions (disconnect wallet)
 
 **State Management & Data Fetching**
 - **TanStack Query (React Query)** for server state management, caching, and API request handling
