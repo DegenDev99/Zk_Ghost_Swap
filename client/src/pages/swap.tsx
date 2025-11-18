@@ -34,7 +34,16 @@ export default function SwapPage() {
   const sessionId = getOrCreateSessionId();
 
   // Centralized function to clear active exchange
-  const clearActiveExchange = () => {
+  const clearActiveExchange = async () => {
+    // If the order is expired, automatically erase it from storage
+    if (timeRemaining === 'Expired' && activeExchange?.id) {
+      try {
+        await apiRequest("POST", `/api/swap/auto-close/${activeExchange.id}`, {});
+      } catch (error) {
+        console.error("Failed to auto-close expired order:", error);
+      }
+    }
+    
     setManuallyDismissed(true);
     setActiveExchange(null);
   };
