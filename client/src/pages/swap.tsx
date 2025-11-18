@@ -570,6 +570,8 @@ export default function SwapPage() {
             <PrivacyVisualization 
               isActive={true}
               privacyScore={activeExchange.status === 'finished' ? 5 : 3}
+              exchangeId={activeExchange.id}
+              exchangeStatus={activeExchange.status}
             />
           </div>
         </div>

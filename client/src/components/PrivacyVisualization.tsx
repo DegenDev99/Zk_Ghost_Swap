@@ -1,11 +1,13 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { Shield, Shuffle, Lock, Zap } from "lucide-react";
+import { Shield, Shuffle, Lock, Zap, Check } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useState, useEffect } from "react";
 
 interface PrivacyVisualizationProps {
   isActive: boolean;
   privacyScore?: number;
+  exchangeId?: string;
+  exchangeStatus?: string;
 }
 
 const privacyStages = [
@@ -39,7 +41,7 @@ const privacyStages = [
   },
 ];
 
-export function PrivacyVisualization({ isActive, privacyScore = 0 }: PrivacyVisualizationProps) {
+export function PrivacyVisualization({ isActive, privacyScore = 0, exchangeId, exchangeStatus }: PrivacyVisualizationProps) {
   const [currentStage, setCurrentStage] = useState(0);
   const [particles, setParticles] = useState<number[]>([]);
 
@@ -220,6 +222,56 @@ export function PrivacyVisualization({ isActive, privacyScore = 0 }: PrivacyVisu
           <div className="text-center py-8 text-sm text-muted-foreground" data-testid="text-idle-message">
             Enter swap details to see privacy layers in action
           </div>
+        )}
+
+        {/* Privacy Guaranteed Box with ZK Hash - Only shown when exchangeId is provided */}
+        {exchangeId && (
+          <>
+            <div className="pt-4 border-t mt-6">
+              <div className="p-4 bg-gradient-to-br from-primary/10 via-purple-500/10 to-pink-500/10 border-2 border-primary/30 rounded-md text-center">
+                <p className="text-sm font-bold text-foreground mb-1">
+                  PRIVACY GUARANTEED
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Your swap is protected by military-grade zero-knowledge cryptography.
+                </p>
+              </div>
+
+              <div className="mt-4">
+                <div className="text-center mb-2">
+                  <p className="text-[10px] text-muted-foreground uppercase tracking-wider">
+                    Proof Hash
+                  </p>
+                </div>
+                <div className={`p-3 rounded-md border ${
+                  exchangeStatus === 'finished' 
+                    ? 'bg-green-500/10 border-green-500/30' 
+                    : 'bg-black/40 border-primary/20'
+                }`} data-testid="box-proof-hash">
+                  <p className={`font-mono text-xs break-all text-center ${
+                    exchangeStatus === 'finished'
+                      ? 'text-green-400'
+                      : 'text-primary/60 animate-pulse'
+                  }`} data-testid="text-proof-hash">
+                    zk_0x{exchangeId.replace(/-/g, '').slice(0, 32).padEnd(32, '0')}
+                  </p>
+                </div>
+                {exchangeStatus === 'finished' && (
+                  <div className="mt-3 p-3 bg-green-500/10 border border-green-500/30 rounded-md">
+                    <div className="flex items-start gap-2">
+                      <Check className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                      <div className="text-xs">
+                        <p className="font-bold text-green-500 mb-1">PROOF FINALIZED</p>
+                        <p className="text-muted-foreground">
+                          Save this proof hash for your records.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </>
         )}
       </CardContent>
     </Card>
