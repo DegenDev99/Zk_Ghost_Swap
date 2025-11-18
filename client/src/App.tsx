@@ -5,9 +5,10 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import SwapPage from "@/pages/swap";
 import HistoryPage from "@/pages/history";
+import DocsPage from "@/pages/docs";
 import NotFound from "@/pages/not-found";
 import { Button } from "@/components/ui/button";
-import { ArrowLeftRight, History, Wallet } from "lucide-react";
+import { ArrowLeftRight, History, Wallet, FileText } from "lucide-react";
 import { WalletProvider, useWallet } from "@/contexts/WalletContext";
 
 function WalletButton() {
@@ -80,6 +81,17 @@ function Router() {
                   History
                 </Button>
               </Link>
+              <Link href="/docs">
+                <Button 
+                  variant={location === "/docs" ? "default" : "ghost"}
+                  size="sm"
+                  className="gap-2"
+                  data-testid="link-docs"
+                >
+                  <FileText className="w-4 h-4" />
+                  Docs
+                </Button>
+              </Link>
               <WalletButton />
             </div>
           </div>
@@ -90,6 +102,7 @@ function Router() {
       <Switch>
         <Route path="/" component={SwapPage} />
         <Route path="/history" component={HistoryPage} />
+        <Route path="/docs" component={DocsPage} />
         <Route component={NotFound} />
       </Switch>
     </div>
