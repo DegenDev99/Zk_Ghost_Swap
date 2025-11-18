@@ -281,15 +281,15 @@ export function PrivacyVisualization({ isActive, privacyScore = 0, exchangeId, e
               </div>
               <div className={`p-3 rounded-md border ${
                 exchangeStatus === 'finished' 
-                  ? 'bg-green-500/10 border-green-500/30' 
-                  : 'bg-black/40 border-primary/20'
+                  ? 'bg-green-500/20 border-green-500/50' 
+                  : 'bg-primary/15 border-primary/40'
               }`} data-testid="box-proof-hash">
                 {exchangeStatus === 'finished' ? (
                   <p className="font-mono text-xs break-all text-center text-green-400" data-testid="text-proof-hash">
                     zk_0x{exchangeId.replace(/-/g, '').slice(0, 32).padEnd(32, '0')}
                   </p>
                 ) : (
-                  <p className="font-mono text-xs break-all text-center text-primary/40 blur-[2px] select-none" data-testid="text-proof-hash-scrambled">
+                  <p className="font-mono text-xs break-all text-center text-primary/70 blur-[2px] select-none" data-testid="text-proof-hash-scrambled">
                     zk_0x{scrambledHash}
                   </p>
                 )}
