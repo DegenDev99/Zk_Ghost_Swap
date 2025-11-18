@@ -849,7 +849,7 @@ export default function SwapPage() {
               Non-custodial • Trustless • Anonymous
             </p>
             <p className="text-[10px] text-muted-foreground">
-              Powered by ChangeNOW
+              Powered by ZK Enigma Link Network
             </p>
           </div>
         </div>
