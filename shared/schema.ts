@@ -1,18 +1,55 @@
-import { sql } from "drizzle-orm";
-import { pgTable, text, varchar } from "drizzle-orm/pg-core";
-import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
-export const users = pgTable("users", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  username: text("username").notNull().unique(),
-  password: text("password").notNull(),
+// Currency interface from ChangeNOW API
+export interface Currency {
+  ticker: string;
+  name: string;
+  image?: string;
+  network?: string;
+  legacyTicker?: string;
+}
+
+// Exchange Amount estimation from ChangeNOW API
+export interface ExchangeAmount {
+  estimatedAmount: string;
+  transactionSpeedForecast?: string;
+  warningMessage?: string;
+}
+
+// Exchange transaction
+export interface Exchange {
+  id: string;
+  payinAddress: string;
+  payoutAddress: string;
+  fromCurrency: string;
+  toCurrency: string;
+  fromAmount: string;
+  toAmount: string;
+  status: string;
+  validUntil?: string;
+  expiresAt?: number; // Server-provided expiry timestamp
+}
+
+// Validation schemas
+export const createExchangeSchema = z.object({
+  from: z.string().min(1, "From currency is required"),
+  to: z.string().min(1, "To currency is required"),
+  fromNetwork: z.string().optional(),
+  toNetwork: z.string().optional(),
+  amount: z.string().refine((val) => {
+    const num = parseFloat(val);
+    return !isNaN(num) && num > 0;
+  }, "Amount must be a positive number"),
+  address: z.string().min(10, "Invalid payout address"),
 });
 
-export const insertUserSchema = createInsertSchema(users).pick({
-  username: true,
-  password: true,
-});
+export type CreateExchangeInput = z.infer<typeof createExchangeSchema>;
 
-export type InsertUser = z.infer<typeof insertUserSchema>;
-export type User = typeof users.$inferSelect;
+// Exchange status response
+export interface ExchangeStatusResponse {
+  status: string;
+  payinHash?: string;
+  payoutHash?: string;
+  amountFrom?: string;
+  amountTo?: string;
+}
