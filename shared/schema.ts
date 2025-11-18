@@ -31,6 +31,10 @@ export interface Exchange {
   status: string;
   validUntil?: string;
   expiresAt?: number; // Server-provided expiry timestamp
+  sessionId?: string;
+  walletAddress?: string;
+  completedAt?: string; // ISO timestamp when order finished
+  autoClosedAt?: string; // ISO timestamp when order auto-closed
 }
 
 // Validation schemas
@@ -71,6 +75,10 @@ export const exchanges = pgTable("exchanges", {
   status: varchar("status", { length: 50 }).notNull(),
   validUntil: varchar("valid_until", { length: 100 }),
   expiresAt: varchar("expires_at", { length: 100 }),
+  sessionId: varchar("session_id", { length: 255 }),
+  walletAddress: varchar("wallet_address", { length: 255 }),
+  completedAt: timestamp("completed_at"),
+  autoClosedAt: timestamp("auto_closed_at"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 

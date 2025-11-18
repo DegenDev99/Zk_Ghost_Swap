@@ -119,6 +119,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const { from, to, fromNetwork, toNetwork, amount, address } = validation.data;
+      const { sessionId, walletAddress } = req.body;
 
       // Build currency codes with network if provided
       // ChangeNOW uses format: ticker or ticker_network (e.g., usdt_erc20)
@@ -184,8 +185,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         expiresAt,
       };
 
-      // Store exchange in memory
-      await storage.createExchange(exchange);
+      // Store exchange with session and wallet tracking
+      await storage.createExchange(exchange, sessionId, walletAddress);
 
       res.json(exchange);
     } catch (error: any) {
@@ -202,6 +203,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error: any) {
       console.error("[Storage] Error fetching exchange history:", error);
       res.status(500).json({ message: error.message || "Failed to fetch exchange history" });
+    }
+  });
+
+  // GET /api/swap/active-order - Get active order by session ID
+  app.get("/api/swap/active-order", async (req, res) => {
+    try {
+      const { sessionId } = req.query;
+      
+      if (!sessionId) {
+        return res.status(400).json({ message: "Session ID is required" });
+      }
+
+      const exchange = await storage.getActiveExchangeBySession(String(sessionId));
+      res.json(exchange || null);
+    } catch (error: any) {
+      console.error("[Storage] Error fetching active order:", error);
+      res.status(500).json({ message: error.message || "Failed to fetch active order" });
     }
   });
 
@@ -230,6 +248,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error: any) {
       console.error("[Rate History] Error fetching rate history:", error);
       res.status(500).json({ message: error.message || "Failed to fetch rate history" });
+    }
+  });
+
+  // POST /api/swap/auto-close/:id - Mark exchange as auto-closed
+  app.post("/api/swap/auto-close/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+
+      if (!id) {
+        return res.status(400).json({ message: "Missing exchange ID" });
+      }
+
+      await storage.markExchangeAutoClosed(id);
+      res.json({ success: true });
+    } catch (error: any) {
+      console.error("[Storage] Error auto-closing exchange:", error);
+      res.status(500).json({ message: error.message || "Failed to auto-close exchange" });
     }
   });
 
@@ -264,6 +299,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Update local storage with latest status
       if (statusData.status) {
         await storage.updateExchangeStatus(id, statusData.status);
+        
+        // Mark as completed if status is 'finished'
+        if (statusData.status === 'finished') {
+          await storage.markExchangeCompleted(id);
+        }
       }
 
       res.json({

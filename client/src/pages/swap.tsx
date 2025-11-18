@@ -1,19 +1,23 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { ArrowDownUp, Clock, Copy, Check, AlertCircle, Loader2, ChevronsUpDown, Shield, Lock, Zap, Globe } from "lucide-react";
+import { ArrowDownUp, Clock, Copy, Check, AlertCircle, Loader2, ChevronsUpDown, Shield, Lock, Zap, Globe, Home } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import type { Currency, ExchangeAmount, Exchange } from "@shared/schema";
 import { PrivacyVisualization } from "@/components/PrivacyVisualization";
+import { useWallet } from "@/contexts/WalletContext";
+import { getOrCreateSessionId } from "@/lib/session";
+import { Link } from "wouter";
 
 export default function SwapPage() {
   const { toast } = useToast();
+  const { walletAddress } = useWallet();
   const [fromCurrency, setFromCurrency] = useState<string>("btc");
   const [toCurrency, setToCurrency] = useState<string>("eth");
   const [fromNetwork, setFromNetwork] = useState<string>("");
@@ -21,11 +25,19 @@ export default function SwapPage() {
   const [fromAmount, setFromAmount] = useState<string>("");
   const [payoutAddress, setPayoutAddress] = useState<string>("");
   const [activeExchange, setActiveExchange] = useState<Exchange | null>(null);
+  const [manuallyDismissed, setManuallyDismissed] = useState(false);
   const [copiedAddress, setCopiedAddress] = useState(false);
   const [copiedOrderId, setCopiedOrderId] = useState(false);
   const [timeRemaining, setTimeRemaining] = useState<string>("");
   const [fromOpen, setFromOpen] = useState(false);
   const [toOpen, setToOpen] = useState(false);
+  const sessionId = getOrCreateSessionId();
+
+  // Centralized function to clear active exchange
+  const clearActiveExchange = () => {
+    setManuallyDismissed(true);
+    setActiveExchange(null);
+  };
 
   // Fetch available currencies
   const { data: currencies = [], isLoading: loadingCurrencies, isError: currenciesError } = useQuery<Currency[]>({
@@ -76,13 +88,46 @@ export default function SwapPage() {
     retryDelay: (attemptIndex) => Math.min(2000 * (attemptIndex + 1), 10000),
   });
 
+  // Check for active order on mount and when activeExchange becomes null
+  const activeOrderQuery = useQuery<Exchange | null>({
+    queryKey: ["/api/swap/active-order", sessionId],
+    queryFn: async () => {
+      const res = await fetch(`/api/swap/active-order?sessionId=${sessionId}`);
+      if (!res.ok) return null;
+      const data = await res.json();
+      if (data) {
+        setManuallyDismissed(false);
+        setActiveExchange(data);
+      }
+      return data;
+    },
+    enabled: !!sessionId,
+  });
+
+  // Refetch when activeExchange is cleared (but not if manually dismissed)
+  // Use a ref to track previous activeExchange to avoid refetch loops
+  const prevActiveExchange = useRef<Exchange | null>(null);
+  useEffect(() => {
+    // Only refetch if we just transitioned from having an exchange to not having one
+    if (prevActiveExchange.current && !activeExchange && sessionId && !manuallyDismissed) {
+      activeOrderQuery.refetch();
+    }
+    prevActiveExchange.current = activeExchange;
+  }, [activeExchange, sessionId, manuallyDismissed]);
+
   // Create exchange mutation
   const createExchangeMutation = useMutation({
     mutationFn: async (data: { from: string; to: string; fromNetwork?: string; toNetwork?: string; amount: string; address: string }) => {
-      const res = await apiRequest("POST", "/api/swap/exchange", data);
+      const payload = {
+        ...data,
+        sessionId,
+        walletAddress: walletAddress || undefined,
+      };
+      const res = await apiRequest("POST", "/api/swap/exchange", payload);
       return await res.json();
     },
     onSuccess: (data: Exchange) => {
+      setManuallyDismissed(false);
       setActiveExchange(data);
       queryClient.invalidateQueries({ queryKey: ["/api/swap/estimate"], exact: false });
       toast({
@@ -256,6 +301,30 @@ export default function SwapPage() {
     }
   }, [exchangeStatus?.status]);
 
+  // Auto-close completed orders after 10 minutes
+  useEffect(() => {
+    if (activeExchange?.status === 'finished') {
+      const autoCloseTimer = setTimeout(async () => {
+        // Mark as auto-closed in the backend
+        try {
+          await apiRequest("POST", `/api/swap/auto-close/${activeExchange.id}`, {});
+        } catch (error) {
+          console.error("Failed to mark order as auto-closed:", error);
+        }
+        
+        // Clear the active exchange
+        clearActiveExchange();
+        
+        toast({
+          title: "Order Closed",
+          description: "Completed order has been archived. Order ID saved to history.",
+        });
+      }, 10 * 60 * 1000); // 10 minutes
+
+      return () => clearTimeout(autoCloseTimer);
+    }
+  }, [activeExchange?.status, activeExchange?.id]);
+
   // Handle status polling errors
   useEffect(() => {
     if (statusError && activeExchange) {
@@ -286,6 +355,22 @@ export default function SwapPage() {
         <div className="w-full max-w-7xl flex flex-col lg:flex-row gap-6 relative z-10">
           {/* Main Exchange Card */}
           <Card className="flex-1 p-6 sm:p-8 bg-card/40 backdrop-blur-sm border-primary/20">
+            {/* Home Button */}
+            <div className="flex justify-end mb-4">
+              <Link href="/">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="gap-2"
+                  onClick={clearActiveExchange}
+                  data-testid="button-home"
+                >
+                  <Home className="w-4 h-4" />
+                  Home
+                </Button>
+              </Link>
+            </div>
+
             <div className="text-center mb-8">
               <h1 className="text-3xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 mb-2">
                 ZK SWAP EXCHANGE
@@ -472,7 +557,7 @@ export default function SwapPage() {
             </div>
 
             <Button
-              onClick={() => setActiveExchange(null)}
+              onClick={clearActiveExchange}
               className="w-full"
               variant="outline"
               data-testid="button-new-exchange"

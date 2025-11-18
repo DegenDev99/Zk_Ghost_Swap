@@ -7,7 +7,41 @@ import SwapPage from "@/pages/swap";
 import HistoryPage from "@/pages/history";
 import NotFound from "@/pages/not-found";
 import { Button } from "@/components/ui/button";
-import { ArrowLeftRight, History } from "lucide-react";
+import { ArrowLeftRight, History, Wallet } from "lucide-react";
+import { WalletProvider, useWallet } from "@/contexts/WalletContext";
+
+function WalletButton() {
+  const { walletAddress, connected, connecting, connect, disconnect } = useWallet();
+
+  if (connected && walletAddress) {
+    return (
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={disconnect}
+        className="gap-2 font-mono"
+        data-testid="button-wallet-disconnect"
+      >
+        <Wallet className="w-4 h-4" />
+        {walletAddress.slice(0, 4)}...{walletAddress.slice(-4)}
+      </Button>
+    );
+  }
+
+  return (
+    <Button
+      variant="ghost"
+      size="sm"
+      onClick={connect}
+      disabled={connecting}
+      className="gap-2"
+      data-testid="button-wallet-connect"
+    >
+      <Wallet className="w-4 h-4" />
+      {connecting ? "Connecting..." : "Connect Wallet"}
+    </Button>
+  );
+}
 
 function Router() {
   const [location] = useLocation();
@@ -46,6 +80,7 @@ function Router() {
                   History
                 </Button>
               </Link>
+              <WalletButton />
             </div>
           </div>
         </div>
@@ -64,10 +99,12 @@ function Router() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Router />
-      </TooltipProvider>
+      <WalletProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Router />
+        </TooltipProvider>
+      </WalletProvider>
     </QueryClientProvider>
   );
 }
