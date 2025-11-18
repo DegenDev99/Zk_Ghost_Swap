@@ -106,3 +106,13 @@ Preferred communication style: Simple, everyday language.
 - Static assets served from `attached_assets` directory
 - Vite alias configuration for `@assets` path resolution
 - Custom fonts loaded from Google Fonts (Space Grotesk, JetBrains Mono)
+
+### Documentation
+
+**Privacy Whitepaper**
+- Comprehensive technical documentation in `WHITEPAPER.md`
+- Covers ZK privacy principles, anonymity features, and security model
+- Explains privacy guarantees, threat model, and trust assumptions
+- Includes use cases, comparisons with traditional exchanges, and future roadmap
+- Designed for privacy-conscious users and technical audience
+- Emphasizes financial sovereignty and censorship resistance

@@ -86,15 +86,12 @@ export class MemStorage implements IStorage {
     const metadataList = Array.from(this.exchanges.values());
     for (const metadata of metadataList) {
       if (metadata.sessionId === sessionId && !metadata.autoClosedAt) {
-        const completedAtStr = metadata.completedAt ? metadata.completedAt.toISOString() : undefined;
-        const autoClosedAtStr = metadata.autoClosedAt ? metadata.autoClosedAt.toISOString() : undefined;
-        
         return {
           ...metadata.exchange,
           sessionId: metadata.sessionId,
           walletAddress: metadata.walletAddress,
-          completedAt: completedAtStr,
-          autoClosedAt: autoClosedAtStr,
+          completedAt: metadata.completedAt?.toISOString(),
+          autoClosedAt: undefined,
         };
       }
     }
