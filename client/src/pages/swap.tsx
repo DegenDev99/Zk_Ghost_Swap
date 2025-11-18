@@ -909,7 +909,7 @@ export default function SwapPage() {
           {/* Footer Info */}
           <div className="pt-4 text-center space-y-2">
             <p className="text-xs text-muted-foreground">
-              Powered by ZK Enigma Link Network
+              Powered by ZK Ghost Swap
             </p>
             <p className="text-[10px] text-muted-foreground">
               Non-custodial • Trustless • Anonymous
