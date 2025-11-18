@@ -8,6 +8,7 @@ Zk Ghost Swap is a privacy-focused cryptocurrency exchange application that enab
 - Anonymous users: Orders expire and are deleted after timer runs out (no persistent history)
 - Wallet-connected users: Transaction history accessible only through wallet dropdown menu
 - Disconnect confirmation: Prevents accidental wallet disconnection with warning dialog
+- **Cancel Order**: Users can manually cancel active orders via confirmation dialog; canceled orders are permanently removed and do not reappear on page reload
 
 ## User Preferences
 
@@ -28,7 +29,7 @@ Preferred communication style: Simple, everyday language.
 - **CSS Variables** approach for theming with dark mode as the primary (and only supported) theme
 - **Custom Design System**: Cyberpunk/Matrix aesthetic with specific typography hierarchy using Space Grotesk (primary), JetBrains Mono (monospace for addresses/amounts), and custom color scheme with HSL-based tokens
 - **Dropdown Menu**: Wallet address button opens menu with Transaction History and Disconnect options
-- **Alert Dialogs**: Confirmation dialogs for critical actions (disconnect wallet)
+- **Alert Dialogs**: Confirmation dialogs for critical actions (disconnect wallet, cancel order)
 
 **State Management & Data Fetching**
 - **TanStack Query (React Query)** for server state management, caching, and API request handling
@@ -53,6 +54,7 @@ Preferred communication style: Simple, everyday language.
   - `GET /api/swap/estimate` - Get exchange rate estimates
   - `POST /api/swap/exchange` - Create new exchange transaction
   - `GET /api/swap/exchange/:id` - Track exchange status
+  - `POST /api/swap/auto-close/:id` - Permanently cancel/close an exchange order
 - Request/response logging middleware for debugging and monitoring
 - Raw body preservation for webhook verification scenarios
 
