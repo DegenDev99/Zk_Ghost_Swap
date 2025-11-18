@@ -356,16 +356,15 @@ export default function SwapPage() {
           {/* Main Exchange Card */}
           <Card className="flex-1 p-6 sm:p-8 bg-card/40 backdrop-blur-sm border-primary/20">
             {/* Home Button */}
-            <div className="flex justify-end mb-4">
+            <div className="flex justify-start mb-6">
               <Link href="/">
                 <Button
-                  variant="ghost"
-                  size="sm"
-                  className="gap-2"
+                  variant="outline"
+                  className="gap-2 text-base font-semibold border-2"
                   onClick={clearActiveExchange}
                   data-testid="button-home"
                 >
-                  <Home className="w-4 h-4" />
+                  <Home className="w-5 h-5" />
                   Home
                 </Button>
               </Link>
