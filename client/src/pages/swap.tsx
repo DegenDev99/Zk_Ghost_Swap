@@ -5,7 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { ArrowDownUp, Clock, Copy, Check, AlertCircle, Loader2, ChevronsUpDown, Shield, Lock, Zap, Globe, Home } from "lucide-react";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { ArrowDownUp, Clock, Copy, Check, AlertCircle, Loader2, ChevronsUpDown, Shield, Lock, Zap, Globe, Home, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
@@ -31,6 +32,8 @@ export default function SwapPage() {
   const [timeRemaining, setTimeRemaining] = useState<string>("");
   const [fromOpen, setFromOpen] = useState(false);
   const [toOpen, setToOpen] = useState(false);
+  const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
+  const [isCancelling, setIsCancelling] = useState(false);
   const sessionId = getOrCreateSessionId();
   const autoClosedOrdersRef = useRef<Set<string>>(new Set());
 
@@ -47,6 +50,54 @@ export default function SwapPage() {
     
     setManuallyDismissed(true);
     setActiveExchange(null);
+  };
+
+  // Cancel order function - permanently cancels and prevents reload
+  const cancelOrder = async () => {
+    if (!activeExchange?.id) return;
+    
+    setIsCancelling(true);
+    try {
+      // Mark as auto-closed in the ref to prevent re-fetching
+      autoClosedOrdersRef.current.add(activeExchange.id);
+      
+      // Set manuallyDismissed BEFORE clearing state to prevent useEffect from re-setting it
+      setManuallyDismissed(true);
+      
+      // Call API to permanently close the order
+      await apiRequest("POST", `/api/swap/auto-close/${activeExchange.id}`, {});
+      
+      // Clear from query cache and invalidate to prevent refetch
+      queryClient.setQueryData(["/api/swap/active-order", sessionId], null);
+      queryClient.invalidateQueries({ queryKey: ["/api/swap/active-order", sessionId] });
+      
+      // Invalidate status query to stop polling
+      queryClient.invalidateQueries({ queryKey: ["/api/swap/status", activeExchange.id] });
+      
+      // Clear active exchange state
+      setActiveExchange(null);
+      
+      // Close the dialog
+      setCancelDialogOpen(false);
+      
+      // Show success toast
+      toast({
+        title: "Order Canceled",
+        description: "Your exchange order has been permanently canceled.",
+      });
+    } catch (error) {
+      console.error("Failed to cancel order:", error);
+      // Remove from ref on failure to allow retry
+      autoClosedOrdersRef.current.delete(activeExchange.id);
+      setManuallyDismissed(false);
+      toast({
+        title: "Cancel Failed",
+        description: "Failed to cancel the order. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsCancelling(false);
+    }
   };
 
   // Fetch available currencies
@@ -116,6 +167,9 @@ export default function SwapPage() {
     
     // Don't process if no data (could be loading, error, or cache cleared)
     if (!fetchedOrder || !fetchedOrder.id) return;
+
+    // Don't process if user manually dismissed/canceled the order
+    if (manuallyDismissed) return;
 
     // Check if already auto-closed to prevent duplicates
     // This ref persists across renders to prevent processing the same order multiple times
@@ -442,13 +496,55 @@ export default function SwapPage() {
               </p>
             </div>
 
-            {/* Timer */}
-            <div className="flex items-center justify-center gap-3 mb-6 p-4 bg-accent/10 border border-accent/30 rounded-md">
-              <Clock className="w-5 h-5 text-accent" />
-              <span className={`text-xl font-mono font-bold ${timeRemaining === 'Expired' ? 'text-destructive' : 'text-accent'}`} data-testid="text-timer">
-                {timeRemaining}
-              </span>
-              <span className="text-sm text-muted-foreground">Time Remaining</span>
+            {/* Timer and Cancel Order */}
+            <div className="space-y-3 mb-6">
+              <div className="flex items-center justify-center gap-3 p-4 bg-accent/10 border border-accent/30 rounded-md">
+                <Clock className="w-5 h-5 text-accent" />
+                <span className={`text-xl font-mono font-bold ${timeRemaining === 'Expired' ? 'text-destructive' : 'text-accent'}`} data-testid="text-timer">
+                  {timeRemaining}
+                </span>
+                <span className="text-sm text-muted-foreground">Time Remaining</span>
+              </div>
+
+              {/* Cancel Order Button */}
+              <AlertDialog open={cancelDialogOpen} onOpenChange={setCancelDialogOpen}>
+                <AlertDialogTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className="w-full gap-2 border-destructive/40 text-destructive hover:bg-destructive/10"
+                    data-testid="button-cancel-order"
+                  >
+                    <X className="w-4 h-4" />
+                    Cancel Order
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent data-testid="dialog-cancel-order">
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Cancel Exchange Order?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This will permanently cancel your exchange order. This action cannot be undone, and the order will not reappear when you reload the page.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel data-testid="button-cancel-dialog-no">Keep Order</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={cancelOrder}
+                      disabled={isCancelling}
+                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                      data-testid="button-cancel-dialog-yes"
+                    >
+                      {isCancelling ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          Canceling...
+                        </>
+                      ) : (
+                        'Cancel Order'
+                      )}
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </div>
 
             {/* Status Polling Error Banner */}
