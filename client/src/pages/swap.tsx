@@ -918,7 +918,7 @@ export default function SwapPage() {
               </div>
 
               <div className="p-6 bg-black/40 border border-primary/20 rounded-md mb-6" data-testid="box-zk-snark-circuit">
-                <h3 className="text-xs font-bold text-muted-foreground mb-4 uppercase tracking-wider text-center">
+                <h3 className="text-xs font-bold mb-4 uppercase tracking-wider text-center bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent animate-pulse">
                   ZK-SNARK Circuit {isPrivacyActive ? 'Active' : 'Standby'}
                 </h3>
                 <div className="space-y-3" data-testid="list-zk-snark-steps">
@@ -930,16 +930,16 @@ export default function SwapPage() {
                   ].map((step, idx) => (
                     <div key={idx} className="flex items-center gap-3">
                       <div 
-                        className={`w-2 h-2 bg-gradient-to-r from-cyan-400 to-pink-400 rounded-full ${isPrivacyActive ? 'animate-pulse' : 'opacity-30'}`}
+                        className="w-2 h-2 bg-gradient-to-r from-cyan-400 to-pink-400 rounded-full animate-pulse shadow-[0_0_8px_rgba(34,211,238,0.6)]"
                         style={{ animationDelay: step.delay }}
                       />
                       <div className="flex-1 h-1 bg-gradient-to-r from-cyan-500/20 to-pink-500/20 rounded-full overflow-hidden">
                         <div 
-                          className={`h-full bg-gradient-to-r from-cyan-500 to-pink-500 ${isPrivacyActive ? 'animate-pulse' : 'opacity-0'}`}
+                          className="h-full bg-gradient-to-r from-cyan-500 to-pink-500 animate-pulse shadow-[0_0_4px_rgba(34,211,238,0.4)]"
                           style={{ animationDelay: step.delay }}
                         />
                       </div>
-                      <span className={`text-xs font-mono ${isPrivacyActive ? 'text-muted-foreground' : 'text-muted-foreground/50'}`}>{step.label}</span>
+                      <span className="text-xs font-mono text-muted-foreground">{step.label}</span>
                     </div>
                   ))}
                 </div>
