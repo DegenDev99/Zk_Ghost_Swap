@@ -59,6 +59,7 @@ export class DbStorage implements IStorage {
     const row = result[0];
     return {
       id: row.exchangeId,
+      provider: row.provider,
       payinAddress: row.payinAddress,
       payoutAddress: row.payoutAddress,
       fromCurrency: row.fromCurrency,
@@ -74,6 +75,7 @@ export class DbStorage implements IStorage {
   async createExchange(exchange: Exchange): Promise<Exchange> {
     await db.insert(exchanges).values({
       exchangeId: exchange.id,
+      provider: exchange.provider || "ChangeNOW",
       payinAddress: exchange.payinAddress,
       payoutAddress: exchange.payoutAddress,
       fromCurrency: exchange.fromCurrency,
@@ -98,6 +100,7 @@ export class DbStorage implements IStorage {
     
     return result.map((row) => ({
       id: row.exchangeId,
+      provider: row.provider,
       payinAddress: row.payinAddress,
       payoutAddress: row.payoutAddress,
       fromCurrency: row.fromCurrency,

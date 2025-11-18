@@ -21,6 +21,7 @@ export interface ExchangeAmount {
 // Exchange transaction
 export interface Exchange {
   id: string;
+  provider?: string;
   payinAddress: string;
   payoutAddress: string;
   fromCurrency: string;
@@ -60,6 +61,7 @@ export interface ExchangeStatusResponse {
 export const exchanges = pgTable("exchanges", {
   id: serial("id").primaryKey(),
   exchangeId: varchar("exchange_id", { length: 255 }).notNull().unique(),
+  provider: varchar("provider", { length: 50 }).notNull().default("ChangeNOW"),
   payinAddress: varchar("payin_address", { length: 255 }).notNull(),
   payoutAddress: varchar("payout_address", { length: 255 }).notNull(),
   fromCurrency: varchar("from_currency", { length: 50 }).notNull(),
