@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { pgTable, serial, varchar, text, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, serial, varchar, text, timestamp, numeric, index } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 
 // Currency interface from ChangeNOW API
@@ -81,3 +81,40 @@ export const insertExchangeSchema = createInsertSchema(exchanges).omit({
 // Types
 export type InsertExchange = z.infer<typeof insertExchangeSchema>;
 export type SelectExchange = typeof exchanges.$inferSelect;
+
+// Database table for rate history tracking
+export const rateHistory = pgTable("rate_history", {
+  id: serial("id").primaryKey(),
+  fromCurrency: varchar("from_currency", { length: 50 }).notNull(),
+  toCurrency: varchar("to_currency", { length: 50 }).notNull(),
+  rate: numeric("rate", { precision: 20, scale: 10 }).notNull(),
+  recordedAt: timestamp("recorded_at").defaultNow().notNull(),
+}, (table) => ({
+  pairTimeIdx: index("pair_time_idx").on(table.fromCurrency, table.toCurrency, table.recordedAt),
+}));
+
+// Insert schema for rate history
+export const insertRateHistorySchema = createInsertSchema(rateHistory).omit({
+  id: true,
+  recordedAt: true,
+});
+
+// Types
+export type InsertRateHistory = z.infer<typeof insertRateHistorySchema>;
+export type SelectRateHistory = typeof rateHistory.$inferSelect;
+
+// Rate history query response
+export interface RateDataPoint {
+  timestamp: number;
+  rate: number;
+}
+
+// Network normalization helper (ChangeNOW API inconsistency workaround)
+export function normalizeNetwork(network: string): string {
+  const normalized = network.toLowerCase();
+  // Map common blockchain names to ChangeNOW's expected format
+  if (normalized === 'eth' || normalized === 'ethereum') return 'erc20';
+  if (normalized === 'bsc' || normalized === 'bnb') return 'bep20';
+  if (normalized === 'trx' || normalized === 'tron') return 'trc20';
+  return normalized;
+}

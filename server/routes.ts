@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { createExchangeSchema } from "@shared/schema";
+import { createExchangeSchema, normalizeNetwork } from "@shared/schema";
 import type { Currency, ExchangeAmount, Exchange } from "@shared/schema";
 
 const CHANGENOW_API_KEY = process.env.CHANGENOW_API_KEY;
@@ -53,16 +53,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let fromCurrency = String(from).toLowerCase();
       let toCurrency = String(to).toLowerCase();
 
-      // Normalize network names (ChangeNOW API inconsistency workaround)
-      const normalizeNetwork = (network: string): string => {
-        const normalized = network.toLowerCase();
-        // Map common blockchain names to ChangeNOW's expected format
-        if (normalized === 'eth' || normalized === 'ethereum') return 'erc20';
-        if (normalized === 'bsc' || normalized === 'bnb') return 'bep20';
-        if (normalized === 'trx' || normalized === 'tron') return 'trc20';
-        return normalized;
-      };
-
       // Only append network if it exists AND is different from the ticker
       // This prevents duplicates like "btc_btc"
       if (fromNetwork && String(fromNetwork).toLowerCase() !== fromCurrency) {
@@ -96,6 +86,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const estimate: ExchangeAmount = await response.json();
       console.log(`[ChangeNOW] Estimate result:`, estimate);
       
+      // Record the exchange rate for historical tracking
+      if (estimate.estimatedAmount) {
+        const amountNum = parseFloat(String(amount));
+        const estimatedNum = parseFloat(estimate.estimatedAmount);
+        if (!isNaN(amountNum) && !isNaN(estimatedNum) && amountNum > 0) {
+          const rate = estimatedNum / amountNum;
+          // Record rate asynchronously without blocking response
+          storage.recordRate(fromCurrency, toCurrency, rate).catch((err) => {
+            console.error("[Rate History] Failed to record rate:", err);
+          });
+        }
+      }
+      
       res.json(estimate);
     } catch (error: any) {
       console.error("[ChangeNOW] Error getting estimate:", error);
@@ -121,16 +124,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // ChangeNOW uses format: ticker or ticker_network (e.g., usdt_erc20)
       let fromCurrency = from.toLowerCase();
       let toCurrency = to.toLowerCase();
-
-      // Normalize network names (ChangeNOW API inconsistency workaround)
-      const normalizeNetwork = (network: string): string => {
-        const normalized = network.toLowerCase();
-        // Map common blockchain names to ChangeNOW's expected format
-        if (normalized === 'eth' || normalized === 'ethereum') return 'erc20';
-        if (normalized === 'bsc' || normalized === 'bnb') return 'bep20';
-        if (normalized === 'trx' || normalized === 'tron') return 'trc20';
-        return normalized;
-      };
 
       // Only append network if it exists AND is different from the ticker
       // This prevents duplicates like "btc_btc"
@@ -209,6 +202,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error: any) {
       console.error("[Storage] Error fetching exchange history:", error);
       res.status(500).json({ message: error.message || "Failed to fetch exchange history" });
+    }
+  });
+
+  // GET /api/swap/rate-history - Get rate history for a currency pair
+  app.get("/api/swap/rate-history", async (req, res) => {
+    try {
+      const { from, to, hours = "24" } = req.query;
+
+      if (!from || !to) {
+        return res.status(400).json({ message: "Missing required parameters: from, to" });
+      }
+
+      const fromCurrency = String(from).toLowerCase();
+      const toCurrency = String(to).toLowerCase();
+      const hoursNum = parseInt(String(hours));
+
+      if (isNaN(hoursNum) || hoursNum <= 0) {
+        return res.status(400).json({ message: "Invalid hours parameter" });
+      }
+
+      console.log(`[Rate History] Fetching ${hoursNum}h history for ${fromCurrency} -> ${toCurrency}`);
+
+      const history = await storage.getRateHistory(fromCurrency, toCurrency, hoursNum);
+      
+      res.json(history);
+    } catch (error: any) {
+      console.error("[Rate History] Error fetching rate history:", error);
+      res.status(500).json({ message: error.message || "Failed to fetch rate history" });
     }
   });
 

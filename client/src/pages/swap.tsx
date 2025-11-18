@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import type { Currency, ExchangeAmount, Exchange } from "@shared/schema";
+import { RateChart } from "@/components/RateChart";
 
 export default function SwapPage() {
   const { toast } = useToast();
@@ -889,6 +890,14 @@ export default function SwapPage() {
           </div>
         </div>
       </Card>
+
+      {/* Rate History Chart */}
+      <RateChart
+        from={fromCurrency}
+        to={toCurrency}
+        fromNetwork={fromNetwork}
+        toNetwork={toNetwork}
+      />
     </div>
   );
 }
