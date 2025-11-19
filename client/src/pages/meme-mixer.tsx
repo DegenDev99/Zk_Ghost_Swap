@@ -50,7 +50,6 @@ export default function MemeMixerPage() {
   const [activeOrder, setActiveOrder] = useState<MixerOrder | null>(null);
   const [timeRemaining, setTimeRemaining] = useState<string>("");
   const [copiedOrderId, setCopiedOrderId] = useState(false);
-  const [isExecuting, setIsExecuting] = useState(false);
   const [showCancelDialog, setShowCancelDialog] = useState(false);
 
   // Create order mutation
@@ -149,6 +148,46 @@ export default function MemeMixerPage() {
     return () => clearInterval(interval);
   }, [activeOrder?.expiresAt, activeOrder?.orderId, toast]);
 
+  // Deposit polling - check for deposits every 10 seconds
+  useEffect(() => {
+    if (!activeOrder || activeOrder.status !== 'pending') {
+      return;
+    }
+
+    const checkDeposit = async () => {
+      try {
+        const response = await fetch(`/api/mixer/check-deposit/${activeOrder.orderId}`);
+        const data = await response.json();
+        
+        if (data.deposited) {
+          // Update local state with deposit confirmation
+          setActiveOrder(prev => prev ? {
+            ...prev,
+            status: 'deposited',
+            depositedAmount: data.amount,
+            depositedAt: data.depositedAt,
+            depositTxSignature: data.signature,
+          } : null);
+          
+          toast({
+            title: "Deposit Confirmed!",
+            description: `Your deposit has been received. Payout scheduled in ${data.payoutScheduledIn} minutes.`,
+          });
+        }
+      } catch (error) {
+        console.error("Error checking deposit:", error);
+      }
+    };
+
+    // Check immediately
+    checkDeposit();
+
+    // Then check every 10 seconds
+    const interval = setInterval(checkDeposit, 10000);
+
+    return () => clearInterval(interval);
+  }, [activeOrder?.orderId, activeOrder?.status, toast]);
+
   const handleCreateOrder = () => {
     if (!walletAddress) {
       toast({
@@ -171,14 +210,152 @@ export default function MemeMixerPage() {
     createOrderMutation.mutate({ tokenMint, amount, recipientAddress });
   };
 
-  const handleExecuteTransfer = async () => {
-    if (!activeOrder || !walletAddress || !signTransaction) return;
+  // Cancel order mutation
+  const cancelOrderMutation = useMutation({
+    mutationFn: async (orderId: string) => {
+      const res = await apiRequest("POST", `/api/mixer/auto-close/${orderId}`);
+      return await res.json();
+    },
+    onSuccess: () => {
+      setActiveOrder(null);
+      setShowCancelDialog(false);
+      toast({
+        title: "Order Cancelled",
+        description: "Your mixer order has been permanently cancelled",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Cancellation Failed",
+        description: error.message || "Failed to cancel order",
+        variant: "destructive",
+      });
+    },
+  });
 
-    setIsExecuting(true);
+  const handleCancelOrder = () => {
+    if (!activeOrder) return;
+    cancelOrderMutation.mutate(activeOrder.orderId);
+  };
 
+  const copyOrderId = () => {
+    if (activeOrder) {
+      navigator.clipboard.writeText(activeOrder.orderId);
+      setCopiedOrderId(true);
+      setTimeout(() => setCopiedOrderId(false), 2000);
+      toast({
+        title: "Copied!",
+        description: "Order ID copied to clipboard",
+      });
+    }
+  };
+
+  // Show active order screen
+  if (activeOrder) {
+    return (
+      <div className="min-h-screen w-full flex items-center justify-center p-4 sm:p-6 lg:p-8">
+        <div className="w-full max-w-7xl flex flex-col lg:flex-row gap-6">
+          {/* Main Order Card - Left Side */}
+          <Card className="flex-1 p-6 sm:p-8 bg-black/40 border-primary/20">
+            {/* Header */}
+            <div className="text-center mb-8">
+              <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 mb-2">
+                MEME MIXER ORDER
+              </h1>
+              <p className="text-sm text-muted-foreground">
+                Custodial Privacy Mixer
+              </p>
+            </div>
+
+            {/* Timer */}
+            <div className="flex items-center justify-center gap-2 mb-6 p-4 bg-accent/10 border border-accent/20 rounded-lg">
+              <Clock className="w-5 h-5 text-accent" />
+              <span className="text-lg font-mono text-accent font-bold">{timeRemaining}</span>
+              <span className="text-sm text-muted-foreground">Time Remaining</span>
+            </div>
+
+            {/* Order ID */}
+            <div className="mb-6 p-4 bg-primary/10 border border-primary/30 rounded-lg">
+              <div className="flex items-center justify-between mb-2">
+                <Label className="text-xs text-muted-foreground">Order ID</Label>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={copyOrderId}
+                  className="h-6 gap-1"
+                  data-testid="button-copy-order-id"
+                >
+                  {copiedOrderId ? (
+                    <>
+                      <Check className="w-3 h-3" />
+                      Copied
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-3 h-3" />
+                      Copy
+                    </>
+                  )}
+                </Button>
+              </div>
+              <p className="text-sm font-mono text-primary break-all" data-testid="text-order-id">
+                {activeOrder.orderId}
+              </p>
+            </div>
+
+            {/* Order Details */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+              <div className="p-4 bg-muted/5 border border-border rounded-lg">
+                <Label className="text-xs text-muted-foreground mb-1">Token Mint</Label>
+                <p className="text-xs font-mono text-foreground break-all" data-testid="text-token-mint">
+                  {active Order.tokenMint}
+                </p>
+              </div>
+              <div className="p-4 bg-muted/5 border border-border rounded-lg">
+                <Label className="text-xs text-muted-foreground mb-1">Amount</Label>
+                <p className="text-sm font-semibold text-foreground" data-testid="text-amount">
+                  {activeOrder.amount}
+                </p>
+              </div>
+              <div className="p-4 bg-muted/5 border border-border rounded-lg">
+                <Label className="text-xs text-muted-foreground mb-1">Status</Label>
+                <div className="flex items-center gap-2">
+                  {activeOrder.status === 'completed' ? (
+                    <>
+                      <Check className="w-4 h-4 text-green-500" />
+                      <span className="text-sm font-semibold text-green-500">Completed</span>
+                    </>
+                  ) : (
+                    <>
+                      <Clock className="w-4 h-4 text-primary" />
+                      <span className="text-sm font-semibold text-primary">Pending</span>
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div className="p-4 bg-muted/5 border border-border rounded-lg">
+              <Label className="text-xs text-muted-foreground mb-1">Recipient Address</Label>
+              <p className="text-sm font-mono text-foreground break-all" data-testid="text-recipient">
+                {activeOrder.recipientAddress}
+              </p>
+            </div>
+
+            {activeOrder.depositTxSignature && (
+              <div className="p-4 bg-green-500/10 border border-green-500/30 rounded-lg">
+                <Label className="text-xs text-muted-foreground mb-1">Deposit Transaction</Label>
+                <p className="text-sm font-mono text-green-500 break-all" data-testid="text-deposit-signature">
+                  {activeOrder.depositTxSignature}
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* (continuing after fixing typo and structure) */}
+          {/* NOTE: The old execute transfer code has been removed - custodial mixer uses deposit addresses */}
+          const removed_old_code = async () => {
     try {
-      // Dynamically import Solana packages only when needed
-      const { Connection, PublicKey, Transaction } = await import("@solana/web3.js");
       const { 
         TOKEN_2022_PROGRAM_ID,
         getAssociatedTokenAddressSync,
@@ -420,23 +597,63 @@ export default function MemeMixerPage() {
               )}
             </div>
 
-            {/* Instructions */}
+            {/* Deposit Address Display */}
+            {activeOrder.status === 'pending' && (
+              <div className="p-6 bg-primary/5 border-2 border-primary/30 rounded-lg mb-6">
+                <Label className="text-sm font-semibold text-primary mb-3 block">
+                  Send Tokens to This Deposit Address:
+                </Label>
+                <div className="flex items-center gap-2 p-3 bg-background border border-border rounded-md mb-3">
+                  <code className="flex-1 text-xs font-mono text-foreground break-all" data-testid="text-deposit-address">
+                    {activeOrder.depositAddress}
+                  </code>
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    onClick={() => {
+                      navigator.clipboard.writeText(activeOrder.depositAddress);
+                      toast({ title: "Copied!", description: "Deposit address copied to clipboard" });
+                    }}
+                    data-testid="button-copy-deposit"
+                  >
+                    <Copy className="w-4 h-4" />
+                  </Button>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Send <strong className="text-foreground">{activeOrder.amount}</strong> tokens to this address. 
+                  The mixer will automatically detect your deposit and schedule a randomized payout to the recipient.
+                </p>
+              </div>
+            )}
+
+            {/* Status Instructions */}
             <div className="p-4 bg-accent/5 border border-accent/20 rounded-lg mb-6">
               <div className="flex items-start gap-2">
                 <AlertCircle className="w-5 h-5 text-accent mt-0.5 flex-shrink-0" />
                 <div className="text-sm text-muted-foreground">
-                  <p className="font-semibold text-foreground mb-1">Instructions:</p>
+                  <p className="font-semibold text-foreground mb-1">Status:</p>
                   <ul className="list-disc list-inside space-y-1">
                     {activeOrder.status === 'pending' ? (
                       <>
-                        <li>Click "Execute Confidential Transfer" to sign and send the transaction</li>
-                        <li>Your wallet will prompt you to approve the transaction</li>
-                        <li>The transfer will use Solana Token-2022 for enhanced privacy</li>
+                        <li>Waiting for your deposit to the address above</li>
+                        <li>Once detected, funds will be pooled with other users' deposits</li>
+                        <li>Payout will be sent after a random delay (5-30 minutes) to break transaction links</li>
                         <li>This order expires in {timeRemaining}</li>
+                      </>
+                    ) : activeOrder.status === 'deposited' ? (
+                      <>
+                        <li>Deposit received! Funds are now in the privacy pool</li>
+                        <li>Payout to recipient will occur after randomized delay</li>
+                        <li>Estimated payout: {activeOrder.payoutScheduledAt ? new Date(activeOrder.payoutScheduledAt).toLocaleTimeString() : 'Shortly'}</li>
+                      </>
+                    ) : activeOrder.status === 'processing' ? (
+                      <>
+                        <li>Payout is being processed...</li>
+                        <li>Your transaction will be sent to the recipient soon</li>
                       </>
                     ) : (
                       <>
-                        <li>Your confidential transfer is complete!</li>
+                        <li>Your privacy-enhanced transfer is complete!</li>
                         <li>The transaction has been recorded on the blockchain</li>
                         <li>You can create a new order or close this one</li>
                       </>
@@ -447,47 +664,23 @@ export default function MemeMixerPage() {
             </div>
 
             {/* Action Buttons */}
-            <div className="space-y-3">
-              {activeOrder.status === 'pending' && (
-                <Button
-                  onClick={handleExecuteTransfer}
-                  disabled={isExecuting || timeRemaining === "Expired"}
-                  className="w-full gap-2"
-                  size="lg"
-                  data-testid="button-execute-transfer"
-                >
-                  {isExecuting ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      Executing Transfer...
-                    </>
-                  ) : (
-                    <>
-                      <Shield className="w-4 h-4" />
-                      Execute Confidential Transfer
-                    </>
-                  )}
-                </Button>
-              )}
-
-              <div className="flex gap-3">
-                <Button
-                  onClick={() => setActiveOrder(null)}
-                  variant="outline"
-                  className="flex-1"
-                  data-testid="button-new-order"
-                >
-                  Create New Order
-                </Button>
-                <Button
-                  onClick={() => setShowCancelDialog(true)}
-                  variant="destructive"
-                  className="flex-1"
-                  data-testid="button-cancel-order"
-                >
-                  Cancel Order
-                </Button>
-              </div>
+            <div className="flex gap-3">
+              <Button
+                onClick={() => setActiveOrder(null)}
+                variant="outline"
+                className="flex-1"
+                data-testid="button-new-order"
+              >
+                Create New Order
+              </Button>
+              <Button
+                onClick={() => setShowCancelDialog(true)}
+                variant="destructive"
+                className="flex-1"
+                data-testid="button-cancel-order"
+              >
+                Cancel Order
+              </Button>
             </div>
           </Card>
 
