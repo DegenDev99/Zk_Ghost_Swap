@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,13 +6,6 @@ import { Label } from "@/components/ui/label";
 import { AlertCircle, Loader2, Shield, Lock, Zap, Eye, EyeOff, Copy, Check } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useWallet } from "@/contexts/WalletContext";
-import { Connection, PublicKey, Transaction } from "@solana/web3.js";
-import { 
-  TOKEN_2022_PROGRAM_ID,
-  getAssociatedTokenAddressSync,
-  createAssociatedTokenAccountInstruction,
-  createTransferCheckedInstruction
-} from "@solana/spl-token";
 import { PrivacyVisualization } from "@/components/PrivacyVisualization";
 
 const SOLANA_RPC = "https://api.mainnet-beta.solana.com";
@@ -51,6 +44,15 @@ export default function MemeMixerPage() {
     setStep("processing");
 
     try {
+      // Dynamically import Solana packages only when needed
+      const { Connection, PublicKey, Transaction } = await import("@solana/web3.js");
+      const { 
+        TOKEN_2022_PROGRAM_ID,
+        getAssociatedTokenAddressSync,
+        createAssociatedTokenAccountInstruction,
+        createTransferCheckedInstruction
+      } = await import("@solana/spl-token");
+
       const connection = new Connection(SOLANA_RPC);
       const walletPubkey = new PublicKey(walletAddress);
       const mintPubkey = new PublicKey(tokenMint);
