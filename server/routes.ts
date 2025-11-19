@@ -3,7 +3,6 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { createExchangeSchema, createMixerOrderSchema, normalizeNetwork } from "@shared/schema";
 import type { Currency, ExchangeAmount, Exchange, MixerOrder } from "@shared/schema";
-import { randomBytes } from "crypto";
 
 const CHANGENOW_API_KEY = process.env.CHANGENOW_API_KEY;
 const CHANGENOW_API_URL = "https://api.changenow.io/v2";
@@ -336,8 +335,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { tokenMint, amount, recipientAddress } = validation.data;
       const { sessionId, walletAddress, senderAddress } = req.body;
 
-      // Generate unique order ID
-      const orderId = `MIX-${randomBytes(8).toString('hex').toUpperCase()}`;
+      // Generate unique order ID using timestamp + random
+      const orderId = `MIX-${Date.now()}-${Math.random().toString(36).substring(2, 10).toUpperCase()}`;
 
       // Calculate expiry time (20 minutes from now)
       const expiresAt = Date.now() + (20 * 60 * 1000);

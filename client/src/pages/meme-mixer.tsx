@@ -97,7 +97,7 @@ export default function MemeMixerPage() {
     },
   });
 
-  // Timer countdown
+  // Timer countdown and auto-close on expiry
   useEffect(() => {
     if (!activeOrder || !activeOrder.expiresAt) {
       setTimeRemaining("20:00");
@@ -106,12 +106,25 @@ export default function MemeMixerPage() {
 
     const expiryTime = activeOrder.expiresAt;
 
-    const updateTimer = () => {
+    const updateTimer = async () => {
       const now = Date.now();
       const diff = expiryTime - now;
 
       if (diff <= 0) {
         setTimeRemaining("Expired");
+        
+        // Auto-close expired order
+        try {
+          await apiRequest("POST", `/api/mixer/auto-close/${activeOrder.id}`);
+          setActiveOrder(null);
+          toast({
+            title: "Order Expired",
+            description: "Your mixer order has expired and been closed",
+          });
+        } catch (error) {
+          console.error("Failed to auto-close expired order:", error);
+        }
+        
         return false;
       } else {
         const minutes = Math.floor(diff / 60000);
@@ -121,21 +134,14 @@ export default function MemeMixerPage() {
       }
     };
 
-    const shouldContinue = updateTimer();
-    
-    if (!shouldContinue) {
-      return;
-    }
+    updateTimer();
 
     const interval = setInterval(() => {
-      const shouldContinue = updateTimer();
-      if (!shouldContinue) {
-        clearInterval(interval);
-      }
+      updateTimer();
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [activeOrder?.expiresAt]);
+  }, [activeOrder?.expiresAt, activeOrder?.id, toast]);
 
   const handleCreateOrder = () => {
     if (!walletAddress) {
@@ -264,24 +270,32 @@ export default function MemeMixerPage() {
     }
   };
 
-  const handleCancelOrder = async () => {
-    if (!activeOrder) return;
-
-    try {
-      await apiRequest("POST", `/api/mixer/auto-close/${activeOrder.id}`);
+  // Cancel order mutation
+  const cancelOrderMutation = useMutation({
+    mutationFn: async (orderId: string) => {
+      const res = await apiRequest("POST", `/api/mixer/auto-close/${orderId}`);
+      return await res.json();
+    },
+    onSuccess: () => {
       setActiveOrder(null);
       setShowCancelDialog(false);
       toast({
         title: "Order Cancelled",
         description: "Your mixer order has been permanently cancelled",
       });
-    } catch (error: any) {
+    },
+    onError: (error: any) => {
       toast({
         title: "Cancellation Failed",
         description: error.message || "Failed to cancel order",
         variant: "destructive",
       });
-    }
+    },
+  });
+
+  const handleCancelOrder = () => {
+    if (!activeOrder) return;
+    cancelOrderMutation.mutate(activeOrder.id);
   };
 
   const copyOrderId = () => {
@@ -473,7 +487,7 @@ export default function MemeMixerPage() {
 
           {/* Privacy Visualization - Right Side */}
           <div className="lg:w-2/5">
-            <PrivacyVisualization />
+            <PrivacyVisualization isActive={activeOrder?.status === 'pending'} />
           </div>
         </div>
 
@@ -635,7 +649,7 @@ export default function MemeMixerPage() {
 
         {/* Privacy Visualization - Right Side */}
         <div className="lg:w-2/5">
-          <PrivacyVisualization />
+          <PrivacyVisualization isActive={false} />
         </div>
       </div>
     </div>

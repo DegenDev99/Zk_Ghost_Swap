@@ -18,6 +18,9 @@ Zk Ghost Swap is a privacy-focused cryptocurrency platform that enables anonymou
 - Zero-knowledge proofs for transaction validity without revealing details
 - Non-custodial: Uses Phantom wallet for signing, no third-party trust required
 - Legitimate and legal: Built on official Solana Token Extensions program
+- **Order Management**: Similar to swap with order IDs, 20-minute expiry, database tracking
+- **Cancel Order**: Users can manually cancel active orders via confirmation dialog; canceled orders are permanently removed
+- **Anonymous Flow**: Create order → Execute confidential transfer → Order recorded in database
 
 ## User Preferences
 
@@ -73,7 +76,10 @@ Preferred communication style: Simple, everyday language.
     - `POST /api/swap/exchange` - Create new exchange transaction
     - `GET /api/swap/exchange/:id` - Track exchange status
     - `POST /api/swap/auto-close/:id` - Permanently cancel/close an exchange order
-  - **Mixer Endpoints:** Currently frontend-only (Solana transactions executed client-side via Phantom wallet)
+  - **Mixer Endpoints:**
+  - `POST /api/mixer/order` - Create new mixer order with 20-min expiry
+  - `POST /api/mixer/submit` - Submit transaction signature after execution
+  - `POST /api/mixer/auto-close/:id` - Permanently cancel/close a mixer order
 - Request/response logging middleware for debugging and monitoring
 - Raw body preservation for webhook verification scenarios
 
@@ -87,13 +93,16 @@ Preferred communication style: Simple, everyday language.
 
 **In-Memory Storage (Current Implementation)**
 - `MemStorage` class implementing `IStorage` interface
-- Map-based storage for exchange records
+- Map-based storage for exchange records and mixer orders
 - No persistence - data lost on server restart
 - Suitable for MVP/development phase
 
 **Database Ready Architecture**
 - **Drizzle ORM** configured with PostgreSQL dialect
-- Schema defined in `shared/schema.ts` for type-safe database operations
+- Schema defined in `shared/schema.ts` for type-safe database operations:
+  - `exchanges` table for swap orders
+  - `mixerOrders` table for confidential transfer orders with order IDs, token info, and expiry timestamps
+  - `rateHistory` table for exchange rate tracking
 - Migration system ready (`drizzle-kit`) with migrations output to `./migrations`
 - **Neon Database** serverless Postgres driver included
 - Database credentials expected via `DATABASE_URL` environment variable
