@@ -16,6 +16,7 @@ import { useWallet } from "@/contexts/WalletContext";
 import { getOrCreateSessionId } from "@/lib/session";
 import { Link } from "wouter";
 import ghostImage from "@assets/Untitled design - 2025-11-19T084820.477_1763560149453.png";
+import textLogo from "@assets/Untitled design - 2025-11-19T090522.120_1763561414346.png";
 
 export default function SwapPage() {
   const { toast } = useToast();
@@ -768,9 +769,14 @@ export default function SwapPage() {
           <Card className="w-full p-6 sm:p-8 bg-card/40 backdrop-blur-sm border-primary/20">
         {/* Header */}
         <div className="text-center mb-6">
-          <h1 className="text-4xl sm:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 mb-2">
-            ZK GHOST SWAP
-          </h1>
+          <div className="flex justify-center mb-2">
+            <img 
+              src={textLogo} 
+              alt="ZK GHOST SWAP" 
+              className="h-12 w-auto sm:h-16"
+              data-testid="img-text-logo-swap"
+            />
+          </div>
           <p className="text-sm text-muted-foreground uppercase tracking-wider">
             Privacy-First Asset Swapping
           </p>
