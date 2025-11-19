@@ -488,7 +488,7 @@ export default function SwapPage() {
             </div>
 
             <div className="text-center mb-8">
-              <h1 className="text-3xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary via-accent to-secondary mb-2">
+              <h1 className="text-3xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 mb-2">
                 ZK GHOST SWAP EXCHANGE
               </h1>
               <p className="text-sm text-muted-foreground uppercase tracking-wider">
@@ -767,7 +767,7 @@ export default function SwapPage() {
           <Card className="w-full p-6 sm:p-8 bg-card/40 backdrop-blur-sm border-primary/20">
         {/* Header */}
         <div className="text-center mb-6">
-          <h1 className="text-4xl sm:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary via-accent to-secondary mb-2">
+          <h1 className="text-4xl sm:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 mb-2">
             ZK GHOST SWAP
           </h1>
           <p className="text-sm text-muted-foreground uppercase tracking-wider">
@@ -1032,7 +1032,7 @@ export default function SwapPage() {
                 <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-primary to-secondary mb-4">
                   <Shield className="w-8 h-8 text-primary-foreground" />
                 </div>
-                <h2 className="text-2xl font-bold bg-gradient-to-r from-primary via-accent to-secondary bg-clip-text text-transparent mb-2">
+                <h2 className="text-2xl font-bold bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 bg-clip-text text-transparent mb-2">
                   ZERO-KNOWLEDGE PRIVACY
                 </h2>
                 <p className="text-xs text-muted-foreground uppercase tracking-wider">

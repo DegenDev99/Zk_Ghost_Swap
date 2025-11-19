@@ -141,7 +141,7 @@ function Router() {
                 className="h-7 w-auto sm:h-8 md:h-9"
                 data-testid="img-logo-main"
               />
-              <div className="text-sm sm:text-base md:text-lg font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent whitespace-nowrap">
+              <div className="text-sm sm:text-base md:text-lg font-bold bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 bg-clip-text text-transparent whitespace-nowrap">
                 ZK GHOST SWAP
               </div>
             </div>
