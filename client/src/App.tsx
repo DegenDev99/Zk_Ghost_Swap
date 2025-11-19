@@ -145,7 +145,7 @@ function Router() {
               <img 
                 src={textLogoImage} 
                 alt="ZK GHOST SWAP" 
-                className="h-6 w-auto sm:h-7 md:h-8"
+                className="h-8 w-auto sm:h-10 md:h-12"
                 data-testid="img-text-logo"
               />
             </div>
