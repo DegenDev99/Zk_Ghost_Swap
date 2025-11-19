@@ -48,26 +48,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Missing required parameters: from, to, amount" });
       }
 
-      // Build currency codes with network if provided
-      // ChangeNOW uses format: ticker or ticker_network (e.g., usdt_erc20)
-      let fromCurrency = String(from).toLowerCase();
-      let toCurrency = String(to).toLowerCase();
+      const fromCurrency = String(from).toLowerCase();
+      const toCurrency = String(to).toLowerCase();
 
-      // Only append network if it exists AND is different from the ticker
-      // This prevents duplicates like "btc_btc"
-      if (fromNetwork && String(fromNetwork).toLowerCase() !== fromCurrency) {
-        const normalizedNetwork = normalizeNetwork(String(fromNetwork));
-        fromCurrency = `${fromCurrency}_${normalizedNetwork}`;
+      // Build API URL with network as separate parameters (ChangeNOW v2 format)
+      const params = new URLSearchParams({
+        fromCurrency,
+        toCurrency,
+        fromAmount: String(amount),
+        toAmount: '',
+        type: 'direct',
+        flow: 'standard',
+      });
+
+      // Add network parameters if provided
+      if (fromNetwork) {
+        params.append('fromNetwork', String(fromNetwork).toLowerCase());
       }
-      if (toNetwork && String(toNetwork).toLowerCase() !== toCurrency) {
-        const normalizedNetwork = normalizeNetwork(String(toNetwork));
-        toCurrency = `${toCurrency}_${normalizedNetwork}`;
+      if (toNetwork) {
+        params.append('toNetwork', String(toNetwork).toLowerCase());
       }
 
-      console.log(`[ChangeNOW] Estimating: ${fromCurrency} -> ${toCurrency}, amount: ${amount}`);
+      console.log(`[ChangeNOW] Estimating: ${fromCurrency} (${fromNetwork || 'default'}) -> ${toCurrency} (${toNetwork || 'default'}), amount: ${amount}`);
 
       const response = await fetch(
-        `${CHANGENOW_API_URL}/exchange/estimated-amount?fromCurrency=${fromCurrency}&toCurrency=${toCurrency}&fromAmount=${amount}&toAmount=&type=direct&flow=standard`,
+        `${CHANGENOW_API_URL}/exchange/estimated-amount?${params.toString()}`,
         {
           headers: {
             "x-changenow-api-key": CHANGENOW_API_KEY || "",
@@ -121,25 +126,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { from, to, fromNetwork, toNetwork, amount, address } = validation.data;
       const { sessionId, walletAddress } = req.body;
 
-      // Build currency codes with network if provided
-      // ChangeNOW uses format: ticker or ticker_network (e.g., usdt_erc20)
-      let fromCurrency = from.toLowerCase();
-      let toCurrency = to.toLowerCase();
+      const fromCurrency = from.toLowerCase();
+      const toCurrency = to.toLowerCase();
 
-      // Only append network if it exists AND is different from the ticker
-      // This prevents duplicates like "btc_btc"
-      if (fromNetwork && fromNetwork.toLowerCase() !== fromCurrency) {
-        const normalizedNetwork = normalizeNetwork(fromNetwork);
-        fromCurrency = `${fromCurrency}_${normalizedNetwork}`;
-      }
-      if (toNetwork && toNetwork.toLowerCase() !== toCurrency) {
-        const normalizedNetwork = normalizeNetwork(toNetwork);
-        toCurrency = `${toCurrency}_${normalizedNetwork}`;
-      }
+      console.log(`[ChangeNOW] Creating exchange: ${fromCurrency} (${fromNetwork || 'default'}) -> ${toCurrency} (${toNetwork || 'default'}), amount: ${amount}`);
 
-      console.log(`[ChangeNOW] Creating exchange: ${fromCurrency} -> ${toCurrency}, amount: ${amount}`);
-
-      const exchangeData = {
+      // Build exchange data with network as separate fields (ChangeNOW v2 format)
+      const exchangeData: any = {
         fromCurrency,
         toCurrency,
         fromAmount: amount,
@@ -147,6 +140,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         flow: "standard",
         type: "direct",
       };
+
+      // Add network fields if provided
+      if (fromNetwork) {
+        exchangeData.fromNetwork = fromNetwork.toLowerCase();
+      }
+      if (toNetwork) {
+        exchangeData.toNetwork = toNetwork.toLowerCase();
+      }
 
       const response = await fetch(`${CHANGENOW_API_URL}/exchange`, {
         method: "POST",
