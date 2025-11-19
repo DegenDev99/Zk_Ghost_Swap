@@ -2,7 +2,7 @@
 
 ## Overview
 
-Zk Ghost Swap is a privacy-focused cryptocurrency platform that enables anonymous asset swapping and token mixing without KYC requirements or user registration. The platform features two core privacy tools: (1) Cross-chain crypto swaps via ChangeNOW API, and (2) Meme Mixer for confidential SPL token transfers using Solana Token-2022 technology. Built with a cyberpunk/Matrix-inspired aesthetic, the application provides streamlined interfaces for creating and tracking privacy-enhanced transactions with real-time status updates.
+Zk Ghost Swap is a privacy-focused cryptocurrency platform that enables anonymous asset swapping and token mixing without KYC requirements or user registration. The platform features two core privacy tools: (1) Cross-chain crypto swaps via ChangeNOW API, and (2) Meme Mixer - a custodial pool-based mixer that pools user deposits and sends randomized payouts to break on-chain transaction links. Built with a cyberpunk/Matrix-inspired aesthetic, the application provides streamlined interfaces for creating and tracking privacy-enhanced transactions with real-time status updates.
 
 **Key Privacy Features:**
 
@@ -12,15 +12,16 @@ Zk Ghost Swap is a privacy-focused cryptocurrency platform that enables anonymou
 - Disconnect confirmation: Prevents accidental wallet disconnection with warning dialog
 - **Cancel Order**: Users can manually cancel active orders via confirmation dialog; canceled orders are permanently removed and do not reappear on page reload
 
-**Meme Mixer (Token-2022 Confidential Transfers):**
-- Solana SPL token privacy transfers using native Token-2022 technology
-- ElGamal homomorphic encryption for hiding transfer amounts
-- Zero-knowledge proofs for transaction validity without revealing details
-- Non-custodial: Uses Phantom wallet for signing, no third-party trust required
-- Legitimate and legal: Built on official Solana Token Extensions program
-- **Order Management**: Similar to swap with order IDs, 20-minute expiry, database tracking
+**Meme Mixer (Custodial Pool-Based Mixer):**
+- **Custodial Architecture**: Backend-controlled privacy pool for breaking on-chain transaction links
+- **Deposit Flow**: Backend generates unique Solana keypairs, encrypts private keys with AES-256
+- **Pooling Mechanism**: Multiple users' deposits pooled together to obscure transaction links
+- **Randomized Payouts**: 5-30 minute random delays before sending to recipients
+- **Security**: Private keys encrypted using crypto-js with MIXER_ENCRYPTION_KEY environment variable
+- **Order Management**: 20-minute order expiry, automatic deposit detection via Solana RPC polling
 - **Cancel Order**: Users can manually cancel active orders via confirmation dialog; canceled orders are permanently removed
-- **Anonymous Flow**: Create order → Execute confidential transfer → Order recorded in database
+- **Anonymous Flow**: Create order → Send to deposit address → Automatic pool mixing → Randomized payout
+- **Storage**: depositAddress, depositPrivateKey (encrypted), depositedAmount, depositedAt, payoutScheduledAt, depositTxSignature fields in database
 
 ## User Preferences
 
@@ -52,9 +53,10 @@ Preferred communication style: Simple, everyday language.
 
 **Solana Integration**
 - **@solana/web3.js** for blockchain interaction and transaction building
-- **@solana/spl-token** with Token-2022 support for confidential transfers
-- **Phantom Wallet Integration** via WalletContext with transaction signing capabilities
-- Direct RPC connection to Solana mainnet for token transfers
+- **@solana/spl-token** for SPL token transfers
+- **Phantom Wallet Integration** via WalletContext for authentication
+- Direct RPC connection to Solana mainnet for deposit detection and payouts
+- **Custodial Keypair Management**: Backend generates and encrypts Solana keypairs for deposit addresses
 
 **Form Handling & Validation**
 - **React Hook Form** with **@hookform/resolvers** for form state management
@@ -77,9 +79,9 @@ Preferred communication style: Simple, everyday language.
     - `GET /api/swap/exchange/:id` - Track exchange status
     - `POST /api/swap/auto-close/:id` - Permanently cancel/close an exchange order
   - **Mixer Endpoints:**
-  - `POST /api/mixer/order` - Create new mixer order with 20-min expiry
-  - `POST /api/mixer/submit` - Submit transaction signature after execution
-  - `POST /api/mixer/auto-close/:id` - Permanently cancel/close a mixer order
+    - `POST /api/mixer/order` - Create custodial mixer order (generates deposit address with encrypted private key)
+    - `GET /api/mixer/deposit/:orderId` - Check deposit status via Solana RPC polling
+    - `POST /api/mixer/auto-close/:id` - Permanently cancel/close a mixer order
 - Request/response logging middleware for debugging and monitoring
 - Raw body preservation for webhook verification scenarios
 

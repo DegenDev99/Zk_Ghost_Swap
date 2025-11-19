@@ -10,8 +10,14 @@ import CryptoJS from "crypto-js";
 const CHANGENOW_API_KEY = process.env.CHANGENOW_API_KEY;
 const CHANGENOW_API_URL = "https://api.changenow.io/v2";
 
-// Encryption key for private keys (MUST be set in production)
-const ENCRYPTION_KEY = process.env.MIXER_ENCRYPTION_KEY || "INSECURE_DEFAULT_KEY_CHANGE_IN_PRODUCTION";
+// Encryption key for private keys - REQUIRED for security
+const ENCRYPTION_KEY = process.env.MIXER_ENCRYPTION_KEY;
+
+if (!ENCRYPTION_KEY) {
+  console.error('[FATAL] MIXER_ENCRYPTION_KEY environment variable is required for custodial mixer security');
+  console.error('[FATAL] Mixer service cannot start without encryption key - aborting');
+  process.exit(1);
+}
 
 // Helper function to encrypt private keys
 function encryptPrivateKey(privateKey: string): string {

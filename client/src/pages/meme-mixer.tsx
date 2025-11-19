@@ -308,7 +308,7 @@ export default function MemeMixerPage() {
               <div className="p-4 bg-muted/5 border border-border rounded-lg">
                 <Label className="text-xs text-muted-foreground mb-1">Token Mint</Label>
                 <p className="text-xs font-mono text-foreground break-all" data-testid="text-token-mint">
-                  {active Order.tokenMint}
+                  {activeOrder.tokenMint}
                 </p>
               </div>
               <div className="p-4 bg-muted/5 border border-border rounded-lg">
@@ -350,252 +350,6 @@ export default function MemeMixerPage() {
                 </p>
               </div>
             )}
-          </div>
-
-          {/* (continuing after fixing typo and structure) */}
-          {/* NOTE: The old execute transfer code has been removed - custodial mixer uses deposit addresses */}
-          const removed_old_code = async () => {
-    try {
-      const { 
-        TOKEN_2022_PROGRAM_ID,
-        getAssociatedTokenAddressSync,
-        createAssociatedTokenAccountInstruction,
-        createTransferCheckedInstruction
-      } = await import("@solana/spl-token");
-
-      const connection = new Connection(SOLANA_RPC);
-      const walletPubkey = new PublicKey(walletAddress);
-      const mintPubkey = new PublicKey(activeOrder.tokenMint);
-      const recipientPubkey = new PublicKey(activeOrder.recipientAddress);
-
-      // Get or create associated token accounts
-      const senderATA = getAssociatedTokenAddressSync(
-        mintPubkey,
-        walletPubkey,
-        false,
-        TOKEN_2022_PROGRAM_ID
-      );
-
-      const recipientATA = getAssociatedTokenAddressSync(
-        mintPubkey,
-        recipientPubkey,
-        false,
-        TOKEN_2022_PROGRAM_ID
-      );
-
-      // Build transaction
-      const transaction = new Transaction();
-
-      // Check if recipient ATA exists, if not create it
-      const recipientATAInfo = await connection.getAccountInfo(recipientATA);
-      if (!recipientATAInfo) {
-        transaction.add(
-          createAssociatedTokenAccountInstruction(
-            walletPubkey,
-            recipientATA,
-            recipientPubkey,
-            mintPubkey,
-            TOKEN_2022_PROGRAM_ID
-          )
-        );
-      }
-
-      // Get token info to determine decimals
-      const tokenInfo = await connection.getParsedAccountInfo(mintPubkey);
-      const decimals = (tokenInfo.value?.data as any)?.parsed?.info?.decimals || 9;
-      const transferAmount = parseFloat(activeOrder.amount) * Math.pow(10, decimals);
-
-      // Add confidential transfer instruction
-      transaction.add(
-        createTransferCheckedInstruction(
-          senderATA,
-          mintPubkey,
-          recipientATA,
-          walletPubkey,
-          transferAmount,
-          decimals,
-          [],
-          TOKEN_2022_PROGRAM_ID
-        )
-      );
-
-      // Get recent blockhash
-      const { blockhash } = await connection.getLatestBlockhash();
-      transaction.recentBlockhash = blockhash;
-      transaction.feePayer = walletPubkey;
-
-      // Sign and send transaction
-      const signedTx = await signTransaction(transaction);
-      const signature = await connection.sendRawTransaction(signedTx.serialize());
-
-      // Wait for confirmation
-      await connection.confirmTransaction(signature);
-
-      // Submit to backend
-      await submitTransactionMutation.mutateAsync({
-        orderId: activeOrder.orderId,
-        signature,
-      });
-
-      toast({
-        title: "Success!",
-        description: "Your confidential transfer is complete.",
-      });
-    } catch (error: any) {
-      console.error("[Mixer] Error executing transfer:", error);
-      toast({
-        title: "Transfer Failed",
-        description: error.message || "Failed to execute confidential transfer",
-        variant: "destructive",
-      });
-    } finally {
-      setIsExecuting(false);
-    }
-  };
-
-  // Cancel order mutation
-  const cancelOrderMutation = useMutation({
-    mutationFn: async (orderId: string) => {
-      const res = await apiRequest("POST", `/api/mixer/auto-close/${orderId}`);
-      return await res.json();
-    },
-    onSuccess: () => {
-      setActiveOrder(null);
-      setShowCancelDialog(false);
-      toast({
-        title: "Order Cancelled",
-        description: "Your mixer order has been permanently cancelled",
-      });
-    },
-    onError: (error: any) => {
-      toast({
-        title: "Cancellation Failed",
-        description: error.message || "Failed to cancel order",
-        variant: "destructive",
-      });
-    },
-  });
-
-  const handleCancelOrder = () => {
-    if (!activeOrder) return;
-    cancelOrderMutation.mutate(activeOrder.orderId);
-  };
-
-  const copyOrderId = () => {
-    if (activeOrder) {
-      navigator.clipboard.writeText(activeOrder.orderId);
-      setCopiedOrderId(true);
-      setTimeout(() => setCopiedOrderId(false), 2000);
-      toast({
-        title: "Copied!",
-        description: "Order ID copied to clipboard",
-      });
-    }
-  };
-
-  // Show active order screen
-  if (activeOrder) {
-    return (
-      <div className="min-h-screen w-full flex items-center justify-center p-4 sm:p-6 lg:p-8">
-        <div className="w-full max-w-7xl flex flex-col lg:flex-row gap-6">
-          {/* Main Order Card - Left Side */}
-          <Card className="flex-1 p-6 sm:p-8 bg-black/40 border-primary/20">
-            {/* Header */}
-            <div className="text-center mb-8">
-              <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 mb-2">
-                MEME MIXER ORDER
-              </h1>
-              <p className="text-sm text-muted-foreground">
-                Confidential Token Transfer
-              </p>
-            </div>
-
-            {/* Timer */}
-            <div className="flex items-center justify-center gap-2 mb-6 p-4 bg-accent/10 border border-accent/20 rounded-lg">
-              <Clock className="w-5 h-5 text-accent" />
-              <span className="text-lg font-mono text-accent font-bold">{timeRemaining}</span>
-              <span className="text-sm text-muted-foreground">Time Remaining</span>
-            </div>
-
-            {/* Order ID */}
-            <div className="mb-6 p-4 bg-primary/10 border border-primary/30 rounded-lg">
-              <div className="flex items-center justify-between mb-2">
-                <Label className="text-xs text-muted-foreground">Order ID</Label>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={copyOrderId}
-                  className="h-6 gap-1"
-                  data-testid="button-copy-order-id"
-                >
-                  {copiedOrderId ? (
-                    <>
-                      <Check className="w-3 h-3" />
-                      <span className="text-xs">Copied</span>
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="w-3 h-3" />
-                      <span className="text-xs">Copy</span>
-                    </>
-                  )}
-                </Button>
-              </div>
-              <p className="text-sm font-mono text-primary break-all" data-testid="text-order-id">
-                {activeOrder.orderId}
-              </p>
-            </div>
-
-            {/* Order Details */}
-            <div className="space-y-4 mb-6">
-              <div className="p-4 bg-muted/5 border border-border rounded-lg">
-                <Label className="text-xs text-muted-foreground mb-1">Token Mint</Label>
-                <p className="text-sm font-mono text-foreground break-all" data-testid="text-token-mint">
-                  {activeOrder.tokenMint}
-                </p>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="p-4 bg-muted/5 border border-border rounded-lg">
-                  <Label className="text-xs text-muted-foreground mb-1">Amount</Label>
-                  <p className="text-lg font-bold text-foreground" data-testid="text-amount">
-                    {activeOrder.amount}
-                  </p>
-                </div>
-                <div className="p-4 bg-muted/5 border border-border rounded-lg">
-                  <Label className="text-xs text-muted-foreground mb-1">Status</Label>
-                  <div className="flex items-center gap-2">
-                    {activeOrder.status === 'completed' ? (
-                      <>
-                        <Check className="w-4 h-4 text-green-500" />
-                        <span className="text-sm font-semibold text-green-500">Completed</span>
-                      </>
-                    ) : (
-                      <>
-                        <Clock className="w-4 h-4 text-primary" />
-                        <span className="text-sm font-semibold text-primary">Pending</span>
-                      </>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              <div className="p-4 bg-muted/5 border border-border rounded-lg">
-                <Label className="text-xs text-muted-foreground mb-1">Recipient Address</Label>
-                <p className="text-sm font-mono text-foreground break-all" data-testid="text-recipient">
-                  {activeOrder.recipientAddress}
-                </p>
-              </div>
-
-              {activeOrder.depositTxSignature && (
-                <div className="p-4 bg-green-500/10 border border-green-500/30 rounded-lg">
-                  <Label className="text-xs text-muted-foreground mb-1">Deposit Transaction</Label>
-                  <p className="text-sm font-mono text-green-500 break-all" data-testid="text-deposit-signature">
-                    {activeOrder.depositTxSignature}
-                  </p>
-                </div>
-              )}
-            </div>
 
             {/* Deposit Address Display */}
             {activeOrder.status === 'pending' && (
@@ -604,7 +358,7 @@ export default function MemeMixerPage() {
                   Send Tokens to This Deposit Address:
                 </Label>
                 <div className="flex items-center gap-2 p-3 bg-background border border-border rounded-md mb-3">
-                  <code className="flex-1 text-xs font-mono text-foreground break-all" data-testid="text-deposit-address">
+                  <code className="flex-1 text-xs font-mono text-foreground break-all" data-testid="text-deposit-address-active">
                     {activeOrder.depositAddress}
                   </code>
                   <Button
@@ -614,7 +368,7 @@ export default function MemeMixerPage() {
                       navigator.clipboard.writeText(activeOrder.depositAddress);
                       toast({ title: "Copied!", description: "Deposit address copied to clipboard" });
                     }}
-                    data-testid="button-copy-deposit"
+                    data-testid="button-copy-deposit-active"
                   >
                     <Copy className="w-4 h-4" />
                   </Button>
@@ -700,19 +454,15 @@ export default function MemeMixerPage() {
               </AlertDialogTitle>
               <AlertDialogDescription>
                 This will permanently cancel your mixer order. This action cannot be undone.
-                The order will be removed and cannot be recovered.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel data-testid="button-cancel-dialog-cancel">
-                Keep Order
-              </AlertDialogCancel>
+              <AlertDialogCancel>Keep Order</AlertDialogCancel>
               <AlertDialogAction
                 onClick={handleCancelOrder}
-                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                data-testid="button-cancel-dialog-confirm"
+                className="bg-destructive hover:bg-destructive/90"
               >
-                Yes, Cancel Order
+                Cancel Order
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
@@ -814,11 +564,11 @@ export default function MemeMixerPage() {
               <div className="text-sm text-muted-foreground">
                 <p className="font-semibold text-foreground mb-1">Privacy Features</p>
                 <ul className="list-disc list-inside space-y-1">
-                  <li>Uses Solana Token-2022 Confidential Transfers</li>
-                  <li>Transfer amounts hidden via ElGamal encryption</li>
-                  <li>Zero-knowledge proofs for transaction validity</li>
-                  <li>Non-custodial: you control your wallet</li>
-                  <li>20-minute window to execute transfer</li>
+                  <li>Custodial pool-based mixer for enhanced privacy</li>
+                  <li>Backend generates unique deposit addresses</li>
+                  <li>Funds pooled with other users' deposits</li>
+                  <li>Randomized payout delays (5-30 min) break transaction links</li>
+                  <li>20-minute window to complete deposit</li>
                 </ul>
               </div>
             </div>
