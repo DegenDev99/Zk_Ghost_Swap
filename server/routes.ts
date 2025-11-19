@@ -3,9 +3,26 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { createExchangeSchema, createMixerOrderSchema, normalizeNetwork } from "@shared/schema";
 import type { Currency, ExchangeAmount, Exchange, MixerOrder } from "@shared/schema";
+import { Keypair } from "@solana/web3.js";
+import bs58 from "bs58";
+import CryptoJS from "crypto-js";
 
 const CHANGENOW_API_KEY = process.env.CHANGENOW_API_KEY;
 const CHANGENOW_API_URL = "https://api.changenow.io/v2";
+
+// Encryption key for private keys (MUST be set in production)
+const ENCRYPTION_KEY = process.env.MIXER_ENCRYPTION_KEY || "INSECURE_DEFAULT_KEY_CHANGE_IN_PRODUCTION";
+
+// Helper function to encrypt private keys
+function encryptPrivateKey(privateKey: string): string {
+  return CryptoJS.AES.encrypt(privateKey, ENCRYPTION_KEY).toString();
+}
+
+// Helper function to decrypt private keys
+function decryptPrivateKey(encryptedKey: string): string {
+  const bytes = CryptoJS.AES.decrypt(encryptedKey, ENCRYPTION_KEY);
+  return bytes.toString(CryptoJS.enc.Utf8);
+}
 
 if (!CHANGENOW_API_KEY) {
   console.error("⚠️  CHANGENOW_API_KEY is not set in environment variables");
