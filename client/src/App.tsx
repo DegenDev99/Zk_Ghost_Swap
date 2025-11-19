@@ -131,10 +131,10 @@ function Router() {
     <div className="min-h-screen bg-background">
       {/* Navigation Header */}
       <nav className="border-b border-border bg-card/60 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto !pl-0 pr-3 sm:pr-4">
-          <div className="flex items-center justify-between h-14 sm:h-16">
-            {/* Logo and Brand - Flush left */}
-            <div className="flex items-center gap-2 sm:gap-3 pl-2">
+        <div className="w-full px-3 sm:px-4">
+          <div className="flex items-center h-14 sm:h-16 relative">
+            {/* Logo and Brand - Far left */}
+            <div className="flex items-center gap-2 sm:gap-3">
               <img 
                 src={logoImage} 
                 alt="Zk Ghost Swap Logo" 
@@ -147,13 +147,13 @@ function Router() {
               </div>
             </div>
             
-            {/* Navigation - Right aligned */}
-            <div className="flex gap-1 sm:gap-2">
+            {/* Navigation - Absolute Center */}
+            <div className="absolute left-1/2 -translate-x-1/2 flex gap-1 sm:gap-2 pointer-events-auto z-10">
               <Link href="/">
                 <Button 
                   variant={location === "/" ? "default" : "ghost"}
                   size="sm"
-                  className="gap-1 sm:gap-2 text-xs sm:text-sm"
+                  className="gap-1 sm:gap-2 text-xs sm:text-sm pointer-events-auto"
                   data-testid="link-swap"
                   aria-label="Swap"
                 >
@@ -165,7 +165,7 @@ function Router() {
                 <Button 
                   variant={location === "/docs" ? "default" : "ghost"}
                   size="sm"
-                  className="gap-1 sm:gap-2 text-xs sm:text-sm"
+                  className="gap-1 sm:gap-2 text-xs sm:text-sm pointer-events-auto"
                   data-testid="link-docs"
                   aria-label="Documentation"
                 >
@@ -173,6 +173,10 @@ function Router() {
                   <span className="hidden xs:inline">Docs</span>
                 </Button>
               </Link>
+            </div>
+
+            {/* Wallet - Right */}
+            <div className="ml-auto">
               <WalletButton />
             </div>
           </div>
