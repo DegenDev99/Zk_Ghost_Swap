@@ -134,14 +134,14 @@ function Router() {
         <div className="container mx-auto px-3 sm:px-4">
           <div className="flex items-center justify-between h-14 sm:h-16">
             {/* Logo and Brand - Left aligned */}
-            <div className="flex items-center gap-2 sm:gap-2.5">
+            <div className="flex items-center gap-2 sm:gap-3">
               <img 
                 src={logoImage} 
                 alt="Zk Ghost Swap Logo" 
-                className="h-7 w-auto sm:h-8 md:h-9"
+                className="h-10 w-auto sm:h-12 md:h-14"
                 data-testid="img-logo-main"
               />
-              <div className="text-sm sm:text-base md:text-lg font-bold bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 bg-clip-text text-transparent whitespace-nowrap">
+              <div className="text-lg sm:text-xl md:text-2xl font-bold bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 bg-clip-text text-transparent whitespace-nowrap">
                 ZK GHOST SWAP
               </div>
             </div>
