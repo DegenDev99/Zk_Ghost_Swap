@@ -11,7 +11,6 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeftRight, History, Wallet, FileText, LogOut } from "lucide-react";
 import { WalletProvider, useWallet } from "@/contexts/WalletContext";
 import logoImage from "@assets/Untitled design - 2025-11-19T084305.349_1763559907026.png";
-import textLogoImage from "@assets/Untitled design - 2025-11-19T090522.120_1763561136135.png";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -142,12 +141,9 @@ function Router() {
                 className="h-10 w-auto sm:h-12 md:h-14"
                 data-testid="img-logo-main"
               />
-              <img 
-                src={textLogoImage} 
-                alt="ZK GHOST SWAP" 
-                className="h-8 w-auto sm:h-10 md:h-12"
-                data-testid="img-text-logo"
-              />
+              <div className="text-lg sm:text-xl md:text-2xl font-bold bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 bg-clip-text text-transparent whitespace-nowrap">
+                ZK GHOST SWAP
+              </div>
             </div>
             
             {/* Navigation - Right aligned */}
