@@ -28,6 +28,12 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Buffer } from "buffer";
+
+// Polyfill Buffer for Solana web3.js
+if (typeof globalThis.Buffer === 'undefined') {
+  globalThis.Buffer = Buffer;
+}
 
 const SOLANA_RPC = "https://api.mainnet-beta.solana.com";
 

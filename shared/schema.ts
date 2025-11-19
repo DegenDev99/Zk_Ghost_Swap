@@ -119,23 +119,38 @@ export interface RateDataPoint {
   rate: number;
 }
 
-// Mixer Order interface
+// Mixer Order interface (custodial pool architecture)
 export interface MixerOrder {
-  id: string;
+  id: number;
+  orderId: string;
   tokenMint: string;
   amount: string;
   senderAddress: string;
   recipientAddress: string;
+  
+  // Custodial deposit address
+  depositAddress: string;
+  depositPrivateKey: string; // Encrypted
+  
+  // Deposit tracking
+  depositedAmount?: string | null;
+  depositedAt?: string | null;
+  depositTxSignature?: string | null;
+  
+  // Payout tracking
+  payoutScheduledAt?: string | null;
+  payoutExecutedAt?: string | null;
+  payoutTxSignature?: string | null;
+  
   status: string;
   expiresAt: number;
-  transactionSignature?: string;
-  sessionId?: string;
-  walletAddress?: string;
-  completedAt?: string;
-  autoClosedAt?: string;
+  sessionId?: string | null;
+  walletAddress?: string | null;
+  completedAt?: string | null;
+  autoClosedAt?: string | null;
 }
 
-// Database table for mixer orders
+// Database table for mixer orders (custodial pool architecture)
 export const mixerOrders = pgTable("mixer_orders", {
   id: serial("id").primaryKey(),
   orderId: varchar("order_id", { length: 255 }).notNull().unique(),
@@ -143,9 +158,23 @@ export const mixerOrders = pgTable("mixer_orders", {
   amount: varchar("amount", { length: 100 }).notNull(),
   senderAddress: varchar("sender_address", { length: 255 }).notNull(),
   recipientAddress: varchar("recipient_address", { length: 255 }).notNull(),
-  status: varchar("status", { length: 50 }).notNull().default("pending"),
+  
+  // Custodial deposit address (backend-controlled)
+  depositAddress: varchar("deposit_address", { length: 255 }).notNull(),
+  depositPrivateKey: text("deposit_private_key").notNull(), // Encrypted
+  
+  // Deposit tracking
+  depositedAmount: varchar("deposited_amount", { length: 100 }),
+  depositedAt: timestamp("deposited_at"),
+  depositTxSignature: varchar("deposit_tx_signature", { length: 255 }),
+  
+  // Payout tracking
+  payoutScheduledAt: timestamp("payout_scheduled_at"),
+  payoutExecutedAt: timestamp("payout_executed_at"),
+  payoutTxSignature: varchar("payout_tx_signature", { length: 255 }),
+  
+  status: varchar("status", { length: 50 }).notNull().default("pending"), // pending, deposited, processing, completed, expired, cancelled
   expiresAt: varchar("expires_at", { length: 100 }).notNull(),
-  transactionSignature: varchar("transaction_signature", { length: 255 }),
   sessionId: varchar("session_id", { length: 255 }),
   walletAddress: varchar("wallet_address", { length: 255 }),
   completedAt: timestamp("completed_at"),
