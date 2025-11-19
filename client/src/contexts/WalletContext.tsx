@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
+import type { Transaction, VersionedTransaction } from "@solana/web3.js";
 
 interface WalletContextType {
   walletAddress: string | null;
@@ -6,6 +7,8 @@ interface WalletContextType {
   connecting: boolean;
   connect: () => Promise<void>;
   disconnect: () => void;
+  signTransaction?: (transaction: Transaction | VersionedTransaction) => Promise<Transaction | VersionedTransaction>;
+  signAllTransactions?: (transactions: (Transaction | VersionedTransaction)[]) => Promise<(Transaction | VersionedTransaction)[]>;
 }
 
 const WalletContext = createContext<WalletContextType | undefined>(undefined);
@@ -57,6 +60,26 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem("walletAddress");
   };
 
+  const signTransaction = async (transaction: Transaction | VersionedTransaction) => {
+    const { solana } = window as any;
+    
+    if (!solana?.isPhantom) {
+      throw new Error("Phantom wallet not found");
+    }
+    
+    return await solana.signTransaction(transaction);
+  };
+
+  const signAllTransactions = async (transactions: (Transaction | VersionedTransaction)[]) => {
+    const { solana } = window as any;
+    
+    if (!solana?.isPhantom) {
+      throw new Error("Phantom wallet not found");
+    }
+    
+    return await solana.signAllTransactions(transactions);
+  };
+
   return (
     <WalletContext.Provider
       value={{
@@ -65,6 +88,8 @@ export function WalletProvider({ children }: { children: ReactNode }) {
         connecting,
         connect,
         disconnect,
+        signTransaction,
+        signAllTransactions,
       }}
     >
       {children}

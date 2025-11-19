@@ -4,11 +4,12 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import SwapPage from "@/pages/swap";
+import MemeMixerPage from "@/pages/meme-mixer";
 import HistoryPage from "@/pages/history";
 import DocsPage from "@/pages/docs";
 import NotFound from "@/pages/not-found";
 import { Button } from "@/components/ui/button";
-import { ArrowLeftRight, History, Wallet, FileText, LogOut } from "lucide-react";
+import { ArrowLeftRight, History, Wallet, FileText, LogOut, Shield } from "lucide-react";
 import { WalletProvider, useWallet } from "@/contexts/WalletContext";
 import logoImage from "@assets/Untitled design - 2025-11-19T084305.349_1763559907026.png";
 import {
@@ -161,6 +162,18 @@ function Router() {
                   <span className="hidden xs:inline">Swap</span>
                 </Button>
               </Link>
+              <Link href="/mixer">
+                <Button 
+                  variant={location === "/mixer" ? "default" : "ghost"}
+                  size="sm"
+                  className="gap-1 sm:gap-2 text-xs sm:text-sm pointer-events-auto"
+                  data-testid="link-mixer"
+                  aria-label="Meme Mixer"
+                >
+                  <Shield className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                  <span className="hidden xs:inline">Mixer</span>
+                </Button>
+              </Link>
               <Link href="/docs">
                 <Button 
                   variant={location === "/docs" ? "default" : "ghost"}
@@ -186,6 +199,7 @@ function Router() {
       {/* Main Content */}
       <Switch>
         <Route path="/" component={SwapPage} />
+        <Route path="/mixer" component={MemeMixerPage} />
         <Route path="/history" component={HistoryPage} />
         <Route path="/docs" component={DocsPage} />
         <Route component={NotFound} />
