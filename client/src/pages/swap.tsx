@@ -15,6 +15,7 @@ import { PrivacyVisualization } from "@/components/PrivacyVisualization";
 import { useWallet } from "@/contexts/WalletContext";
 import { getOrCreateSessionId } from "@/lib/session";
 import { Link } from "wouter";
+import ghostImage from "@assets/Untitled design - 2025-11-19T084820.477_1763560149453.png";
 
 export default function SwapPage() {
   const { toast } = useToast();
@@ -1029,8 +1030,8 @@ export default function SwapPage() {
 
             <div className="relative z-10">
               <div className="text-center mb-8">
-                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-primary to-secondary mb-4">
-                  <Shield className="w-8 h-8 text-primary-foreground" />
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-cyan-400 via-blue-500 to-purple-600 mb-4 p-2">
+                  <img src={ghostImage} alt="Ghost" className="w-full h-full object-contain" />
                 </div>
                 <h2 className="text-2xl font-bold bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 bg-clip-text text-transparent mb-2">
                   ZERO-KNOWLEDGE PRIVACY
