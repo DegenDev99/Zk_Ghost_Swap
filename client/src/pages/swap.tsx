@@ -1036,8 +1036,9 @@ export default function SwapPage() {
                 <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-gradient-to-br from-cyan-400 via-blue-500 to-purple-600 mb-4 p-1">
                   <img src={ghostImage} alt="Ghost" className="w-full h-full object-contain" />
                 </div>
-                <h2 className="text-2xl font-bold bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 bg-clip-text text-transparent mb-2">
-                  ZERO-KNOWLEDGE PRIVACY
+                <h2 className="text-2xl font-bold mb-2">
+                  <span className="text-[#00D9FF]">Zero-Knowledge</span>
+                  <span className="text-[#6600FF]"> Privacy</span>
                 </h2>
                 <p className="text-xs text-muted-foreground uppercase tracking-wider">
                   {isPrivacyActive ? 'Active Protection' : 'Ready to Activate'}

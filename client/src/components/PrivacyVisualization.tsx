@@ -123,7 +123,8 @@ export function PrivacyVisualization({ isActive, privacyScore = 0, exchangeId, e
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Lock className="h-5 w-5 text-primary" />
-          ZK Privacy Tunnel
+          <span className="text-[#00D9FF]">Zk</span>
+          <span className="text-[#6600FF]"> Privacy Tunnel</span>
         </CardTitle>
         <p className="text-sm text-muted-foreground">
           Your transaction flows through multiple privacy layers

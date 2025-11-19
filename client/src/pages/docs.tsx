@@ -155,7 +155,7 @@ export default function DocsPage() {
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-                    <span><strong>ZK Privacy Tunnel</strong> – Visual cryptographic proof of privacy-preserving execution</span>
+                    <span><strong><span className="text-[#00D9FF]">Zk</span><span className="text-[#6600FF]"> Privacy Tunnel</span></strong> – Visual cryptographic proof of privacy-preserving execution</span>
                   </li>
                 </ul>
               </section>
