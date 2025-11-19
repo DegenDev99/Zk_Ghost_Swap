@@ -108,12 +108,23 @@ export default function SwapPage() {
     queryKey: ["/api/swap/currencies"],
   });
 
-  // Sort currencies to prioritize exact ticker matches
+  // Filter and sort currencies to prioritize exact ticker matches
   const getSortedCurrencies = (searchTerm: string) => {
     if (!searchTerm) return currencies;
     
     const search = searchTerm.toLowerCase().trim();
-    return [...currencies].sort((a, b) => {
+    
+    // Filter to only matching currencies
+    const filtered = currencies.filter((currency) => {
+      return (
+        currency.ticker.toLowerCase().includes(search) ||
+        currency.name.toLowerCase().includes(search) ||
+        (currency.network && currency.network.toLowerCase().includes(search))
+      );
+    });
+    
+    // Sort with exact ticker matches first
+    return filtered.sort((a, b) => {
       const aTickerMatch = a.ticker.toLowerCase() === search;
       const bTickerMatch = b.ticker.toLowerCase() === search;
       const aTickerStarts = a.ticker.toLowerCase().startsWith(search);
