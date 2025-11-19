@@ -1,8 +1,9 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { createExchangeSchema, normalizeNetwork } from "@shared/schema";
-import type { Currency, ExchangeAmount, Exchange } from "@shared/schema";
+import { createExchangeSchema, createMixerOrderSchema, normalizeNetwork } from "@shared/schema";
+import type { Currency, ExchangeAmount, Exchange, MixerOrder } from "@shared/schema";
+import { randomBytes } from "crypto";
 
 const CHANGENOW_API_KEY = process.env.CHANGENOW_API_KEY;
 const CHANGENOW_API_URL = "https://api.changenow.io/v2";
@@ -317,6 +318,90 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error: any) {
       console.error("[ChangeNOW] Error fetching status:", error);
       res.status(500).json({ message: error.message || "Failed to fetch exchange status" });
+    }
+  });
+
+  // POST /api/mixer/order - Create a new mixer order
+  app.post("/api/mixer/order", async (req, res) => {
+    try {
+      // Validate request body
+      const validation = createMixerOrderSchema.safeParse(req.body);
+      if (!validation.success) {
+        return res.status(400).json({ 
+          message: "Invalid request data", 
+          errors: validation.error.errors 
+        });
+      }
+
+      const { tokenMint, amount, recipientAddress } = validation.data;
+      const { sessionId, walletAddress, senderAddress } = req.body;
+
+      // Generate unique order ID
+      const orderId = `MIX-${randomBytes(8).toString('hex').toUpperCase()}`;
+
+      // Calculate expiry time (20 minutes from now)
+      const expiresAt = Date.now() + (20 * 60 * 1000);
+
+      console.log(`[Mixer] Creating order: ${orderId}, token: ${tokenMint}, amount: ${amount}`);
+
+      const mixerOrder: MixerOrder = {
+        id: orderId,
+        tokenMint,
+        amount,
+        senderAddress: senderAddress || walletAddress || '',
+        recipientAddress,
+        status: 'pending',
+        expiresAt,
+        sessionId,
+        walletAddress,
+      };
+
+      await storage.createMixerOrder(mixerOrder, sessionId, walletAddress);
+
+      console.log(`[Mixer] Order created: ${orderId}, expires at ${new Date(expiresAt).toISOString()}`);
+
+      res.json(mixerOrder);
+    } catch (error: any) {
+      console.error("[Mixer] Error creating order:", error);
+      res.status(500).json({ message: error.message || "Failed to create mixer order" });
+    }
+  });
+
+  // POST /api/mixer/submit - Submit transaction signature for mixer order
+  app.post("/api/mixer/submit", async (req, res) => {
+    try {
+      const { orderId, signature } = req.body;
+
+      if (!orderId || !signature) {
+        return res.status(400).json({ message: "Missing orderId or signature" });
+      }
+
+      console.log(`[Mixer] Submitting transaction for order: ${orderId}`);
+
+      await storage.updateMixerOrderStatus(orderId, 'completed', signature);
+      await storage.markMixerOrderCompleted(orderId);
+
+      res.json({ success: true });
+    } catch (error: any) {
+      console.error("[Mixer] Error submitting transaction:", error);
+      res.status(500).json({ message: error.message || "Failed to submit transaction" });
+    }
+  });
+
+  // POST /api/mixer/auto-close/:id - Permanently cancel/close a mixer order
+  app.post("/api/mixer/auto-close/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+
+      if (!id) {
+        return res.status(400).json({ message: "Missing order ID" });
+      }
+
+      await storage.markMixerOrderAutoClosed(id);
+      res.json({ success: true });
+    } catch (error: any) {
+      console.error("[Mixer] Error auto-closing order:", error);
+      res.status(500).json({ message: error.message || "Failed to auto-close order" });
     }
   });
 
