@@ -119,6 +119,62 @@ export interface RateDataPoint {
   rate: number;
 }
 
+// Mixer Order interface
+export interface MixerOrder {
+  id: string;
+  tokenMint: string;
+  amount: string;
+  senderAddress: string;
+  recipientAddress: string;
+  status: string;
+  expiresAt: number;
+  transactionSignature?: string;
+  sessionId?: string;
+  walletAddress?: string;
+  completedAt?: string;
+  autoClosedAt?: string;
+}
+
+// Database table for mixer orders
+export const mixerOrders = pgTable("mixer_orders", {
+  id: serial("id").primaryKey(),
+  orderId: varchar("order_id", { length: 255 }).notNull().unique(),
+  tokenMint: varchar("token_mint", { length: 255 }).notNull(),
+  amount: varchar("amount", { length: 100 }).notNull(),
+  senderAddress: varchar("sender_address", { length: 255 }).notNull(),
+  recipientAddress: varchar("recipient_address", { length: 255 }).notNull(),
+  status: varchar("status", { length: 50 }).notNull().default("pending"),
+  expiresAt: varchar("expires_at", { length: 100 }).notNull(),
+  transactionSignature: varchar("transaction_signature", { length: 255 }),
+  sessionId: varchar("session_id", { length: 255 }),
+  walletAddress: varchar("wallet_address", { length: 255 }),
+  completedAt: timestamp("completed_at"),
+  autoClosedAt: timestamp("auto_closed_at"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// Insert schema for mixer orders
+export const insertMixerOrderSchema = createInsertSchema(mixerOrders).omit({
+  id: true,
+  createdAt: true,
+});
+
+// Types
+export type InsertMixerOrder = z.infer<typeof insertMixerOrderSchema>;
+export type SelectMixerOrder = typeof mixerOrders.$inferSelect;
+
+// Mixer order creation input
+export const createMixerOrderSchema = z.object({
+  tokenMint: z.string().min(32, "Invalid token mint address"),
+  amount: z.string().refine((val) => {
+    const num = parseFloat(val);
+    return !isNaN(num) && num > 0;
+  }, "Amount must be a positive number"),
+  recipientAddress: z.string().min(32, "Invalid recipient address"),
+});
+
+export type CreateMixerOrderInput = z.infer<typeof createMixerOrderSchema>;
+
 // Network normalization helper (ChangeNOW API inconsistency workaround)
 export function normalizeNetwork(network: string): string {
   const normalized = network.toLowerCase();
