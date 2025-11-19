@@ -33,6 +33,8 @@ export default function SwapPage() {
   const [timeRemaining, setTimeRemaining] = useState<string>("");
   const [fromOpen, setFromOpen] = useState(false);
   const [toOpen, setToOpen] = useState(false);
+  const [fromSearch, setFromSearch] = useState("");
+  const [toSearch, setToSearch] = useState("");
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
   const [isCancelling, setIsCancelling] = useState(false);
   const sessionId = getOrCreateSessionId();
@@ -105,6 +107,36 @@ export default function SwapPage() {
   const { data: currencies = [], isLoading: loadingCurrencies, isError: currenciesError } = useQuery<Currency[]>({
     queryKey: ["/api/swap/currencies"],
   });
+
+  // Sort currencies to prioritize exact ticker matches
+  const getSortedCurrencies = (searchTerm: string) => {
+    if (!searchTerm) return currencies;
+    
+    const search = searchTerm.toLowerCase().trim();
+    return [...currencies].sort((a, b) => {
+      const aTickerMatch = a.ticker.toLowerCase() === search;
+      const bTickerMatch = b.ticker.toLowerCase() === search;
+      const aTickerStarts = a.ticker.toLowerCase().startsWith(search);
+      const bTickerStarts = b.ticker.toLowerCase().startsWith(search);
+      const aNameIncludes = a.name.toLowerCase().includes(search);
+      const bNameIncludes = b.name.toLowerCase().includes(search);
+
+      // Exact ticker match comes first
+      if (aTickerMatch && !bTickerMatch) return -1;
+      if (!aTickerMatch && bTickerMatch) return 1;
+
+      // Ticker starts with search comes second
+      if (aTickerStarts && !bTickerStarts) return -1;
+      if (!aTickerStarts && bTickerStarts) return 1;
+
+      // Name includes search comes third
+      if (aNameIncludes && !bNameIncludes) return -1;
+      if (!aNameIncludes && bNameIncludes) return 1;
+
+      // Otherwise, alphabetical by ticker
+      return a.ticker.localeCompare(b.ticker);
+    });
+  };
 
   // Fetch estimated amount
   const { data: estimation, isLoading: loadingEstimation, isError: estimationError } = useQuery<ExchangeAmount>({
@@ -828,12 +860,17 @@ export default function SwapPage() {
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-full p-0" align="start">
-                <Command>
-                  <CommandInput placeholder="Search currencies..." className="font-mono" />
+                <Command shouldFilter={false}>
+                  <CommandInput 
+                    placeholder="Search currencies..." 
+                    className="font-mono" 
+                    value={fromSearch}
+                    onValueChange={setFromSearch}
+                  />
                   <CommandList>
                     <CommandEmpty>No currency found.</CommandEmpty>
                     <CommandGroup>
-                      {currencies.map((currency, index) => (
+                      {getSortedCurrencies(fromSearch).map((currency, index) => (
                         <CommandItem
                           key={`from-${currency.ticker}-${currency.network || 'none'}-${index}`}
                           value={`${currency.ticker} ${currency.name} ${currency.network || ''}`}
@@ -841,6 +878,7 @@ export default function SwapPage() {
                             setFromCurrency(currency.ticker.toLowerCase());
                             setFromNetwork(currency.network || "");
                             setFromOpen(false);
+                            setFromSearch("");
                           }}
                         >
                           <span className="font-mono font-medium">{currency.ticker.toUpperCase()}</span>
@@ -913,12 +951,17 @@ export default function SwapPage() {
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-full p-0" align="start">
-                <Command>
-                  <CommandInput placeholder="Search currencies..." className="font-mono" />
+                <Command shouldFilter={false}>
+                  <CommandInput 
+                    placeholder="Search currencies..." 
+                    className="font-mono" 
+                    value={toSearch}
+                    onValueChange={setToSearch}
+                  />
                   <CommandList>
                     <CommandEmpty>No currency found.</CommandEmpty>
                     <CommandGroup>
-                      {currencies.map((currency, index) => (
+                      {getSortedCurrencies(toSearch).map((currency, index) => (
                         <CommandItem
                           key={`to-${currency.ticker}-${currency.network || 'none'}-${index}`}
                           value={`${currency.ticker} ${currency.name} ${currency.network || ''}`}
@@ -926,6 +969,7 @@ export default function SwapPage() {
                             setToCurrency(currency.ticker.toLowerCase());
                             setToNetwork(currency.network || "");
                             setToOpen(false);
+                            setToSearch("");
                           }}
                         >
                           <span className="font-mono font-medium">{currency.ticker.toUpperCase()}</span>

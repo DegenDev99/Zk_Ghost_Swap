@@ -28,7 +28,8 @@ Preferred communication style: Simple, everyday language.
 - **Tailwind CSS** for utility-first styling with custom design tokens
 - **CSS Variables** approach for theming with dark mode as the primary (and only supported) theme
 - **Custom Design System**: Cyberpunk/Matrix aesthetic with specific typography hierarchy using Space Grotesk (primary), JetBrains Mono (monospace for addresses/amounts), and custom color scheme with HSL-based tokens
-- **Responsive Navigation**: Fully responsive header with logo positioned top-left, adaptive sizing across all breakpoints (mobile, tablet, desktop), and icon-only mode for screens under 475px with proper accessibility labels
+- **Responsive Navigation**: Three-column grid layout with logo/brand flush left, Swap/Docs navigation centered, and wallet button on right; icon-only mode for screens under 475px
+- **Smart Currency Search**: Custom sorting algorithm prioritizes exact ticker matches first, then partial ticker matches, then name matches for intuitive search results
 - **Dropdown Menu**: Wallet address button opens menu with Transaction History and Disconnect options
 - **Alert Dialogs**: Confirmation dialogs for critical actions (disconnect wallet, cancel order)
 
@@ -93,10 +94,11 @@ Preferred communication style: Simple, everyday language.
 - API key required via `CHANGENOW_API_KEY` environment variable
 - Key operations:
   - Currency listing with active status filtering
-  - Exchange amount estimation with network selection support
-  - Exchange creation returning payin address and transaction details
+  - Exchange amount estimation with network selection support (using separate `fromNetwork` and `toNetwork` query parameters)
+  - Exchange creation returning payin address and transaction details (with network as separate fields in request body)
   - Status tracking for monitoring transaction progress
 - Error handling for API failures with status code propagation
+- **Network Parameter Format**: Networks are passed as separate parameters (e.g., `fromCurrency=bnb&fromNetwork=bsc`) rather than appended to ticker (not `bnb_bsc`)
 
 **Third-Party UI Libraries**
 - **Radix UI** primitives (20+ components) for accessible, unstyled UI foundations
