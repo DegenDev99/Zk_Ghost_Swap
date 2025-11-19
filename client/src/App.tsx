@@ -131,10 +131,10 @@ function Router() {
     <div className="min-h-screen bg-background">
       {/* Navigation Header */}
       <nav className="border-b border-border bg-card/60 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-3 sm:px-4">
+        <div className="container mx-auto !pl-0 pr-3 sm:pr-4">
           <div className="flex items-center justify-between h-14 sm:h-16">
-            {/* Logo and Brand - Left aligned */}
-            <div className="flex items-center gap-2 sm:gap-3">
+            {/* Logo and Brand - Flush left */}
+            <div className="flex items-center gap-2 sm:gap-3 pl-2">
               <img 
                 src={logoImage} 
                 alt="Zk Ghost Swap Logo" 
