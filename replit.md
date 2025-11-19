@@ -2,13 +2,22 @@
 
 ## Overview
 
-Zk Ghost Swap is a privacy-focused cryptocurrency exchange application that enables anonymous asset swapping without KYC requirements or user registration. The platform integrates with ChangeNOW API to facilitate cross-chain cryptocurrency exchanges while maintaining user privacy. Built with a cyberpunk/Matrix-inspired aesthetic, the application provides a streamlined interface for creating and tracking exchanges with real-time status updates and countdown timers.
+Zk Ghost Swap is a privacy-focused cryptocurrency platform that enables anonymous asset swapping and token mixing without KYC requirements or user registration. The platform features two core privacy tools: (1) Cross-chain crypto swaps via ChangeNOW API, and (2) Meme Mixer for confidential SPL token transfers using Solana Token-2022 technology. Built with a cyberpunk/Matrix-inspired aesthetic, the application provides streamlined interfaces for creating and tracking privacy-enhanced transactions with real-time status updates.
 
 **Key Privacy Features:**
+
+**Cross-Chain Swaps:**
 - Anonymous users: Orders expire and are deleted after timer runs out (no persistent history)
 - Wallet-connected users: Transaction history accessible only through wallet dropdown menu
 - Disconnect confirmation: Prevents accidental wallet disconnection with warning dialog
 - **Cancel Order**: Users can manually cancel active orders via confirmation dialog; canceled orders are permanently removed and do not reappear on page reload
+
+**Meme Mixer (Token-2022 Confidential Transfers):**
+- Solana SPL token privacy transfers using native Token-2022 technology
+- ElGamal homomorphic encryption for hiding transfer amounts
+- Zero-knowledge proofs for transaction validity without revealing details
+- Non-custodial: Uses Phantom wallet for signing, no third-party trust required
+- Legitimate and legal: Built on official Solana Token Extensions program
 
 ## User Preferences
 
@@ -28,7 +37,7 @@ Preferred communication style: Simple, everyday language.
 - **Tailwind CSS** for utility-first styling with custom design tokens
 - **CSS Variables** approach for theming with dark mode as the primary (and only supported) theme
 - **Custom Design System**: Cyberpunk/Matrix aesthetic with specific typography hierarchy using Space Grotesk (primary), JetBrains Mono (monospace for addresses/amounts), and custom color scheme with HSL-based tokens
-- **Responsive Navigation**: Three-column grid layout with logo/brand flush left, Swap/Docs navigation centered, and wallet button on right; icon-only mode for screens under 475px
+- **Responsive Navigation**: Three-column grid layout with logo/brand flush left, Swap/Mixer/Docs navigation centered, and wallet button on right; icon-only mode for screens under 475px
 - **Smart Currency Search**: Custom sorting algorithm prioritizes exact ticker matches first, then partial ticker matches, then name matches for intuitive search results
 - **Dropdown Menu**: Wallet address button opens menu with Transaction History and Disconnect options
 - **Alert Dialogs**: Confirmation dialogs for critical actions (disconnect wallet, cancel order)
@@ -37,6 +46,12 @@ Preferred communication style: Simple, everyday language.
 - **TanStack Query (React Query)** for server state management, caching, and API request handling
 - Query client configured with no automatic refetching (staleTime: Infinity) to prevent unnecessary API calls
 - Custom `apiRequest` utility for standardized fetch requests with credential inclusion
+
+**Solana Integration**
+- **@solana/web3.js** for blockchain interaction and transaction building
+- **@solana/spl-token** with Token-2022 support for confidential transfers
+- **Phantom Wallet Integration** via WalletContext with transaction signing capabilities
+- Direct RPC connection to Solana mainnet for token transfers
 
 **Form Handling & Validation**
 - **React Hook Form** with **@hookform/resolvers** for form state management
@@ -52,11 +67,13 @@ Preferred communication style: Simple, everyday language.
 
 **API Design Pattern**
 - RESTful API with clear endpoint structure:
-  - `GET /api/swap/currencies` - Fetch available cryptocurrencies
-  - `GET /api/swap/estimate` - Get exchange rate estimates
-  - `POST /api/swap/exchange` - Create new exchange transaction
-  - `GET /api/swap/exchange/:id` - Track exchange status
-  - `POST /api/swap/auto-close/:id` - Permanently cancel/close an exchange order
+  - **Swap Endpoints:**
+    - `GET /api/swap/currencies` - Fetch available cryptocurrencies
+    - `GET /api/swap/estimate` - Get exchange rate estimates
+    - `POST /api/swap/exchange` - Create new exchange transaction
+    - `GET /api/swap/exchange/:id` - Track exchange status
+    - `POST /api/swap/auto-close/:id` - Permanently cancel/close an exchange order
+  - **Mixer Endpoints:** Currently frontend-only (Solana transactions executed client-side via Phantom wallet)
 - Request/response logging middleware for debugging and monitoring
 - Raw body preservation for webhook verification scenarios
 
