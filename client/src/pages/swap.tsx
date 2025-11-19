@@ -489,8 +489,10 @@ export default function SwapPage() {
             </div>
 
             <div className="text-center mb-8">
-              <h1 className="text-3xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 mb-2">
-                ZK GHOST SWAP EXCHANGE
+              <h1 className="text-3xl sm:text-4xl font-bold mb-2">
+                <span className="text-[#00D9FF]">Zk Ghost</span>
+                <span className="text-[#6600FF]"> Swap</span>
+                <span className="text-foreground"> Exchange</span>
               </h1>
               <p className="text-sm text-muted-foreground uppercase tracking-wider">
                 Privacy-First Asset Swapping
@@ -768,8 +770,9 @@ export default function SwapPage() {
           <Card className="w-full p-6 sm:p-8 bg-card/40 backdrop-blur-sm border-primary/20">
         {/* Header */}
         <div className="text-center mb-6">
-          <h1 className="text-4xl sm:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 mb-2">
-            ZK GHOST SWAP
+          <h1 className="text-4xl sm:text-5xl font-bold mb-2">
+            <span className="text-[#00D9FF]">Zk Ghost</span>
+            <span className="text-[#6600FF]"> Swap</span>
           </h1>
           <p className="text-sm text-muted-foreground uppercase tracking-wider">
             Privacy-First Asset Swapping

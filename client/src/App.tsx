@@ -141,8 +141,9 @@ function Router() {
                 className="h-10 w-auto sm:h-12 md:h-14"
                 data-testid="img-logo-main"
               />
-              <div className="text-lg sm:text-xl md:text-2xl font-bold bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 bg-clip-text text-transparent whitespace-nowrap">
-                ZK GHOST SWAP
+              <div className="text-lg sm:text-xl md:text-2xl font-bold whitespace-nowrap">
+                <span className="text-[#00D9FF]">Zk Ghost</span>
+                <span className="text-[#6600FF]"> Swap</span>
               </div>
             </div>
             
