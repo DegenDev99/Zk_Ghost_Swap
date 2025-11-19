@@ -415,6 +415,132 @@ export class DbStorage implements IStorage {
       .where(eq(exchanges.exchangeId, id));
   }
 
+  // Mixer Order Methods
+  async getMixerOrder(id: string): Promise<MixerOrder | undefined> {
+    const result = await db.select().from(mixerOrders).where(eq(mixerOrders.orderId, id)).limit(1);
+    if (result.length === 0) return undefined;
+    
+    const row = result[0];
+    return {
+      id: row.orderId,
+      tokenMint: row.tokenMint,
+      amount: row.amount,
+      senderAddress: row.senderAddress,
+      recipientAddress: row.recipientAddress,
+      status: row.status,
+      expiresAt: parseInt(row.expiresAt),
+      transactionSignature: row.transactionSignature || undefined,
+      sessionId: row.sessionId || undefined,
+      walletAddress: row.walletAddress || undefined,
+      completedAt: row.completedAt?.toISOString(),
+      autoClosedAt: row.autoClosedAt?.toISOString(),
+    };
+  }
+
+  async createMixerOrder(order: MixerOrder, sessionId?: string, walletAddress?: string): Promise<MixerOrder> {
+    await db.insert(mixerOrders).values({
+      orderId: order.id,
+      tokenMint: order.tokenMint,
+      amount: order.amount,
+      senderAddress: order.senderAddress,
+      recipientAddress: order.recipientAddress,
+      status: order.status,
+      expiresAt: order.expiresAt.toString(),
+      transactionSignature: order.transactionSignature,
+      sessionId,
+      walletAddress,
+    });
+    return order;
+  }
+
+  async updateMixerOrderStatus(id: string, status: string, signature?: string): Promise<void> {
+    const updateData: any = { status };
+    if (signature) {
+      updateData.transactionSignature = signature;
+    }
+    await db.update(mixerOrders)
+      .set(updateData)
+      .where(eq(mixerOrders.orderId, id));
+  }
+
+  async getActiveMixerOrderBySession(sessionId: string): Promise<MixerOrder | undefined> {
+    const result = await db
+      .select()
+      .from(mixerOrders)
+      .where(
+        and(
+          eq(mixerOrders.sessionId, sessionId),
+          sql`${mixerOrders.autoClosedAt} IS NULL`
+        )
+      )
+      .orderBy(desc(mixerOrders.createdAt))
+      .limit(1);
+    
+    if (result.length === 0) return undefined;
+    
+    const row = result[0];
+    return {
+      id: row.orderId,
+      tokenMint: row.tokenMint,
+      amount: row.amount,
+      senderAddress: row.senderAddress,
+      recipientAddress: row.recipientAddress,
+      status: row.status,
+      expiresAt: parseInt(row.expiresAt),
+      transactionSignature: row.transactionSignature || undefined,
+      sessionId: row.sessionId || undefined,
+      walletAddress: row.walletAddress || undefined,
+      completedAt: row.completedAt?.toISOString(),
+      autoClosedAt: row.autoClosedAt?.toISOString(),
+    };
+  }
+
+  async getMixerOrdersByWallet(walletAddress: string): Promise<MixerOrder[]> {
+    const result = await db
+      .select()
+      .from(mixerOrders)
+      .where(eq(mixerOrders.walletAddress, walletAddress))
+      .orderBy(desc(mixerOrders.createdAt));
+    
+    const now = Date.now();
+    
+    return result
+      .filter((row) => {
+        if (row.status === 'pending' && row.expiresAt && now > parseInt(row.expiresAt)) {
+          return false;
+        }
+        return true;
+      })
+      .map((row) => ({
+        id: row.orderId,
+        tokenMint: row.tokenMint,
+        amount: row.amount,
+        senderAddress: row.senderAddress,
+        recipientAddress: row.recipientAddress,
+        status: row.status,
+        expiresAt: parseInt(row.expiresAt),
+        transactionSignature: row.transactionSignature || undefined,
+        sessionId: row.sessionId || undefined,
+        walletAddress: row.walletAddress || undefined,
+        completedAt: row.completedAt?.toISOString(),
+        autoClosedAt: row.autoClosedAt?.toISOString(),
+      }));
+  }
+
+  async markMixerOrderCompleted(id: string): Promise<void> {
+    await db
+      .update(mixerOrders)
+      .set({ completedAt: sql`NOW()` })
+      .where(eq(mixerOrders.orderId, id));
+  }
+
+  async markMixerOrderAutoClosed(id: string): Promise<void> {
+    await db
+      .update(mixerOrders)
+      .set({ autoClosedAt: sql`NOW()` })
+      .where(eq(mixerOrders.orderId, id));
+  }
+
   async recordRate(fromCurrency: string, toCurrency: string, rate: number): Promise<void> {
     await db.insert(rateHistory).values({
       fromCurrency,
