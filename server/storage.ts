@@ -17,6 +17,8 @@ export interface IStorage {
   getMixerOrder(id: string): Promise<MixerOrder | undefined>;
   createMixerOrder(order: MixerOrder, sessionId?: string, walletAddress?: string): Promise<MixerOrder>;
   updateMixerOrderStatus(id: string, status: string, signature?: string): Promise<void>;
+  updateMixerDeposit(orderId: string, amount: string, depositedAt: string, signature?: string): Promise<void>;
+  scheduleMixerPayout(orderId: string, scheduledAt: string): Promise<void>;
   getActiveMixerOrderBySession(sessionId: string): Promise<MixerOrder | undefined>;
   getMixerOrdersByWallet(walletAddress: string): Promise<MixerOrder[]>;
   markMixerOrderCompleted(id: string): Promise<void>;
@@ -171,7 +173,7 @@ export class MemStorage implements IStorage {
   }
 
   async createMixerOrder(order: MixerOrder, sessionId?: string, walletAddress?: string): Promise<MixerOrder> {
-    this.mixerOrders.set(order.id, {
+    this.mixerOrders.set(order.orderId, {
       order,
       sessionId,
       walletAddress,
@@ -184,9 +186,31 @@ export class MemStorage implements IStorage {
     if (metadata) {
       metadata.order.status = status;
       if (signature) {
-        metadata.order.transactionSignature = signature;
+        metadata.order.depositTxSignature = signature;
       }
       this.mixerOrders.set(id, metadata);
+    }
+  }
+
+  async updateMixerDeposit(orderId: string, amount: string, depositedAt: string, signature?: string): Promise<void> {
+    const metadata = this.mixerOrders.get(orderId);
+    if (metadata) {
+      metadata.order.depositedAmount = amount;
+      metadata.order.depositedAt = depositedAt;
+      metadata.order.status = 'deposited';
+      if (signature) {
+        metadata.order.depositTxSignature = signature;
+      }
+      this.mixerOrders.set(orderId, metadata);
+    }
+  }
+
+  async scheduleMixerPayout(orderId: string, scheduledAt: string): Promise<void> {
+    const metadata = this.mixerOrders.get(orderId);
+    if (metadata) {
+      metadata.order.payoutScheduledAt = scheduledAt;
+      metadata.order.status = 'processing';
+      this.mixerOrders.set(orderId, metadata);
     }
   }
 
@@ -422,31 +446,40 @@ export class DbStorage implements IStorage {
     
     const row = result[0];
     return {
-      id: row.orderId,
+      id: row.id,
+      orderId: row.orderId,
       tokenMint: row.tokenMint,
       amount: row.amount,
       senderAddress: row.senderAddress,
       recipientAddress: row.recipientAddress,
+      depositAddress: row.depositAddress,
+      depositPrivateKey: row.depositPrivateKey,
+      depositedAmount: row.depositedAmount || undefined,
+      depositedAt: row.depositedAt?.toISOString() || undefined,
+      depositTxSignature: row.depositTxSignature || undefined,
+      payoutScheduledAt: row.payoutScheduledAt?.toISOString() || undefined,
+      payoutExecutedAt: row.payoutExecutedAt?.toISOString() || undefined,
+      payoutTxSignature: row.payoutTxSignature || undefined,
       status: row.status,
       expiresAt: parseInt(row.expiresAt),
-      transactionSignature: row.transactionSignature || undefined,
       sessionId: row.sessionId || undefined,
       walletAddress: row.walletAddress || undefined,
-      completedAt: row.completedAt?.toISOString(),
-      autoClosedAt: row.autoClosedAt?.toISOString(),
+      completedAt: row.completedAt?.toISOString() || undefined,
+      autoClosedAt: row.autoClosedAt?.toISOString() || undefined,
     };
   }
 
   async createMixerOrder(order: MixerOrder, sessionId?: string, walletAddress?: string): Promise<MixerOrder> {
     await db.insert(mixerOrders).values({
-      orderId: order.id,
+      orderId: order.orderId,
       tokenMint: order.tokenMint,
       amount: order.amount,
       senderAddress: order.senderAddress,
       recipientAddress: order.recipientAddress,
+      depositAddress: order.depositAddress,
+      depositPrivateKey: order.depositPrivateKey,
       status: order.status,
       expiresAt: order.expiresAt.toString(),
-      transactionSignature: order.transactionSignature,
       sessionId,
       walletAddress,
     });
@@ -456,11 +489,34 @@ export class DbStorage implements IStorage {
   async updateMixerOrderStatus(id: string, status: string, signature?: string): Promise<void> {
     const updateData: any = { status };
     if (signature) {
-      updateData.transactionSignature = signature;
+      updateData.depositTxSignature = signature;
     }
     await db.update(mixerOrders)
       .set(updateData)
       .where(eq(mixerOrders.orderId, id));
+  }
+
+  async updateMixerDeposit(orderId: string, amount: string, depositedAt: string, signature?: string): Promise<void> {
+    const updateData: any = {
+      depositedAmount: amount,
+      depositedAt: new Date(depositedAt),
+      status: 'deposited',
+    };
+    if (signature) {
+      updateData.depositTxSignature = signature;
+    }
+    await db.update(mixerOrders)
+      .set(updateData)
+      .where(eq(mixerOrders.orderId, orderId));
+  }
+
+  async scheduleMixerPayout(orderId: string, scheduledAt: string): Promise<void> {
+    await db.update(mixerOrders)
+      .set({
+        payoutScheduledAt: new Date(scheduledAt),
+        status: 'processing',
+      })
+      .where(eq(mixerOrders.orderId, orderId));
   }
 
   async getActiveMixerOrderBySession(sessionId: string): Promise<MixerOrder | undefined> {
@@ -480,18 +536,26 @@ export class DbStorage implements IStorage {
     
     const row = result[0];
     return {
-      id: row.orderId,
+      id: row.id,
+      orderId: row.orderId,
       tokenMint: row.tokenMint,
       amount: row.amount,
       senderAddress: row.senderAddress,
       recipientAddress: row.recipientAddress,
+      depositAddress: row.depositAddress,
+      depositPrivateKey: row.depositPrivateKey,
+      depositedAmount: row.depositedAmount || undefined,
+      depositedAt: row.depositedAt?.toISOString() || undefined,
+      depositTxSignature: row.depositTxSignature || undefined,
+      payoutScheduledAt: row.payoutScheduledAt?.toISOString() || undefined,
+      payoutExecutedAt: row.payoutExecutedAt?.toISOString() || undefined,
+      payoutTxSignature: row.payoutTxSignature || undefined,
       status: row.status,
       expiresAt: parseInt(row.expiresAt),
-      transactionSignature: row.transactionSignature || undefined,
       sessionId: row.sessionId || undefined,
       walletAddress: row.walletAddress || undefined,
-      completedAt: row.completedAt?.toISOString(),
-      autoClosedAt: row.autoClosedAt?.toISOString(),
+      completedAt: row.completedAt?.toISOString() || undefined,
+      autoClosedAt: row.autoClosedAt?.toISOString() || undefined,
     };
   }
 
@@ -512,18 +576,26 @@ export class DbStorage implements IStorage {
         return true;
       })
       .map((row) => ({
-        id: row.orderId,
+        id: row.id,
+        orderId: row.orderId,
         tokenMint: row.tokenMint,
         amount: row.amount,
         senderAddress: row.senderAddress,
         recipientAddress: row.recipientAddress,
+        depositAddress: row.depositAddress,
+        depositPrivateKey: row.depositPrivateKey,
+        depositedAmount: row.depositedAmount || undefined,
+        depositedAt: row.depositedAt?.toISOString() || undefined,
+        depositTxSignature: row.depositTxSignature || undefined,
+        payoutScheduledAt: row.payoutScheduledAt?.toISOString() || undefined,
+        payoutExecutedAt: row.payoutExecutedAt?.toISOString() || undefined,
+        payoutTxSignature: row.payoutTxSignature || undefined,
         status: row.status,
         expiresAt: parseInt(row.expiresAt),
-        transactionSignature: row.transactionSignature || undefined,
         sessionId: row.sessionId || undefined,
         walletAddress: row.walletAddress || undefined,
-        completedAt: row.completedAt?.toISOString(),
-        autoClosedAt: row.autoClosedAt?.toISOString(),
+        completedAt: row.completedAt?.toISOString() || undefined,
+        autoClosedAt: row.autoClosedAt?.toISOString() || undefined,
       }));
   }
 

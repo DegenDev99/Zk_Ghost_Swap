@@ -401,24 +401,81 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // POST /api/mixer/submit - Submit transaction signature for mixer order
-  app.post("/api/mixer/submit", async (req, res) => {
+  // GET /api/mixer/check-deposit/:orderId - Check if deposit has been received
+  app.get("/api/mixer/check-deposit/:orderId", async (req, res) => {
     try {
-      const { orderId, signature } = req.body;
-
-      if (!orderId || !signature) {
-        return res.status(400).json({ message: "Missing orderId or signature" });
+      const { orderId } = req.params;
+      
+      if (!orderId) {
+        return res.status(400).json({ message: "Missing orderId" });
       }
 
-      console.log(`[Mixer] Submitting transaction for order: ${orderId}`);
+      const order = await storage.getMixerOrder(orderId);
+      
+      if (!order) {
+        return res.status(404).json({ message: "Order not found" });
+      }
 
-      await storage.updateMixerOrderStatus(orderId, 'completed', signature);
-      await storage.markMixerOrderCompleted(orderId);
+      // If already deposited, return the cached info
+      if (order.depositedAmount && order.depositedAt) {
+        return res.json({
+          deposited: true,
+          amount: order.depositedAmount,
+          depositedAt: order.depositedAt,
+          signature: order.depositTxSignature,
+        });
+      }
 
-      res.json({ success: true });
+      // Check Solana balance for the deposit address
+      const { Connection, PublicKey } = await import("@solana/web3.js");
+      const { getAccount, getAssociatedTokenAddress } = await import("@solana/spl-token");
+      
+      const connection = new Connection("https://api.mainnet-beta.solana.com");
+      const depositPubkey = new PublicKey(order.depositAddress);
+      const tokenMintPubkey = new PublicKey(order.tokenMint);
+      
+      try {
+        // Get the associated token account for this deposit address
+        const ata = await getAssociatedTokenAddress(
+          tokenMintPubkey,
+          depositPubkey,
+          false // allowOwnerOffCurve
+        );
+        
+        const tokenAccount = await getAccount(connection, ata);
+        const balance = tokenAccount.amount.toString();
+        
+        console.log(`[Mixer] Deposit check for ${orderId}: balance = ${balance}`);
+        
+        // If balance matches or exceeds expected amount, mark as deposited
+        if (BigInt(balance) >= BigInt(order.amount)) {
+          const now = new Date().toISOString();
+          await storage.updateMixerDeposit(orderId, balance, now);
+          
+          // Schedule payout (randomized delay 5-30 minutes)
+          const delayMinutes = 5 + Math.floor(Math.random() * 25);
+          const scheduledAt = new Date(Date.now() + delayMinutes * 60 * 1000).toISOString();
+          await storage.scheduleMixerPayout(orderId, scheduledAt);
+          
+          console.log(`[Mixer] Deposit confirmed for ${orderId}, payout scheduled in ${delayMinutes}min`);
+          
+          return res.json({
+            deposited: true,
+            amount: balance,
+            depositedAt: now,
+            payoutScheduledIn: delayMinutes,
+          });
+        }
+        
+        res.json({ deposited: false, balance });
+      } catch (accountError: any) {
+        // Account doesn't exist yet (no tokens sent)
+        console.log(`[Mixer] No deposit yet for ${orderId}: ${accountError.message}`);
+        res.json({ deposited: false, balance: "0" });
+      }
     } catch (error: any) {
-      console.error("[Mixer] Error submitting transaction:", error);
-      res.status(500).json({ message: error.message || "Failed to submit transaction" });
+      console.error("[Mixer] Error checking deposit:", error);
+      res.status(500).json({ message: error.message || "Failed to check deposit" });
     }
   });
 
