@@ -115,7 +115,7 @@ export default function MemeMixerPage() {
         
         // Auto-close expired order
         try {
-          await apiRequest("POST", `/api/mixer/auto-close/${activeOrder.id}`);
+          await apiRequest("POST", `/api/mixer/auto-close/${activeOrder.orderId}`);
           setActiveOrder(null);
           toast({
             title: "Order Expired",
@@ -141,7 +141,7 @@ export default function MemeMixerPage() {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [activeOrder?.expiresAt, activeOrder?.id, toast]);
+  }, [activeOrder?.expiresAt, activeOrder?.orderId, toast]);
 
   const handleCreateOrder = () => {
     if (!walletAddress) {
@@ -250,7 +250,7 @@ export default function MemeMixerPage() {
 
       // Submit to backend
       await submitTransactionMutation.mutateAsync({
-        orderId: activeOrder.id,
+        orderId: activeOrder.orderId,
         signature,
       });
 
@@ -295,12 +295,12 @@ export default function MemeMixerPage() {
 
   const handleCancelOrder = () => {
     if (!activeOrder) return;
-    cancelOrderMutation.mutate(activeOrder.id);
+    cancelOrderMutation.mutate(activeOrder.orderId);
   };
 
   const copyOrderId = () => {
     if (activeOrder) {
-      navigator.clipboard.writeText(activeOrder.id);
+      navigator.clipboard.writeText(activeOrder.orderId);
       setCopiedOrderId(true);
       setTimeout(() => setCopiedOrderId(false), 2000);
       toast({
@@ -359,7 +359,7 @@ export default function MemeMixerPage() {
                 </Button>
               </div>
               <p className="text-sm font-mono text-primary break-all" data-testid="text-order-id">
-                {activeOrder.id}
+                {activeOrder.orderId}
               </p>
             </div>
 
