@@ -28,6 +28,7 @@ Preferred communication style: Simple, everyday language.
 - **Tailwind CSS** for utility-first styling with custom design tokens
 - **CSS Variables** approach for theming with dark mode as the primary (and only supported) theme
 - **Custom Design System**: Cyberpunk/Matrix aesthetic with specific typography hierarchy using Space Grotesk (primary), JetBrains Mono (monospace for addresses/amounts), and custom color scheme with HSL-based tokens
+- **Responsive Navigation**: Fully responsive header with logo positioned top-left, adaptive sizing across all breakpoints (mobile, tablet, desktop), and icon-only mode for screens under 475px with proper accessibility labels
 - **Dropdown Menu**: Wallet address button opens menu with Transaction History and Disconnect options
 - **Alert Dialogs**: Confirmation dialogs for critical actions (disconnect wallet, cancel order)
 
