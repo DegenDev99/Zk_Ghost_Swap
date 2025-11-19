@@ -410,11 +410,11 @@ export default function MemeMixerPage() {
                 </p>
               </div>
 
-              {activeOrder.transactionSignature && (
+              {activeOrder.depositTxSignature && (
                 <div className="p-4 bg-green-500/10 border border-green-500/30 rounded-lg">
-                  <Label className="text-xs text-muted-foreground mb-1">Transaction Signature</Label>
-                  <p className="text-sm font-mono text-green-500 break-all" data-testid="text-signature">
-                    {activeOrder.transactionSignature}
+                  <Label className="text-xs text-muted-foreground mb-1">Deposit Transaction</Label>
+                  <p className="text-sm font-mono text-green-500 break-all" data-testid="text-deposit-signature">
+                    {activeOrder.depositTxSignature}
                   </p>
                 </div>
               )}

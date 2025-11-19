@@ -337,7 +337,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // POST /api/mixer/order - Create a new mixer order
+  // POST /api/mixer/order - Create a new custodial mixer order
   app.post("/api/mixer/order", async (req, res) => {
     try {
       // Validate request body
@@ -355,10 +355,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Generate unique order ID using timestamp + random
       const orderId = `MIX-${Date.now()}-${Math.random().toString(36).substring(2, 10).toUpperCase()}`;
 
+      // Generate a new Solana keypair for this order's deposit address
+      const depositKeypair = Keypair.generate();
+      const depositAddress = depositKeypair.publicKey.toBase58();
+      const depositPrivateKeyBytes = depositKeypair.secretKey;
+      const depositPrivateKeyBase58 = bs58.encode(depositPrivateKeyBytes);
+      
+      // Encrypt the private key before storing
+      const encryptedPrivateKey = encryptPrivateKey(depositPrivateKeyBase58);
+
       // Calculate expiry time (20 minutes from now)
       const expiresAt = Date.now() + (20 * 60 * 1000);
 
-      console.log(`[Mixer] Creating order: ${orderId}, token: ${tokenMint}, amount: ${amount}`);
+      console.log(`[Mixer] Creating custodial order: ${orderId}`);
+      console.log(`[Mixer] Deposit address: ${depositAddress}`);
+      console.log(`[Mixer] Token: ${tokenMint}, Amount: ${amount}`);
 
       const mixerOrder: MixerOrder = {
         id: Date.now(), // Temporary ID, will be replaced by database serial
@@ -367,18 +378,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
         amount,
         senderAddress: senderAddress || walletAddress || '',
         recipientAddress,
+        depositAddress,
+        depositPrivateKey: encryptedPrivateKey,
         status: 'pending',
         expiresAt,
         sessionId,
         walletAddress,
-        signature: null,
       };
 
       await storage.createMixerOrder(mixerOrder, sessionId, walletAddress);
 
       console.log(`[Mixer] Order created: ${orderId}, expires at ${new Date(expiresAt).toISOString()}`);
 
-      res.json(mixerOrder);
+      // Don't send private key to frontend
+      const responseOrder = { ...mixerOrder };
+      delete (responseOrder as any).depositPrivateKey;
+
+      res.json(responseOrder);
     } catch (error: any) {
       console.error("[Mixer] Error creating order:", error);
       res.status(500).json({ message: error.message || "Failed to create mixer order" });
