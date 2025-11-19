@@ -344,7 +344,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log(`[Mixer] Creating order: ${orderId}, token: ${tokenMint}, amount: ${amount}`);
 
       const mixerOrder: MixerOrder = {
-        id: orderId,
+        id: Date.now(), // Temporary ID, will be replaced by database serial
+        orderId,
         tokenMint,
         amount,
         senderAddress: senderAddress || walletAddress || '',
@@ -353,6 +354,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         expiresAt,
         sessionId,
         walletAddress,
+        signature: null,
       };
 
       await storage.createMixerOrder(mixerOrder, sessionId, walletAddress);
