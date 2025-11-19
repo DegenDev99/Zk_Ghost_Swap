@@ -10,7 +10,7 @@ import NotFound from "@/pages/not-found";
 import { Button } from "@/components/ui/button";
 import { ArrowLeftRight, History, Wallet, FileText, LogOut } from "lucide-react";
 import { WalletProvider, useWallet } from "@/contexts/WalletContext";
-import logoImage from "@assets/ChatGPT Image Nov 18, 2025, 05_40_02 PM_1763507596567.png";
+import logoImage from "@assets/Untitled design - 2025-11-19T084305.349_1763559907026.png";
 import {
   DropdownMenu,
   DropdownMenuContent,
