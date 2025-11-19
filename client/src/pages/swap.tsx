@@ -513,6 +513,12 @@ export default function SwapPage() {
                     variant="outline"
                     className="w-full gap-2 border-destructive/40 text-destructive hover:bg-destructive/10"
                     data-testid="button-cancel-order"
+                    disabled={
+                      activeExchange?.status === 'finished' || 
+                      activeExchange?.status === 'failed' || 
+                      activeExchange?.status === 'refunded' || 
+                      activeExchange?.status === 'expired'
+                    }
                   >
                     <X className="w-4 h-4" />
                     Cancel Order
