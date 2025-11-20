@@ -1,5 +1,5 @@
-import type { Exchange, RateDataPoint, MixerOrder } from "@shared/schema";
-import { exchanges, rateHistory, mixerOrders, type SelectExchange, type InsertExchange, type InsertRateHistory } from "@shared/schema";
+import type { Exchange, RateDataPoint, MixerOrder, AttachmentMetadata } from "@shared/schema";
+import { exchanges, rateHistory, mixerOrders, supportTickets, type SelectExchange, type InsertExchange, type InsertRateHistory, type SelectSupportTicket, type InsertSupportTicket } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and, gte, sql } from "drizzle-orm";
 
@@ -29,6 +29,10 @@ export interface IStorage {
   // Rate history methods
   recordRate(fromCurrency: string, toCurrency: string, rate: number): Promise<void>;
   getRateHistory(fromCurrency: string, toCurrency: string, hours: number): Promise<RateDataPoint[]>;
+  
+  // Support ticket methods
+  createSupportTicket(contactEmail: string, orderId: string | undefined, description: string, attachments: AttachmentMetadata[]): Promise<SelectSupportTicket>;
+  getSupportTickets(): Promise<SelectSupportTicket[]>;
 }
 
 interface ExchangeMetadata {
@@ -290,6 +294,28 @@ export class MemStorage implements IStorage {
 
   async getRateHistory(fromCurrency: string, toCurrency: string, hours: number): Promise<RateDataPoint[]> {
     return [];
+  }
+
+  // Support ticket methods
+  private supportTickets: SelectSupportTicket[] = [];
+  private nextTicketId = 1;
+
+  async createSupportTicket(contactEmail: string, orderId: string | undefined, description: string, attachments: AttachmentMetadata[]): Promise<SelectSupportTicket> {
+    const ticket: SelectSupportTicket = {
+      id: this.nextTicketId++,
+      contactEmail,
+      orderId: orderId || null,
+      description,
+      attachments: attachments as any,
+      status: "open",
+      createdAt: new Date(),
+    };
+    this.supportTickets.push(ticket);
+    return ticket;
+  }
+
+  async getSupportTickets(): Promise<SelectSupportTicket[]> {
+    return this.supportTickets;
   }
 }
 
@@ -694,6 +720,23 @@ export class DbStorage implements IStorage {
       timestamp: row.recordedAt.getTime(),
       rate: parseFloat(row.rate),
     }));
+  }
+
+  // Support ticket methods
+  async createSupportTicket(contactEmail: string, orderId: string | undefined, description: string, attachments: AttachmentMetadata[]): Promise<SelectSupportTicket> {
+    const result = await db.insert(supportTickets).values({
+      contactEmail,
+      orderId: orderId || null,
+      description,
+      attachments: attachments as any,
+      status: "open",
+    }).returning();
+    
+    return result[0];
+  }
+
+  async getSupportTickets(): Promise<SelectSupportTicket[]> {
+    return await db.select().from(supportTickets).orderBy(desc(supportTickets.createdAt));
   }
 }
 
