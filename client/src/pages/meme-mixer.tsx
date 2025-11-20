@@ -544,7 +544,6 @@ export default function MemeMixerPage() {
                   <li>Custodial pool-based mixer for enhanced privacy</li>
                   <li>Backend generates unique deposit addresses</li>
                   <li>Funds pooled with other users' deposits</li>
-                  <li>Randomized payout delays (5-30 min) break transaction links</li>
                   <li>20-minute window to complete deposit</li>
                 </ul>
               </div>
