@@ -11,8 +11,8 @@
 
 **Zk Ghost Swap** is a privacy-preserving cryptocurrency platform that enables anonymous asset swapping and token mixing without KYC requirements or user registration. Built with a cyberpunk/Matrix-inspired aesthetic, the platform provides two core privacy tools:
 
-1. **Cross-Chain Crypto Swaps** - Anonymous exchanges via ChangeNOW API across 1,200+ cryptocurrencies
-2. **Meme Mixer** - Custodial pool-based mixer for Solana SPL tokens that breaks on-chain transaction links
+1. **Cross-Chain Crypto Swaps**
+2. **Meme Mixer**
 
 ---
 
