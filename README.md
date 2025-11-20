@@ -108,6 +108,7 @@ npm start
 - **In-Memory Storage** - Data lost on server restart (production uses database)
 - **Automatic Cleanup** - Completed orders deleted after 10 minutes
 - **ZK Privacy Tunnel** - Visual cryptographic proof interface
+- **Mixer** - Backend controls mixer deposit addresses for privacy pooling
 
 ---
 
@@ -176,7 +177,7 @@ npm start
 
 ### Trust Model
 - **Non-Custodial Swaps** - We never hold your swap funds
-- **Custodial Mixer** - Backend controls mixer deposit addresses for privacy pooling
+- **Mixer** - Backend controls mixer deposit addresses for privacy pooling
 - **Open Source** - All code is public and auditable
 - **Minimal Trust** - Designed to require minimal trust in operators
 
