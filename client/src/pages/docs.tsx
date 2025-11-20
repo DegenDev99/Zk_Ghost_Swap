@@ -1,6 +1,6 @@
 import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Shield, Lock, Eye, Globe, Zap, CheckCircle2 } from "lucide-react";
+import { Shield, Lock, Eye, Globe, Zap, CheckCircle2, Shuffle } from "lucide-react";
 
 export default function DocsPage() {
   return (
@@ -158,6 +158,104 @@ export default function DocsPage() {
                     <span><strong><span className="text-[#00D9FF]">Zk</span><span className="text-[#6600FF]"> Privacy Tunnel</span></strong> – Visual cryptographic proof of privacy-preserving execution</span>
                   </li>
                 </ul>
+              </section>
+
+              {/* Meme Mixer */}
+              <section data-testid="section-meme-mixer">
+                <h2 className="text-2xl font-bold text-foreground mb-4 flex items-center gap-2">
+                  <Shuffle className="w-6 h-6 text-secondary" />
+                  Meme Mixer: Custodial Pool-Based Privacy
+                </h2>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  The Meme Mixer is a specialized privacy tool for Solana SPL tokens that breaks on-chain transaction links through custodial pooling. Unlike traditional mixers, it uses a custodial architecture where the backend manages deposit addresses and orchestrates privacy-enhanced transfers.
+                </p>
+
+                <h3 className="text-xl font-semibold text-foreground mb-3 mt-6">How It Works</h3>
+                <div className="space-y-3 text-muted-foreground">
+                  <div className="flex items-start gap-2">
+                    <span className="text-secondary font-bold mt-1">1.</span>
+                    <div>
+                      <strong className="text-foreground">Create Order:</strong> Users specify the token mint address, amount, and recipient address. No wallet signature required for order creation.
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <span className="text-secondary font-bold mt-1">2.</span>
+                    <div>
+                      <strong className="text-foreground">Backend Generates Deposit Address:</strong> The server creates a unique Solana keypair for each order, encrypts the private key with AES-256 (using MIXER_ENCRYPTION_KEY), and stores it securely in the database.
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <span className="text-secondary font-bold mt-1">3.</span>
+                    <div>
+                      <strong className="text-foreground">User Deposits Tokens:</strong> Users send tokens to the generated deposit address. The backend automatically detects deposits via Solana RPC polling.
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <span className="text-secondary font-bold mt-1">4.</span>
+                    <div>
+                      <strong className="text-foreground">Pooling & Randomization:</strong> Multiple users' deposits are pooled together. Each order waits in the privacy pool before being processed.
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <span className="text-secondary font-bold mt-1">5.</span>
+                    <div>
+                      <strong className="text-foreground">Automated Payout:</strong> The backend decrypts the private key, signs the transfer transaction, and sends tokens to the recipient address. All transaction fees are sponsored by the master fee payer wallet.
+                    </div>
+                  </div>
+                </div>
+
+                <h3 className="text-xl font-semibold text-foreground mb-3 mt-6">Privacy Features</h3>
+                <ul className="space-y-2 text-muted-foreground">
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-5 h-5 text-secondary mt-0.5 flex-shrink-0" />
+                    <span><strong>Transaction Link Breaking:</strong> On-chain analysis cannot connect deposit addresses to recipient addresses due to pooling</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-5 h-5 text-secondary mt-0.5 flex-shrink-0" />
+                    <span><strong>Encrypted Key Storage:</strong> Private keys encrypted with crypto-js AES-256 using environment variable secret</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-5 h-5 text-secondary mt-0.5 flex-shrink-0" />
+                    <span><strong>Fee Sponsorship:</strong> Master wallet pays all transaction fees - users only send tokens, no SOL required</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-5 h-5 text-secondary mt-0.5 flex-shrink-0" />
+                    <span><strong>Automatic Processing:</strong> Backend handles all deposit detection, pooling, and payout automation</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-5 h-5 text-secondary mt-0.5 flex-shrink-0" />
+                    <span><strong>Time-Limited Orders:</strong> 20-minute expiration window ensures orders don't linger indefinitely</span>
+                  </li>
+                </ul>
+
+                <h3 className="text-xl font-semibold text-foreground mb-3 mt-6">Trust Model</h3>
+                <p className="text-muted-foreground leading-relaxed mb-3">
+                  The Meme Mixer operates on a <strong className="text-foreground">custodial trust model</strong> where the backend temporarily controls deposit addresses. This differs from the non-custodial swap feature:
+                </p>
+                <ul className="space-y-2 text-muted-foreground">
+                  <li className="flex items-start gap-2">
+                    <span className="text-secondary mt-1">•</span>
+                    <span><strong>Custodial Period:</strong> From deposit detection to payout completion (typically minutes)</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-secondary mt-1">•</span>
+                    <span><strong>Encrypted Storage:</strong> Private keys never stored in plaintext, only AES-256 encrypted form</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-secondary mt-1">•</span>
+                    <span><strong>Automatic Cleanup:</strong> Keys and expired orders deleted after completion or timeout</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-secondary mt-1">•</span>
+                    <span><strong>No Manual Access:</strong> Automated processes only - no administrative access to decrypt keys</span>
+                  </li>
+                </ul>
+
+                <div className="mt-4 p-4 bg-accent/10 border border-accent/20 rounded-lg">
+                  <p className="text-sm text-muted-foreground">
+                    <strong className="text-foreground">Note:</strong> The Meme Mixer prioritizes privacy over full decentralization. Users trust the platform operator to execute payouts correctly. This trade-off enables superior transaction unlinkability compared to fully non-custodial alternatives.
+                  </p>
+                </div>
               </section>
 
               {/* Privacy Guarantees */}
