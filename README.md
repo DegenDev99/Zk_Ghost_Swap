@@ -32,7 +32,7 @@
 - **Real-time status tracking** with visual privacy indicators
 - **Manual order cancellation** via confirmation dialog
 
-### 🎭 Meme Mixer (Custodial Pool-Based Privacy)
+### 🎭 Meme Mixer
 - **Break Transaction Links** - Pool multiple users' deposits to obscure on-chain connections
 - **Backend-Controlled** - Automated deposit detection via Solana RPC polling
 - **Encrypted Key Storage** - AES-256 encryption with environment variable secret
