@@ -9,7 +9,7 @@ import HistoryPage from "@/pages/history";
 import DocsPage from "@/pages/docs";
 import NotFound from "@/pages/not-found";
 import { Button } from "@/components/ui/button";
-import { ArrowLeftRight, History, Wallet, FileText, LogOut, Shield, Mail } from "lucide-react";
+import { ArrowLeftRight, History, Wallet, FileText, LogOut, Shield, Mail, Menu } from "lucide-react";
 import { SiX } from "react-icons/si";
 import { WalletProvider, useWallet } from "@/contexts/WalletContext";
 import logoImage from "@assets/Untitled design - 2025-11-19T084305.349_1763559907026.png";
@@ -143,14 +143,14 @@ function Router() {
                 className="h-10 w-auto sm:h-12 md:h-14"
                 data-testid="img-logo-main"
               />
-              <div className="text-lg sm:text-xl md:text-2xl font-bold whitespace-nowrap">
+              <div className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold whitespace-nowrap">
                 <span className="text-[#00D9FF]">Zk Ghost</span>
                 <span className="text-[#6600FF]"> Swap</span>
               </div>
             </div>
             
-            {/* Navigation - Absolute Center */}
-            <div className="absolute left-1/2 -translate-x-1/2 flex gap-1 sm:gap-2 pointer-events-auto z-10">
+            {/* Navigation - Absolute Center (Desktop only) */}
+            <div className="hidden md:flex absolute left-1/2 -translate-x-1/2 gap-1 sm:gap-2 pointer-events-auto z-10">
               <Link href="/">
                 <Button 
                   variant={location === "/" ? "default" : "ghost"}
@@ -160,7 +160,7 @@ function Router() {
                   aria-label="Swap"
                 >
                   <ArrowLeftRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                  <span className="hidden xs:inline">Swap</span>
+                  <span>Swap</span>
                 </Button>
               </Link>
               <Link href="/mixer">
@@ -172,7 +172,7 @@ function Router() {
                   aria-label="Meme Mixer"
                 >
                   <Shield className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                  <span className="hidden xs:inline">Meme Mixer</span>
+                  <span>Meme Mixer</span>
                 </Button>
               </Link>
               <Link href="/docs">
@@ -184,13 +184,59 @@ function Router() {
                   aria-label="Documentation"
                 >
                   <FileText className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                  <span className="hidden xs:inline">Docs</span>
+                  <span>Docs</span>
                 </Button>
               </Link>
             </div>
 
             {/* Social and Wallet - Right */}
             <div className="ml-auto flex items-center gap-2">
+              {/* Mobile Navigation Dropdown */}
+              <div className="md:hidden">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      data-testid="button-mobile-menu"
+                      aria-label="Navigation menu"
+                    >
+                      <Menu className="w-5 h-5" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-48">
+                    <DropdownMenuLabel>Navigation</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <Link href="/">
+                      <DropdownMenuItem
+                        className="gap-2 cursor-pointer"
+                        data-testid="mobile-menu-swap"
+                      >
+                        <ArrowLeftRight className="w-4 h-4" />
+                        <span>Swap</span>
+                      </DropdownMenuItem>
+                    </Link>
+                    <Link href="/mixer">
+                      <DropdownMenuItem
+                        className="gap-2 cursor-pointer"
+                        data-testid="mobile-menu-mixer"
+                      >
+                        <Shield className="w-4 h-4" />
+                        <span>Meme Mixer</span>
+                      </DropdownMenuItem>
+                    </Link>
+                    <Link href="/docs">
+                      <DropdownMenuItem
+                        className="gap-2 cursor-pointer"
+                        data-testid="mobile-menu-docs"
+                      >
+                        <FileText className="w-4 h-4" />
+                        <span>Documentation</span>
+                      </DropdownMenuItem>
+                    </Link>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
               <a
                 href="https://x.com/ZKGhostSwap"
                 target="_blank"
