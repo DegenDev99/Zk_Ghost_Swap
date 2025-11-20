@@ -143,7 +143,7 @@ npm start
 - `POST /api/swap/auto-close/:id` - Cancel/close an order
 
 **Mixer Endpoints:**
-- `POST /api/mixer/order` - Create custodial mixer order
+- `POST /api/mixer/order` - Create mixer order
 - `GET /api/mixer/deposit/:orderId` - Check deposit status
 - `POST /api/mixer/auto-close/:id` - Cancel/close a mixer order
 
