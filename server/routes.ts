@@ -21,11 +21,13 @@ if (!ENCRYPTION_KEY) {
 
 // Helper function to encrypt private keys
 function encryptPrivateKey(privateKey: string): string {
+  if (!ENCRYPTION_KEY) throw new Error('Encryption key not available');
   return CryptoJS.AES.encrypt(privateKey, ENCRYPTION_KEY).toString();
 }
 
 // Helper function to decrypt private keys
 function decryptPrivateKey(encryptedKey: string): string {
+  if (!ENCRYPTION_KEY) throw new Error('Encryption key not available');
   const bytes = CryptoJS.AES.decrypt(encryptedKey, ENCRYPTION_KEY);
   return bytes.toString(CryptoJS.enc.Utf8);
 }
@@ -501,6 +503,125 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: error.message || "Failed to auto-close order" });
     }
   });
+
+  // Background payout processor - runs every minute
+  async function processScheduledPayouts() {
+    try {
+      // Get all mixer orders ready for payout
+      const orders = await storage.getAllMixerOrders();
+      const now = Date.now();
+
+      for (const order of orders) {
+        // Skip if not in deposited state or no scheduled payout time
+        if (order.status !== 'deposited' || !order.payoutScheduledAt) {
+          continue;
+        }
+
+        const scheduledTime = new Date(order.payoutScheduledAt).getTime();
+        
+        // Check if it's time to execute payout
+        if (now >= scheduledTime) {
+          console.log(`[Mixer] Executing payout for order ${order.orderId}`);
+          
+          try {
+            // Mark as processing
+            await storage.updateMixerOrderStatus(order.orderId, 'processing');
+
+            // Decrypt the private key
+            const privateKeyStr = decryptPrivateKey(order.depositPrivateKey);
+            const depositKeypair = Keypair.fromSecretKey(bs58.decode(privateKeyStr));
+
+            // Execute payout
+            const { Connection, PublicKey, Transaction, SystemProgram } = await import("@solana/web3.js");
+            const { 
+              getAssociatedTokenAddress, 
+              createAssociatedTokenAccountInstruction,
+              createTransferInstruction,
+              getAccount
+            } = await import("@solana/spl-token");
+
+            const connection = new Connection("https://api.mainnet-beta.solana.com");
+            const tokenMintPubkey = new PublicKey(order.tokenMint);
+            const recipientPubkey = new PublicKey(order.recipientAddress);
+
+            // Get source and destination token accounts
+            const sourceATA = await getAssociatedTokenAddress(
+              tokenMintPubkey,
+              depositKeypair.publicKey,
+              false
+            );
+
+            const destinationATA = await getAssociatedTokenAddress(
+              tokenMintPubkey,
+              recipientPubkey,
+              false
+            );
+
+            // Build transaction
+            const transaction = new Transaction();
+
+            // Check if recipient ATA exists
+            try {
+              await getAccount(connection, destinationATA);
+            } catch {
+              // Create recipient ATA if it doesn't exist
+              transaction.add(
+                createAssociatedTokenAccountInstruction(
+                  depositKeypair.publicKey,
+                  destinationATA,
+                  recipientPubkey,
+                  tokenMintPubkey
+                )
+              );
+            }
+
+            // Get source account to determine amount
+            const sourceAccount = await getAccount(connection, sourceATA);
+            const transferAmount = sourceAccount.amount;
+
+            // Add transfer instruction
+            transaction.add(
+              createTransferInstruction(
+                sourceATA,
+                destinationATA,
+                depositKeypair.publicKey,
+                transferAmount
+              )
+            );
+
+            // Get recent blockhash and send
+            const { blockhash } = await connection.getLatestBlockhash();
+            transaction.recentBlockhash = blockhash;
+            transaction.feePayer = depositKeypair.publicKey;
+
+            // Sign and send
+            transaction.sign(depositKeypair);
+            const signature = await connection.sendRawTransaction(transaction.serialize());
+            
+            // Wait for confirmation
+            await connection.confirmTransaction(signature, 'confirmed');
+
+            console.log(`[Mixer] Payout completed for ${order.orderId}: ${signature}`);
+
+            // Update order status
+            await storage.updateMixerOrderStatus(order.orderId, 'completed');
+            await storage.updateMixerPayoutSignature(order.orderId, signature);
+
+          } catch (payoutError: any) {
+            console.error(`[Mixer] Payout failed for ${order.orderId}:`, payoutError);
+            // Mark as failed but keep trying on next cycle
+            await storage.updateMixerOrderStatus(order.orderId, 'deposited');
+          }
+        }
+      }
+    } catch (error: any) {
+      console.error("[Mixer] Error in payout processor:", error);
+    }
+  }
+
+  // Start payout processor - runs every 30 seconds
+  setInterval(processScheduledPayouts, 30000);
+  console.log('[Mixer] Payout processor started (runs every 30 seconds)');
 
   const httpServer = createServer(app);
   return httpServer;

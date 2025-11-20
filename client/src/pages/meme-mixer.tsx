@@ -78,30 +78,6 @@ export default function MemeMixerPage() {
     },
   });
 
-  // Submit transaction mutation
-  const submitTransactionMutation = useMutation({
-    mutationFn: async (data: { orderId: string; signature: string }) => {
-      const res = await apiRequest("POST", "/api/mixer/submit", data);
-      return await res.json();
-    },
-    onSuccess: () => {
-      if (activeOrder) {
-        setActiveOrder({ ...activeOrder, status: 'completed' });
-        toast({
-          title: "🎉 Transfer Complete!",
-          description: "Your confidential transfer was successful",
-        });
-      }
-    },
-    onError: (error: any) => {
-      toast({
-        title: "Submission Failed",
-        description: error.message || "Failed to submit transaction",
-        variant: "destructive",
-      });
-    },
-  });
-
   // Timer countdown and auto-close on expiry
   useEffect(() => {
     if (!activeOrder || !activeOrder.expiresAt) {

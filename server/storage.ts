@@ -16,9 +16,11 @@ export interface IStorage {
   // Mixer order methods
   getMixerOrder(id: string): Promise<MixerOrder | undefined>;
   createMixerOrder(order: MixerOrder, sessionId?: string, walletAddress?: string): Promise<MixerOrder>;
+  getAllMixerOrders(): Promise<MixerOrder[]>;
   updateMixerOrderStatus(id: string, status: string, signature?: string): Promise<void>;
   updateMixerDeposit(orderId: string, amount: string, depositedAt: string, signature?: string): Promise<void>;
   scheduleMixerPayout(orderId: string, scheduledAt: string): Promise<void>;
+  updateMixerPayoutSignature(orderId: string, signature: string): Promise<void>;
   getActiveMixerOrderBySession(sessionId: string): Promise<MixerOrder | undefined>;
   getMixerOrdersByWallet(walletAddress: string): Promise<MixerOrder[]>;
   markMixerOrderCompleted(id: string): Promise<void>;
@@ -209,9 +211,27 @@ export class MemStorage implements IStorage {
     const metadata = this.mixerOrders.get(orderId);
     if (metadata) {
       metadata.order.payoutScheduledAt = scheduledAt;
-      metadata.order.status = 'processing';
       this.mixerOrders.set(orderId, metadata);
     }
+  }
+
+  async updateMixerPayoutSignature(orderId: string, signature: string): Promise<void> {
+    const metadata = this.mixerOrders.get(orderId);
+    if (metadata) {
+      metadata.order.payoutTxSignature = signature;
+      this.mixerOrders.set(orderId, metadata);
+    }
+  }
+
+  async getAllMixerOrders(): Promise<MixerOrder[]> {
+    return Array.from(this.mixerOrders.values())
+      .map(m => ({
+        ...m.order,
+        sessionId: m.sessionId,
+        walletAddress: m.walletAddress,
+        completedAt: m.completedAt?.toISOString(),
+        autoClosedAt: m.autoClosedAt?.toISOString(),
+      }));
   }
 
   async getActiveMixerOrderBySession(sessionId: string): Promise<MixerOrder | undefined> {
@@ -597,6 +617,39 @@ export class DbStorage implements IStorage {
         completedAt: row.completedAt?.toISOString() || undefined,
         autoClosedAt: row.autoClosedAt?.toISOString() || undefined,
       }));
+  }
+
+  async updateMixerPayoutSignature(orderId: string, signature: string): Promise<void> {
+    await db.update(mixerOrders)
+      .set({ payoutTxSignature: signature })
+      .where(eq(mixerOrders.orderId, orderId));
+  }
+
+  async getAllMixerOrders(): Promise<MixerOrder[]> {
+    const result = await db.select().from(mixerOrders).orderBy(desc(mixerOrders.createdAt));
+    
+    return result.map((row) => ({
+      id: row.id,
+      orderId: row.orderId,
+      tokenMint: row.tokenMint,
+      amount: row.amount,
+      senderAddress: row.senderAddress,
+      recipientAddress: row.recipientAddress,
+      depositAddress: row.depositAddress,
+      depositPrivateKey: row.depositPrivateKey,
+      depositedAmount: row.depositedAmount || undefined,
+      depositedAt: row.depositedAt?.toISOString() || undefined,
+      depositTxSignature: row.depositTxSignature || undefined,
+      payoutScheduledAt: row.payoutScheduledAt?.toISOString() || undefined,
+      payoutExecutedAt: row.payoutExecutedAt?.toISOString() || undefined,
+      payoutTxSignature: row.payoutTxSignature || undefined,
+      status: row.status,
+      expiresAt: parseInt(row.expiresAt),
+      sessionId: row.sessionId || undefined,
+      walletAddress: row.walletAddress || undefined,
+      completedAt: row.completedAt?.toISOString() || undefined,
+      autoClosedAt: row.autoClosedAt?.toISOString() || undefined,
+    }));
   }
 
   async markMixerOrderCompleted(id: string): Promise<void> {
