@@ -1,4 +1,4 @@
-# Zk Ghost Swap - Privacy-First Cryptocurrency Exchange
+# Zk Ghost Swap - Privacy-First Cryptocurrency Exchange | ✅ Security Check Passed
 
 ## Overview
 
