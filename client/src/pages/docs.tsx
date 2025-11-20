@@ -7,17 +7,17 @@ export default function DocsPage() {
     <div className="container mx-auto px-4 py-8 max-w-5xl">
       <div className="space-y-8">
         {/* Header */}
-        <div className="text-center space-y-4">
-          <div className="inline-flex items-center gap-3 px-6 py-3 rounded-lg bg-gradient-to-r from-primary/10 to-secondary/10 border border-primary/20">
-            <Shield className="w-6 h-6 text-primary" />
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+        <div className="text-center space-y-3 sm:space-y-4">
+          <div className="inline-flex items-center gap-2 sm:gap-3 px-4 sm:px-6 py-2 sm:py-3 rounded-lg bg-gradient-to-r from-primary/10 to-secondary/10 border border-primary/20">
+            <Shield className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
               Privacy Whitepaper
             </h1>
           </div>
-          <p className="text-muted-foreground text-lg">
+          <p className="text-muted-foreground text-sm sm:text-base md:text-lg px-4">
             Zk Ghost Swap: Privacy-First Cross-Chain Asset Exchange
           </p>
-          <p className="text-sm text-muted-foreground/70">
+          <p className="text-xs sm:text-sm text-muted-foreground/70">
             Version 1.0 • Powered by ZK Enigma Link Network
           </p>
         </div>
@@ -62,9 +62,9 @@ export default function DocsPage() {
         </div>
 
         {/* Main Content */}
-        <Card className="p-8 bg-card/60 backdrop-blur">
-          <ScrollArea className="h-[600px] pr-4">
-            <div className="prose prose-invert max-w-none space-y-6">
+        <Card className="p-4 sm:p-6 md:p-8 bg-card/60 backdrop-blur">
+          <ScrollArea className="h-[500px] sm:h-[600px] pr-2 sm:pr-4">
+            <div className="prose prose-invert max-w-none space-y-4 sm:space-y-6 text-sm sm:text-base">
               
               {/* Abstract */}
               <section data-testid="section-abstract">

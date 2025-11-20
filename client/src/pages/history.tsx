@@ -49,11 +49,11 @@ export default function HistoryPage() {
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8 max-w-6xl">
         {/* Header */}
-        <div className="mb-8 text-center">
-          <h1 className="text-4xl sm:text-5xl font-bold mb-3 bg-gradient-to-r from-primary via-accent to-secondary bg-clip-text text-transparent" data-testid="heading-history">
+        <div className="mb-6 sm:mb-8 text-center">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-2 sm:mb-3 bg-gradient-to-r from-primary via-accent to-secondary bg-clip-text text-transparent" data-testid="heading-history">
             TRANSACTION HISTORY
           </h1>
-          <p className="text-sm text-muted-foreground uppercase tracking-wider">
+          <p className="text-xs sm:text-sm text-muted-foreground uppercase tracking-wider">
             Your Complete Swap Records
           </p>
         </div>
@@ -113,20 +113,20 @@ export default function HistoryPage() {
 
                   {/* Exchange Details */}
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between gap-4 mb-3">
-                      <div className="flex items-center gap-3">
+                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4 mb-3">
+                      <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
                         <div className="text-center">
-                          <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">From</p>
-                          <p className="font-mono font-bold text-lg text-foreground">{exchange.fromAmount}</p>
-                          <p className="font-mono text-sm text-primary">{exchange.fromCurrency.toUpperCase()}</p>
+                          <p className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wider mb-1">From</p>
+                          <p className="font-mono font-bold text-sm sm:text-base md:text-lg text-foreground break-all">{exchange.fromAmount}</p>
+                          <p className="font-mono text-xs sm:text-sm text-primary">{exchange.fromCurrency.toUpperCase()}</p>
                         </div>
                         
-                        <ArrowRight className="w-5 h-5 text-muted-foreground flex-shrink-0" />
+                        <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground flex-shrink-0" />
                         
                         <div className="text-center">
-                          <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">To</p>
-                          <p className="font-mono font-bold text-lg text-foreground">{exchange.toAmount}</p>
-                          <p className="font-mono text-sm text-primary">{exchange.toCurrency.toUpperCase()}</p>
+                          <p className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wider mb-1">To</p>
+                          <p className="font-mono font-bold text-sm sm:text-base md:text-lg text-foreground break-all">{exchange.toAmount}</p>
+                          <p className="font-mono text-xs sm:text-sm text-primary">{exchange.toCurrency.toUpperCase()}</p>
                         </div>
                       </div>
                       
