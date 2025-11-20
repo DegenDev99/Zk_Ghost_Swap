@@ -245,7 +245,7 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## 📞 Contact
 
-For security issues, please contact: `security@zkghostswap.org` (Coming Soon)
+For issues, please contact: `security@zkghostswap.org`
 
 ---
 
