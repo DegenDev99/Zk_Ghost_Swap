@@ -227,35 +227,6 @@ export default function DocsPage() {
                     <span><strong>Time-Limited Orders:</strong> 20-minute expiration window ensures orders don't linger indefinitely</span>
                   </li>
                 </ul>
-
-                <h3 className="text-xl font-semibold text-foreground mb-3 mt-6">Trust Model</h3>
-                <p className="text-muted-foreground leading-relaxed mb-3">
-                  The Meme Mixer operates on a <strong className="text-foreground">custodial trust model</strong> where the backend temporarily controls deposit addresses. This differs from the non-custodial swap feature:
-                </p>
-                <ul className="space-y-2 text-muted-foreground">
-                  <li className="flex items-start gap-2">
-                    <span className="text-secondary mt-1">•</span>
-                    <span><strong>Custodial Period:</strong> From deposit detection to payout completion (typically minutes)</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-secondary mt-1">•</span>
-                    <span><strong>Encrypted Storage:</strong> Private keys never stored in plaintext, only AES-256 encrypted form</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-secondary mt-1">•</span>
-                    <span><strong>Automatic Cleanup:</strong> Keys and expired orders deleted after completion or timeout</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-secondary mt-1">•</span>
-                    <span><strong>No Manual Access:</strong> Automated processes only - no administrative access to decrypt keys</span>
-                  </li>
-                </ul>
-
-                <div className="mt-4 p-4 bg-accent/10 border border-accent/20 rounded-lg">
-                  <p className="text-sm text-muted-foreground">
-                    <strong className="text-foreground">Note:</strong> The Meme Mixer prioritizes privacy over full decentralization. Users trust the platform operator to execute payouts correctly. This trade-off enables superior transaction unlinkability compared to fully non-custodial alternatives.
-                  </p>
-                </div>
               </section>
 
               {/* Privacy Guarantees */}
