@@ -2,7 +2,7 @@
 
 ## Overview
 
-Zk Ghost Swap is a privacy-focused cryptocurrency platform that enables anonymous asset swapping and token mixing without KYC requirements or user registration. The platform features two core privacy tools: (1) Cross-chain crypto swaps via ChangeNOW API, and (2) Meme Mixer - a custodial pool-based mixer that pools user deposits and sends randomized payouts to break on-chain transaction links. Built with a cyberpunk/Matrix-inspired aesthetic, the application provides streamlined interfaces for creating and tracking privacy-enhanced transactions with real-time status updates.
+Zk Ghost Swap is a privacy-focused cryptocurrency platform that enables anonymous asset swapping and token mixing without KYC requirements or user registration. The platform features two core privacy tools: (1) Cross-chain crypto swaps via ChangeNOW API, and (2) Meme Mixer - a pool-based mixer that pools user deposits and sends randomized payouts to break on-chain transaction links. Built with a cyberpunk/Matrix-inspired aesthetic, the application provides streamlined interfaces for creating and tracking privacy-enhanced transactions with real-time status updates.
 
 **Key Privacy Features:**
 
@@ -12,8 +12,8 @@ Zk Ghost Swap is a privacy-focused cryptocurrency platform that enables anonymou
 - Disconnect confirmation: Prevents accidental wallet disconnection with warning dialog
 - **Cancel Order**: Users can manually cancel active orders via confirmation dialog; canceled orders are permanently removed and do not reappear on page reload
 
-**Meme Mixer (Custodial Pool-Based Mixer):**
-- **Custodial Architecture**: Backend-controlled privacy pool for breaking on-chain transaction links
+**Meme Mixer (Pool-Based Mixer):**
+- **Pool Architecture**: Backend-controlled privacy pool for breaking on-chain transaction links
 - **Deposit Flow**: Backend generates unique Solana keypairs, encrypts private keys with AES-256
 - **Pooling Mechanism**: Multiple users' deposits pooled together to obscure transaction links
 - **Randomized Payouts**: 5-30 minute random delays before sending to recipients
