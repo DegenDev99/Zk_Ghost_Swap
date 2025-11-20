@@ -231,14 +231,6 @@ For complete technical documentation, privacy guarantees, and security model, se
 
 ---
 
-## ⚠️ Disclaimer
-
-Zk Ghost Swap is experimental software provided "as is" without warranty. Users assume all risks. This project is for informational purposes only and does not constitute financial, legal, or investment advice. Cryptocurrency trading involves substantial risk. Consult professionals before making financial decisions.
-
-**Privacy Notice:** While we implement extensive privacy protections, absolute anonymity cannot be guaranteed. Blockchain transactions are permanently recorded on public ledgers. Use privacy-enhancing tools (Tor, VPNs, privacy coins) in combination with Zk Ghost Swap for maximum protection.
-
----
-
 ## 📄 License
 
 MIT License - See LICENSE file for details
