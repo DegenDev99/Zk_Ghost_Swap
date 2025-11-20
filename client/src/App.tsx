@@ -9,7 +9,7 @@ import HistoryPage from "@/pages/history";
 import DocsPage from "@/pages/docs";
 import NotFound from "@/pages/not-found";
 import { Button } from "@/components/ui/button";
-import { ArrowLeftRight, History, Wallet, FileText, LogOut, Shield } from "lucide-react";
+import { ArrowLeftRight, History, Wallet, FileText, LogOut, Shield, Mail } from "lucide-react";
 import { SiX } from "react-icons/si";
 import { WalletProvider, useWallet } from "@/contexts/WalletContext";
 import logoImage from "@assets/Untitled design - 2025-11-19T084305.349_1763559907026.png";
@@ -211,6 +211,35 @@ function Router() {
           </div>
         </div>
       </nav>
+
+      {/* Support Banner */}
+      <div className="bg-gradient-to-r from-primary/10 to-secondary/10 border-b border-primary/20">
+        <div className="container mx-auto px-4 py-3">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 text-center sm:text-left">
+            <div className="flex items-center gap-2">
+              <Mail className="w-4 h-4 text-primary flex-shrink-0" />
+              <span className="text-sm text-muted-foreground">
+                <strong className="text-foreground">Need Help?</strong> Our support team is here for you.
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-muted-foreground">
+                Email us at{" "}
+                <a
+                  href="mailto:support@zkghostswap.tech"
+                  className="text-primary hover:text-primary/80 font-semibold underline-offset-4 hover:underline"
+                  data-testid="link-support-email"
+                >
+                  support@zkghostswap.tech
+                </a>
+              </span>
+            </div>
+            <div className="text-xs text-muted-foreground/80 hidden md:block">
+              (Include your Order ID for faster assistance)
+            </div>
+          </div>
+        </div>
+      </div>
 
       {/* Main Content */}
       <Switch>
