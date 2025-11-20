@@ -550,26 +550,25 @@ export default function MemeMixerPage() {
             </div>
           </div>
 
-          {/* Create Order Button */}
-          <Button
-            onClick={handleCreateOrder}
-            disabled={createOrderMutation.isPending || !walletAddress}
-            className="w-full gap-2"
-            size="lg"
-            data-testid="button-create-order"
-          >
-            {createOrderMutation.isPending ? (
-              <>
-                <Loader2 className="w-4 h-4 animate-spin" />
-                Creating Order...
-              </>
-            ) : (
-              <>
-                <Shield className="w-4 h-4" />
-                Create Anonymous Order
-              </>
-            )}
-          </Button>
+          {/* Coming Soon Notice */}
+          <div className="p-6 bg-gradient-to-r from-primary/10 to-secondary/10 border-2 border-primary/30 rounded-lg text-center">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/20 mb-4">
+              <Shield className="w-8 h-8 text-primary" />
+            </div>
+            <h3 className="text-xl font-bold text-foreground mb-2">Coming Soon</h3>
+            <p className="text-sm text-muted-foreground mb-4">
+              The Meme Mixer is currently in development. This privacy-enhanced token transfer feature will be available soon.
+            </p>
+            <Button
+              disabled
+              className="w-full gap-2 opacity-50 cursor-not-allowed"
+              size="lg"
+              data-testid="button-create-order"
+            >
+              <Shield className="w-4 h-4" />
+              Create Anonymous Order
+            </Button>
+          </div>
         </Card>
 
         {/* Privacy Visualization - Right Side */}
