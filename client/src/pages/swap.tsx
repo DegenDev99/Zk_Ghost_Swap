@@ -809,7 +809,8 @@ export default function SwapPage() {
 
       <div className="max-w-7xl mx-auto relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 items-start">
-          {/* Swap Form - Left Side */}
+          {/* Left Column - Swap Form + Support */}
+          <div className="space-y-6">
           <Card className="w-full p-6 sm:p-8 bg-card/40 backdrop-blur-sm border-primary/20">
         {/* Header */}
         <div className="text-center mb-6">
@@ -1112,8 +1113,9 @@ export default function SwapPage() {
               </div>
             </div>
           </Card>
+          </div>
 
-          {/* Privacy Panel - Zero-Knowledge Privacy */}
+          {/* Right Column - Privacy Panel - Zero-Knowledge Privacy */}
           <Card className="lg:sticky lg:top-8 p-6 sm:p-8 bg-card/60 backdrop-blur-sm border-primary/30 relative overflow-hidden">
             <div className="absolute inset-0 opacity-10">
               <div className="absolute top-0 left-0 w-64 h-64 bg-gradient-to-br from-primary to-transparent rounded-full blur-3xl animate-pulse" />
