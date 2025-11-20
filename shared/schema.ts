@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { pgTable, serial, varchar, text, timestamp, numeric, index } from "drizzle-orm/pg-core";
+import { pgTable, serial, varchar, text, timestamp, numeric, index, jsonb } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 
 // Currency interface from ChangeNOW API
@@ -213,3 +213,40 @@ export function normalizeNetwork(network: string): string {
   if (normalized === 'trx' || normalized === 'tron') return 'trc20';
   return normalized;
 }
+
+// Support ticket attachment metadata
+export interface AttachmentMetadata {
+  originalName: string;
+  storedName: string;
+  size: number;
+  mimeType: string;
+}
+
+// Database table for support tickets
+export const supportTickets = pgTable("support_tickets", {
+  id: serial("id").primaryKey(),
+  contactEmail: varchar("contact_email", { length: 255 }).notNull(),
+  orderId: varchar("order_id", { length: 255 }),
+  description: text("description").notNull(),
+  attachments: jsonb("attachments").$type<AttachmentMetadata[]>().default([]),
+  status: varchar("status", { length: 50 }).notNull().default("open"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// Insert schema for support tickets
+export const insertSupportTicketSchema = createInsertSchema(supportTickets).omit({
+  id: true,
+  createdAt: true,
+});
+
+// Frontend validation schema (extends insert schema)
+export const createSupportTicketSchema = z.object({
+  contactEmail: z.string().email("Invalid email address"),
+  orderId: z.string().max(255).optional().transform(val => val?.trim() || undefined),
+  description: z.string().min(10, "Description must be at least 10 characters").max(5000, "Description too long"),
+});
+
+// Types
+export type InsertSupportTicket = z.infer<typeof insertSupportTicketSchema>;
+export type SelectSupportTicket = typeof supportTickets.$inferSelect;
+export type CreateSupportTicketInput = z.infer<typeof createSupportTicketSchema>;
