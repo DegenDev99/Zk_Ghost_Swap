@@ -19,6 +19,25 @@ if (!ENCRYPTION_KEY) {
   process.exit(1);
 }
 
+// Master fee payer wallet - REQUIRED to sponsor transaction fees
+const MIXER_FEE_PAYER_KEY = process.env.MIXER_FEE_PAYER_KEY;
+
+if (!MIXER_FEE_PAYER_KEY) {
+  console.error('[FATAL] MIXER_FEE_PAYER_KEY environment variable is required to sponsor transaction fees');
+  console.error('[FATAL] This wallet pays for all mixer transaction fees - aborting');
+  process.exit(1);
+}
+
+// Load the master fee payer keypair
+let masterFeePayerKeypair: Keypair;
+try {
+  masterFeePayerKeypair = Keypair.fromSecretKey(bs58.decode(MIXER_FEE_PAYER_KEY));
+  console.log('[Mixer] Master fee payer wallet loaded:', masterFeePayerKeypair.publicKey.toBase58());
+} catch (error) {
+  console.error('[FATAL] Invalid MIXER_FEE_PAYER_KEY format - must be base58 encoded private key');
+  process.exit(1);
+}
+
 // Helper function to encrypt private keys
 function encryptPrivateKey(privateKey: string): string {
   if (!ENCRYPTION_KEY) throw new Error('Encryption key not available');
@@ -565,9 +584,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
               await getAccount(connection, destinationATA);
             } catch {
               // Create recipient ATA if it doesn't exist
+              // Master wallet pays for ATA creation
               transaction.add(
                 createAssociatedTokenAccountInstruction(
-                  depositKeypair.publicKey,
+                  masterFeePayerKeypair.publicKey,
                   destinationATA,
                   recipientPubkey,
                   tokenMintPubkey
@@ -589,13 +609,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
               )
             );
 
-            // Get recent blockhash and send
+            // Get recent blockhash and set master wallet as fee payer
             const { blockhash } = await connection.getLatestBlockhash();
             transaction.recentBlockhash = blockhash;
-            transaction.feePayer = depositKeypair.publicKey;
+            transaction.feePayer = masterFeePayerKeypair.publicKey; // Master wallet pays all fees
 
-            // Sign and send
-            transaction.sign(depositKeypair);
+            // Sign with BOTH wallets:
+            // 1. depositKeypair authorizes token transfer
+            // 2. masterFeePayerKeypair pays transaction fees
+            transaction.sign(depositKeypair, masterFeePayerKeypair);
             const signature = await connection.sendRawTransaction(transaction.serialize());
             
             // Wait for confirmation
