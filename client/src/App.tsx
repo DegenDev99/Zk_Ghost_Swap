@@ -10,6 +10,7 @@ import DocsPage from "@/pages/docs";
 import NotFound from "@/pages/not-found";
 import { Button } from "@/components/ui/button";
 import { ArrowLeftRight, History, Wallet, FileText, LogOut, Shield } from "lucide-react";
+import { SiX } from "react-icons/si";
 import { WalletProvider, useWallet } from "@/contexts/WalletContext";
 import logoImage from "@assets/Untitled design - 2025-11-19T084305.349_1763559907026.png";
 import {
@@ -188,8 +189,23 @@ function Router() {
               </Link>
             </div>
 
-            {/* Wallet - Right */}
-            <div className="ml-auto">
+            {/* Social and Wallet - Right */}
+            <div className="ml-auto flex items-center gap-2">
+              <a
+                href="https://x.com/ZKGhostSwap"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Follow us on X (Twitter)"
+              >
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="text-muted-foreground hover:text-foreground"
+                  data-testid="link-twitter"
+                >
+                  <SiX className="w-4 h-4" />
+                </Button>
+              </a>
               <WalletButton />
             </div>
           </div>
