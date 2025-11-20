@@ -322,41 +322,6 @@ export default function DocsPage() {
                 </div>
               </section>
 
-              {/* Future Roadmap */}
-              <section data-testid="section-roadmap">
-                <h2 className="text-2xl font-bold text-foreground mb-4">Future Roadmap</h2>
-                
-                <div className="space-y-4">
-                  <div>
-                    <h3 className="text-lg font-semibold text-primary mb-2">Phase 1: Privacy Enhancements (Q2 2025)</h3>
-                    <ul className="text-muted-foreground text-sm space-y-1 ml-4">
-                      <li>• Full ZK-SNARK integration with production proof circuits</li>
-                      <li>• Native Tor hidden service (.onion address)</li>
-                      <li>• Multi-hop swaps through privacy coins</li>
-                    </ul>
-                  </div>
-
-                  <div>
-                    <h3 className="text-lg font-semibold text-secondary mb-2">Phase 2: Decentralization (Q3 2025)</h3>
-                    <ul className="text-muted-foreground text-sm space-y-1 ml-4">
-                      <li>• Decentralized exchange network with P2P liquidity</li>
-                      <li>• IPFS frontend hosting for censorship resistance</li>
-                      <li>• DAO governance for protocol upgrades</li>
-                    </ul>
-                  </div>
-
-                  <div>
-                    <h3 className="text-lg font-semibold text-accent mb-2">Phase 3: Advanced Features (Q4 2025)</h3>
-                    <ul className="text-muted-foreground text-sm space-y-1 ml-4">
-                      <li>• Lightning Network integration for instant BTC swaps</li>
-                      <li>• Private stablecoin support</li>
-                      <li>• Native mobile applications (iOS & Android)</li>
-                      <li>• Smart contract privacy integrations</li>
-                    </ul>
-                  </div>
-                </div>
-              </section>
-
               {/* Conclusion */}
               <section data-testid="section-conclusion">
                 <h2 className="text-2xl font-bold text-foreground mb-4">Conclusion</h2>
