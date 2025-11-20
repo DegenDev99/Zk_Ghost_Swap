@@ -9,7 +9,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { ArrowDownUp, Clock, Copy, Check, AlertCircle, Loader2, ChevronsUpDown, Shield, Lock, Zap, Globe, Home, X, Mail, Upload, FileText } from "lucide-react";
+import { ArrowDownUp, Clock, Copy, Check, AlertCircle, Loader2, ChevronsUpDown, Shield, Lock, Zap, Globe, Home, X, Mail, Upload, FileText, MessageCircle } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createSupportTicketSchema } from "@shared/schema";
@@ -19,6 +19,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import type { Currency, ExchangeAmount, Exchange } from "@shared/schema";
 import { PrivacyVisualization } from "@/components/PrivacyVisualization";
+import { ChatbotDialog } from "@/components/ChatbotDialog";
 import { useWallet } from "@/contexts/WalletContext";
 import { getOrCreateSessionId } from "@/lib/session";
 import { Link } from "wouter";
@@ -45,6 +46,7 @@ export default function SwapPage() {
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
   const [isCancelling, setIsCancelling] = useState(false);
   const [supportDialogOpen, setSupportDialogOpen] = useState(false);
+  const [chatDialogOpen, setChatDialogOpen] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const sessionId = getOrCreateSessionId();
   const autoClosedOrdersRef = useRef<Set<string>>(new Set());
@@ -1198,6 +1200,17 @@ export default function SwapPage() {
                   💡 Tip: Include your Order ID in your email for faster assistance
                 </p>
                 
+                {/* Live Chat Support Button */}
+                <Button 
+                  variant="default" 
+                  className="w-full mt-3" 
+                  onClick={() => setChatDialogOpen(true)}
+                  data-testid="button-live-chat"
+                >
+                  <MessageCircle className="w-4 h-4 mr-2" />
+                  Live Chat Support
+                </Button>
+                
                 {/* Submit a Request Button & Dialog */}
                 <Dialog open={supportDialogOpen} onOpenChange={setSupportDialogOpen}>
                   <DialogTrigger asChild>
@@ -1470,6 +1483,9 @@ export default function SwapPage() {
           </Card>
         </div>
       </div>
+
+      {/* Chat Dialog */}
+      <ChatbotDialog open={chatDialogOpen} onOpenChange={setChatDialogOpen} />
     </div>
   );
 }

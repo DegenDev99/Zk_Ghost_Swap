@@ -1,8 +1,9 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { createExchangeSchema, createMixerOrderSchema, normalizeNetwork, createSupportTicketSchema, type AttachmentMetadata } from "@shared/schema";
+import { createExchangeSchema, createMixerOrderSchema, normalizeNetwork, createSupportTicketSchema, chatMessageSchema, type AttachmentMetadata, type ChatMessage } from "@shared/schema";
 import type { Currency, ExchangeAmount, Exchange, MixerOrder } from "@shared/schema";
+import { generateChatResponse } from "./chatbot";
 import { Keypair } from "@solana/web3.js";
 import bs58 from "bs58";
 import CryptoJS from "crypto-js";
@@ -791,6 +792,92 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Start payout processor - runs every 30 seconds
   setInterval(processScheduledPayouts, 30000);
   console.log('[Mixer] Payout processor started (runs every 30 seconds)');
+
+  // Chat API endpoint
+  app.post("/api/chat/message", async (req, res) => {
+    try {
+      const validation = chatMessageSchema.safeParse(req.body);
+      
+      if (!validation.success) {
+        return res.status(400).json({ 
+          message: "Invalid request", 
+          errors: validation.error.errors 
+        });
+      }
+
+      const { message, sessionId } = validation.data;
+
+      // Get or create chat session
+      let session = await storage.getChatSession(sessionId);
+      if (!session) {
+        session = await storage.createChatSession(sessionId);
+      }
+
+      // Parse existing messages from jsonb
+      const existingMessages: ChatMessage[] = Array.isArray(session.messages) 
+        ? session.messages as ChatMessage[]
+        : [];
+
+      // Add user message
+      const userMessage: ChatMessage = {
+        role: "user",
+        content: message,
+        timestamp: Date.now(),
+      };
+
+      const updatedMessages = [...existingMessages, userMessage];
+
+      // Generate AI response
+      const aiResponse = await generateChatResponse(updatedMessages, sessionId);
+
+      // Add assistant message
+      const assistantMessage: ChatMessage = {
+        role: "assistant",
+        content: aiResponse,
+        timestamp: Date.now(),
+      };
+
+      const finalMessages = [...updatedMessages, assistantMessage];
+
+      // Update session with new messages
+      await storage.updateChatSession(sessionId, finalMessages);
+
+      res.json({ 
+        response: aiResponse,
+        messages: finalMessages,
+      });
+    } catch (error: any) {
+      console.error("Chat message error:", error);
+      res.status(500).json({ 
+        message: "Failed to process chat message",
+        error: error.message 
+      });
+    }
+  });
+
+  // Get chat history
+  app.get("/api/chat/history/:sessionId", async (req, res) => {
+    try {
+      const { sessionId } = req.params;
+      const session = await storage.getChatSession(sessionId);
+
+      if (!session) {
+        return res.json({ messages: [] });
+      }
+
+      const messages: ChatMessage[] = Array.isArray(session.messages)
+        ? session.messages as ChatMessage[]
+        : [];
+
+      res.json({ messages });
+    } catch (error: any) {
+      console.error("Get chat history error:", error);
+      res.status(500).json({ 
+        message: "Failed to get chat history",
+        error: error.message 
+      });
+    }
+  });
 
   const httpServer = createServer(app);
   return httpServer;

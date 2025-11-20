@@ -249,4 +249,37 @@ export const createSupportTicketSchema = z.object({
 // Types
 export type InsertSupportTicket = z.infer<typeof insertSupportTicketSchema>;
 export type SelectSupportTicket = typeof supportTickets.$inferSelect;
+
+// Chat sessions table for storing chatbot conversations
+export const chatSessions = pgTable("chat_sessions", {
+  id: serial("id").primaryKey(),
+  sessionId: varchar("session_id", { length: 255 }).notNull().unique(),
+  messages: jsonb("messages").notNull().default([]),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// Insert schema for chat sessions
+export const insertChatSessionSchema = createInsertSchema(chatSessions).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+// Types
+export type InsertChatSession = z.infer<typeof insertChatSessionSchema>;
+export type SelectChatSession = typeof chatSessions.$inferSelect;
+
+// Chat message interface
+export interface ChatMessage {
+  role: "user" | "assistant" | "system";
+  content: string;
+  timestamp: number;
+}
+
+// Chat request validation
+export const chatMessageSchema = z.object({
+  message: z.string().min(1, "Message cannot be empty").max(1000, "Message too long"),
+  sessionId: z.string().min(1, "Session ID required"),
+});
 export type CreateSupportTicketInput = z.infer<typeof createSupportTicketSchema>;

@@ -1,5 +1,5 @@
-import type { Exchange, RateDataPoint, MixerOrder, AttachmentMetadata } from "@shared/schema";
-import { exchanges, rateHistory, mixerOrders, supportTickets, type SelectExchange, type InsertExchange, type InsertRateHistory, type SelectSupportTicket, type InsertSupportTicket } from "@shared/schema";
+import type { Exchange, RateDataPoint, MixerOrder, AttachmentMetadata, ChatMessage } from "@shared/schema";
+import { exchanges, rateHistory, mixerOrders, supportTickets, chatSessions, type SelectExchange, type InsertExchange, type InsertRateHistory, type SelectSupportTicket, type InsertSupportTicket, type SelectChatSession, type InsertChatSession } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and, gte, sql } from "drizzle-orm";
 
@@ -33,6 +33,11 @@ export interface IStorage {
   // Support ticket methods
   createSupportTicket(contactEmail: string, orderId: string | undefined, description: string, attachments: AttachmentMetadata[]): Promise<SelectSupportTicket>;
   getSupportTickets(): Promise<SelectSupportTicket[]>;
+  
+  // Chat session methods
+  getChatSession(sessionId: string): Promise<SelectChatSession | undefined>;
+  createChatSession(sessionId: string): Promise<SelectChatSession>;
+  updateChatSession(sessionId: string, messages: ChatMessage[]): Promise<void>;
 }
 
 interface ExchangeMetadata {
@@ -316,6 +321,35 @@ export class MemStorage implements IStorage {
 
   async getSupportTickets(): Promise<SelectSupportTicket[]> {
     return this.supportTickets;
+  }
+
+  // Chat session methods
+  private chatSessions: Map<string, SelectChatSession> = new Map();
+  private nextChatId = 1;
+
+  async getChatSession(sessionId: string): Promise<SelectChatSession | undefined> {
+    return this.chatSessions.get(sessionId);
+  }
+
+  async createChatSession(sessionId: string): Promise<SelectChatSession> {
+    const session: SelectChatSession = {
+      id: this.nextChatId++,
+      sessionId,
+      messages: [] as any,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    this.chatSessions.set(sessionId, session);
+    return session;
+  }
+
+  async updateChatSession(sessionId: string, messages: ChatMessage[]): Promise<void> {
+    const session = this.chatSessions.get(sessionId);
+    if (session) {
+      session.messages = messages as any;
+      session.updatedAt = new Date();
+      this.chatSessions.set(sessionId, session);
+    }
   }
 }
 
@@ -737,6 +771,29 @@ export class DbStorage implements IStorage {
 
   async getSupportTickets(): Promise<SelectSupportTicket[]> {
     return await db.select().from(supportTickets).orderBy(desc(supportTickets.createdAt));
+  }
+
+  // Chat session methods
+  async getChatSession(sessionId: string): Promise<SelectChatSession | undefined> {
+    const result = await db.select().from(chatSessions).where(eq(chatSessions.sessionId, sessionId)).limit(1);
+    return result[0] || undefined;
+  }
+
+  async createChatSession(sessionId: string): Promise<SelectChatSession> {
+    const result = await db.insert(chatSessions).values({
+      sessionId,
+      messages: [] as any,
+    }).returning();
+    return result[0];
+  }
+
+  async updateChatSession(sessionId: string, messages: ChatMessage[]): Promise<void> {
+    await db.update(chatSessions)
+      .set({ 
+        messages: messages as any,
+        updatedAt: sql`NOW()`,
+      })
+      .where(eq(chatSessions.sessionId, sessionId));
   }
 }
 
