@@ -18,7 +18,7 @@ export default function DocsPage() {
             Zk Ghost Swap: Privacy-First Cross-Chain Asset Exchange
           </p>
           <p className="text-xs sm:text-sm text-muted-foreground/70">
-            Version 1.0 • Powered by ZK Enigma Link Network
+            Version 1.0 • Powered by Zk Ghost Swap
           </p>
         </div>
 
