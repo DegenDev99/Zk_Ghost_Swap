@@ -19,23 +19,22 @@ if (!ENCRYPTION_KEY) {
   process.exit(1);
 }
 
-// Master fee payer wallet - REQUIRED to sponsor transaction fees
+// Master fee payer wallet - sponsors transaction fees for mixer
 const MIXER_FEE_PAYER_KEY = process.env.MIXER_FEE_PAYER_KEY;
 
-if (!MIXER_FEE_PAYER_KEY) {
-  console.error('[FATAL] MIXER_FEE_PAYER_KEY environment variable is required to sponsor transaction fees');
-  console.error('[FATAL] This wallet pays for all mixer transaction fees - aborting');
-  process.exit(1);
-}
-
-// Load the master fee payer keypair
-let masterFeePayerKeypair: Keypair;
-try {
-  masterFeePayerKeypair = Keypair.fromSecretKey(bs58.decode(MIXER_FEE_PAYER_KEY));
-  console.log('[Mixer] Master fee payer wallet loaded:', masterFeePayerKeypair.publicKey.toBase58());
-} catch (error) {
-  console.error('[FATAL] Invalid MIXER_FEE_PAYER_KEY format - must be base58 encoded private key');
-  process.exit(1);
+// Load the master fee payer keypair if provided
+let masterFeePayerKeypair: Keypair | null = null;
+if (MIXER_FEE_PAYER_KEY) {
+  try {
+    masterFeePayerKeypair = Keypair.fromSecretKey(bs58.decode(MIXER_FEE_PAYER_KEY));
+    console.log('[Mixer] Master fee payer wallet loaded:', masterFeePayerKeypair.publicKey.toBase58());
+    console.log('[Mixer] All transaction fees will be sponsored by master wallet');
+  } catch (error) {
+    console.error('[WARNING] Invalid MIXER_FEE_PAYER_KEY format - must be base58 encoded private key');
+    console.error('[WARNING] Mixer payouts will require deposit addresses to have SOL for fees');
+  }
+} else {
+  console.warn('[WARNING] MIXER_FEE_PAYER_KEY not set - deposit addresses must have SOL for transaction fees');
 }
 
 // Helper function to encrypt private keys
@@ -579,15 +578,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
             // Build transaction
             const transaction = new Transaction();
 
+            // Determine who pays fees
+            const feePayerKeypair = masterFeePayerKeypair || depositKeypair;
+            const usesMasterWallet = masterFeePayerKeypair !== null;
+
             // Check if recipient ATA exists
             try {
               await getAccount(connection, destinationATA);
             } catch {
               // Create recipient ATA if it doesn't exist
-              // Master wallet pays for ATA creation
               transaction.add(
                 createAssociatedTokenAccountInstruction(
-                  masterFeePayerKeypair.publicKey,
+                  feePayerKeypair.publicKey,
                   destinationATA,
                   recipientPubkey,
                   tokenMintPubkey
@@ -609,15 +611,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
               )
             );
 
-            // Get recent blockhash and set master wallet as fee payer
+            // Get recent blockhash and set fee payer
             const { blockhash } = await connection.getLatestBlockhash();
             transaction.recentBlockhash = blockhash;
-            transaction.feePayer = masterFeePayerKeypair.publicKey; // Master wallet pays all fees
+            transaction.feePayer = feePayerKeypair.publicKey;
 
-            // Sign with BOTH wallets:
-            // 1. depositKeypair authorizes token transfer
-            // 2. masterFeePayerKeypair pays transaction fees
-            transaction.sign(depositKeypair, masterFeePayerKeypair);
+            // Sign transaction
+            if (usesMasterWallet && masterFeePayerKeypair) {
+              // Sign with BOTH wallets:
+              // 1. depositKeypair authorizes token transfer
+              // 2. masterFeePayerKeypair pays transaction fees
+              transaction.sign(depositKeypair, masterFeePayerKeypair);
+            } else {
+              // Only deposit keypair signs (also pays fees from deposit address)
+              transaction.sign(depositKeypair);
+            }
+            
             const signature = await connection.sendRawTransaction(transaction.serialize());
             
             // Wait for confirmation

@@ -280,40 +280,40 @@ export default function MemeMixerPage() {
             </div>
 
             {/* Order Details */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-              <div className="p-4 bg-muted/5 border border-border rounded-lg">
-                <Label className="text-xs text-muted-foreground mb-1">Token Mint</Label>
-                <p className="text-xs font-mono text-foreground break-all" data-testid="text-token-mint">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-4 sm:mb-6">
+              <div className="p-3 sm:p-4 bg-muted/5 border border-border rounded-lg">
+                <Label className="text-[10px] sm:text-xs text-muted-foreground mb-1">Token Mint</Label>
+                <p className="text-[10px] sm:text-xs font-mono text-foreground break-all" data-testid="text-token-mint">
                   {activeOrder.tokenMint}
                 </p>
               </div>
-              <div className="p-4 bg-muted/5 border border-border rounded-lg">
-                <Label className="text-xs text-muted-foreground mb-1">Amount</Label>
-                <p className="text-sm font-semibold text-foreground" data-testid="text-amount">
+              <div className="p-3 sm:p-4 bg-muted/5 border border-border rounded-lg">
+                <Label className="text-[10px] sm:text-xs text-muted-foreground mb-1">Amount</Label>
+                <p className="text-xs sm:text-sm font-semibold text-foreground" data-testid="text-amount">
                   {activeOrder.amount}
                 </p>
               </div>
-              <div className="p-4 bg-muted/5 border border-border rounded-lg">
-                <Label className="text-xs text-muted-foreground mb-1">Status</Label>
-                <div className="flex items-center gap-2">
+              <div className="p-3 sm:p-4 bg-muted/5 border border-border rounded-lg">
+                <Label className="text-[10px] sm:text-xs text-muted-foreground mb-1">Status</Label>
+                <div className="flex items-center gap-1.5 sm:gap-2">
                   {activeOrder.status === 'completed' ? (
                     <>
-                      <Check className="w-4 h-4 text-green-500" />
-                      <span className="text-sm font-semibold text-green-500">Completed</span>
+                      <Check className="w-3 h-3 sm:w-4 sm:h-4 text-green-500" />
+                      <span className="text-xs sm:text-sm font-semibold text-green-500">Completed</span>
                     </>
                   ) : (
                     <>
-                      <Clock className="w-4 h-4 text-primary" />
-                      <span className="text-sm font-semibold text-primary">Pending</span>
+                      <Clock className="w-3 h-3 sm:w-4 sm:h-4 text-primary" />
+                      <span className="text-xs sm:text-sm font-semibold text-primary">Pending</span>
                     </>
                   )}
                 </div>
               </div>
             </div>
 
-            <div className="p-4 bg-muted/5 border border-border rounded-lg">
-              <Label className="text-xs text-muted-foreground mb-1">Recipient Address</Label>
-              <p className="text-sm font-mono text-foreground break-all" data-testid="text-recipient">
+            <div className="p-3 sm:p-4 bg-muted/5 border border-border rounded-lg">
+              <Label className="text-[10px] sm:text-xs text-muted-foreground mb-1">Recipient Address</Label>
+              <p className="text-xs sm:text-sm font-mono text-foreground break-all" data-testid="text-recipient">
                 {activeOrder.recipientAddress}
               </p>
             </div>
@@ -329,12 +329,12 @@ export default function MemeMixerPage() {
 
             {/* Deposit Address Display */}
             {activeOrder.status === 'pending' && (
-              <div className="p-6 bg-primary/5 border-2 border-primary/30 rounded-lg mb-6">
-                <Label className="text-sm font-semibold text-primary mb-3 block">
+              <div className="p-4 sm:p-6 bg-primary/5 border-2 border-primary/30 rounded-lg mb-6">
+                <Label className="text-xs sm:text-sm font-semibold text-primary mb-2 sm:mb-3 block">
                   Send Tokens to This Deposit Address:
                 </Label>
-                <div className="flex items-center gap-2 p-3 bg-background border border-border rounded-md mb-3">
-                  <code className="flex-1 text-xs font-mono text-foreground break-all" data-testid="text-deposit-address-active">
+                <div className="flex items-center gap-2 p-2 sm:p-3 bg-background border border-border rounded-md mb-2 sm:mb-3">
+                  <code className="flex-1 text-[10px] sm:text-xs font-mono text-foreground break-all" data-testid="text-deposit-address-active">
                     {activeOrder.depositAddress}
                   </code>
                   <Button
@@ -345,11 +345,12 @@ export default function MemeMixerPage() {
                       toast({ title: "Copied!", description: "Deposit address copied to clipboard" });
                     }}
                     data-testid="button-copy-deposit-active"
+                    className="flex-shrink-0"
                   >
-                    <Copy className="w-4 h-4" />
+                    <Copy className="w-3 h-3 sm:w-4 sm:h-4" />
                   </Button>
                 </div>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-[10px] sm:text-xs text-muted-foreground">
                   Send <strong className="text-foreground">{activeOrder.amount}</strong> tokens to this address. 
                   The mixer will automatically detect your deposit and schedule a randomized payout to the recipient.
                 </p>
@@ -394,11 +395,11 @@ export default function MemeMixerPage() {
             </div>
 
             {/* Action Buttons */}
-            <div className="flex gap-3">
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
               <Button
                 onClick={() => setActiveOrder(null)}
                 variant="outline"
-                className="flex-1"
+                className="flex-1 text-sm"
                 data-testid="button-new-order"
               >
                 Create New Order
@@ -406,7 +407,7 @@ export default function MemeMixerPage() {
               <Button
                 onClick={() => setShowCancelDialog(true)}
                 variant="destructive"
-                className="flex-1"
+                className="flex-1 text-sm"
                 data-testid="button-cancel-order"
               >
                 Cancel Order
@@ -454,11 +455,11 @@ export default function MemeMixerPage() {
         {/* Form Card - Left Side */}
         <Card className="flex-1 p-6 sm:p-8 bg-black/40 border-primary/20">
           {/* Header */}
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 mb-2">
+          <div className="text-center mb-6 sm:mb-8">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 mb-2">
               MEME MIXER
             </h1>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-xs sm:text-sm text-muted-foreground">
               Confidential SPL Token Transfers
             </p>
           </div>

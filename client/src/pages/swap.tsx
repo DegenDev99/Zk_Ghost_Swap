@@ -531,13 +531,13 @@ export default function SwapPage() {
               </Link>
             </div>
 
-            <div className="text-center mb-8">
-              <h1 className="text-3xl sm:text-4xl font-bold mb-2">
+            <div className="text-center mb-6 sm:mb-8">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2">
                 <span className="text-[#00D9FF]">Zk Ghost</span>
                 <span className="text-[#6600FF]"> Swap</span>
                 <span className="text-foreground"> Exchange</span>
               </h1>
-              <p className="text-sm text-muted-foreground uppercase tracking-wider">
+              <p className="text-xs sm:text-sm text-muted-foreground uppercase tracking-wider">
                 Privacy-First Asset Swapping
               </p>
             </div>
@@ -625,16 +625,16 @@ export default function SwapPage() {
 
             {/* Exchange Details */}
             <div className="space-y-4 mb-6">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="p-4 bg-muted/5 border border-border rounded-md">
-                  <Label className="text-xs text-muted-foreground mb-1 uppercase tracking-wider">You Send</Label>
-                  <p className="text-lg font-bold font-mono text-foreground" data-testid="text-exchange-from-amount">
+              <div className="grid grid-cols-2 gap-2 sm:gap-4">
+                <div className="p-3 sm:p-4 bg-muted/5 border border-border rounded-md">
+                  <Label className="text-[10px] sm:text-xs text-muted-foreground mb-1 uppercase tracking-wider">You Send</Label>
+                  <p className="text-sm sm:text-base md:text-lg font-bold font-mono text-foreground break-all" data-testid="text-exchange-from-amount">
                     {activeExchange.fromAmount} {activeExchange.fromCurrency.toUpperCase()}
                   </p>
                 </div>
-                <div className="p-4 bg-muted/5 border border-primary/20 rounded-md">
-                  <Label className="text-xs text-muted-foreground mb-1 uppercase tracking-wider">You Receive</Label>
-                  <p className="text-lg font-bold font-mono text-primary" data-testid="text-exchange-to-amount">
+                <div className="p-3 sm:p-4 bg-muted/5 border border-primary/20 rounded-md">
+                  <Label className="text-[10px] sm:text-xs text-muted-foreground mb-1 uppercase tracking-wider">You Receive</Label>
+                  <p className="text-sm sm:text-base md:text-lg font-bold font-mono text-primary break-all" data-testid="text-exchange-to-amount">
                     {activeExchange.toAmount} {activeExchange.toCurrency.toUpperCase()}
                   </p>
                 </div>
@@ -813,18 +813,18 @@ export default function SwapPage() {
           <Card className="w-full p-6 sm:p-8 bg-card/40 backdrop-blur-sm border-primary/20">
         {/* Header */}
         <div className="text-center mb-6">
-          <h1 className="text-4xl sm:text-5xl font-bold mb-2">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-2">
             <span className="text-[#00D9FF]">Zk Ghost</span>
             <span className="text-[#6600FF]"> Swap</span>
           </h1>
-          <p className="text-sm text-muted-foreground uppercase tracking-wider">
+          <p className="text-xs sm:text-sm text-muted-foreground uppercase tracking-wider">
             Privacy-First Asset Swapping
           </p>
-          <div className="flex items-center justify-center gap-2 mt-4">
-            <span className="px-3 py-1 bg-primary/10 border border-primary/30 rounded-full text-xs font-bold text-primary uppercase tracking-wide">
+          <div className="flex items-center justify-center gap-1.5 sm:gap-2 mt-3 sm:mt-4 flex-wrap">
+            <span className="px-2 sm:px-3 py-0.5 sm:py-1 bg-primary/10 border border-primary/30 rounded-full text-[10px] sm:text-xs font-bold text-primary uppercase tracking-wide">
               No KYC
             </span>
-            <span className="px-3 py-1 bg-accent/10 border border-accent/30 rounded-full text-xs font-bold text-accent uppercase tracking-wide">
+            <span className="px-2 sm:px-3 py-0.5 sm:py-1 bg-accent/10 border border-accent/30 rounded-full text-[10px] sm:text-xs font-bold text-accent uppercase tracking-wide">
               Anonymous
             </span>
           </div>
@@ -999,35 +999,35 @@ export default function SwapPage() {
 
           {/* Live Conversion */}
           {loadingEstimation ? (
-            <div className="flex items-center justify-center gap-3 p-6 bg-gradient-to-r from-primary/10 to-secondary/10 border-2 border-primary/30 rounded-md" data-testid="banner-loading-estimate">
-              <Loader2 className="w-5 h-5 animate-spin text-primary" />
-              <span className="text-sm font-medium text-foreground">Fetching live rates...</span>
+            <div className="flex items-center justify-center gap-2 sm:gap-3 p-4 sm:p-6 bg-gradient-to-r from-primary/10 to-secondary/10 border-2 border-primary/30 rounded-md" data-testid="banner-loading-estimate">
+              <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin text-primary" />
+              <span className="text-xs sm:text-sm font-medium text-foreground">Fetching live rates...</span>
             </div>
           ) : estimation && estimation.estimatedAmount ? (
-            <div className="p-5 bg-gradient-to-br from-primary/5 via-secondary/5 to-primary/10 border-2 border-primary/30 rounded-md space-y-3" data-testid="box-live-estimate">
+            <div className="p-3 sm:p-4 md:p-5 bg-gradient-to-br from-primary/5 via-secondary/5 to-primary/10 border-2 border-primary/30 rounded-md space-y-2 sm:space-y-3" data-testid="box-live-estimate">
               <div className="flex items-center justify-between">
-                <span className="text-xs text-muted-foreground uppercase tracking-wider">Live Estimate</span>
-                <span className="px-2 py-0.5 bg-green-500/20 border border-green-500/50 rounded-full text-[10px] font-bold text-green-500 animate-pulse">LIVE</span>
+                <span className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wider">Live Estimate</span>
+                <span className="px-1.5 sm:px-2 py-0.5 bg-green-500/20 border border-green-500/50 rounded-full text-[9px] sm:text-[10px] font-bold text-green-500 animate-pulse">LIVE</span>
               </div>
               <div className="text-center">
-                <p className="text-3xl font-bold font-mono text-primary mb-1" data-testid="text-estimated-amount">
+                <p className="text-2xl sm:text-3xl font-bold font-mono text-primary mb-1 break-all" data-testid="text-estimated-amount">
                   ≈ {estimation.estimatedAmount}
                 </p>
-                <p className="text-sm text-muted-foreground font-mono">
+                <p className="text-xs sm:text-sm text-muted-foreground font-mono">
                   {toCurrency.toUpperCase()}
                 </p>
               </div>
               {estimation.transactionSpeedForecast && (
-                <div className="text-center pt-2 border-t border-primary/20">
-                  <p className="text-xs text-muted-foreground">
+                <div className="text-center pt-1.5 sm:pt-2 border-t border-primary/20">
+                  <p className="text-[10px] sm:text-xs text-muted-foreground">
                     Est. Time: <span className="font-mono text-foreground">{estimation.transactionSpeedForecast}</span>
                   </p>
                 </div>
               )}
             </div>
           ) : estimationError ? (
-            <div className="p-4 bg-destructive/10 border border-destructive/20 rounded-md" data-testid="banner-error-estimate">
-              <p className="text-sm text-destructive text-center">Failed to fetch estimate</p>
+            <div className="p-3 sm:p-4 bg-destructive/10 border border-destructive/20 rounded-md" data-testid="banner-error-estimate">
+              <p className="text-xs sm:text-sm text-destructive text-center">Failed to fetch estimate</p>
             </div>
           ) : null}
 
