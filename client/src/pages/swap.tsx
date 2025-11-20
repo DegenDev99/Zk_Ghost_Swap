@@ -6,7 +6,14 @@ import { Label } from "@/components/ui/label";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { ArrowDownUp, Clock, Copy, Check, AlertCircle, Loader2, ChevronsUpDown, Shield, Lock, Zap, Globe, Home, X, Mail } from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { ArrowDownUp, Clock, Copy, Check, AlertCircle, Loader2, ChevronsUpDown, Shield, Lock, Zap, Globe, Home, X, Mail, Upload, FileText } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { createSupportTicketSchema } from "@shared/schema";
+import type { z } from "zod";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
@@ -37,8 +44,88 @@ export default function SwapPage() {
   const [toSearch, setToSearch] = useState("");
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
   const [isCancelling, setIsCancelling] = useState(false);
+  const [supportDialogOpen, setSupportDialogOpen] = useState(false);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const sessionId = getOrCreateSessionId();
   const autoClosedOrdersRef = useRef<Set<string>>(new Set());
+
+  // Support request form
+  const supportForm = useForm<z.infer<typeof createSupportTicketSchema>>({
+    resolver: zodResolver(createSupportTicketSchema),
+    defaultValues: {
+      contactEmail: "",
+      orderId: "",
+      description: "",
+    },
+  });
+
+  // Support ticket submission mutation
+  const submitSupportTicket = useMutation({
+    mutationFn: async (data: z.infer<typeof createSupportTicketSchema> & { files: File[] }) => {
+      const formData = new FormData();
+      formData.append('contactEmail', data.contactEmail);
+      if (data.orderId) formData.append('orderId', data.orderId);
+      formData.append('description', data.description);
+      
+      // Append files
+      data.files.forEach(file => {
+        formData.append('attachments', file);
+      });
+
+      const response = await fetch('/api/support/tickets', {
+        method: 'POST',
+        credentials: 'include',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to submit support request');
+      }
+
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Request Submitted",
+        description: "Your support request has been submitted successfully. We'll get back to you soon!",
+      });
+      supportForm.reset();
+      setSelectedFiles([]);
+      setSupportDialogOpen(false);
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Submission Failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Handle file selection
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length + selectedFiles.length > 3) {
+      toast({
+        title: "Too Many Files",
+        description: "You can only upload up to 3 files",
+        variant: "destructive",
+      });
+      return;
+    }
+    setSelectedFiles(prev => [...prev, ...files].slice(0, 3));
+  };
+
+  // Remove selected file
+  const removeFile = (index: number) => {
+    setSelectedFiles(prev => prev.filter((_, i) => i !== index));
+  };
+
+  // Submit support request
+  const onSubmitSupport = (data: z.infer<typeof createSupportTicketSchema>) => {
+    submitSupportTicket.mutate({ ...data, files: selectedFiles });
+  };
 
   // Centralized function to clear active exchange
   const clearActiveExchange = async () => {
@@ -1110,6 +1197,171 @@ export default function SwapPage() {
                 <p className="text-xs text-muted-foreground/80 italic">
                   💡 Tip: Include your Order ID in your email for faster assistance
                 </p>
+                
+                {/* Submit a Request Button & Dialog */}
+                <Dialog open={supportDialogOpen} onOpenChange={setSupportDialogOpen}>
+                  <DialogTrigger asChild>
+                    <Button 
+                      variant="outline" 
+                      className="w-full mt-4" 
+                      data-testid="button-submit-request"
+                    >
+                      <Upload className="w-4 h-4 mr-2" />
+                      Submit a Request
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-[525px]">
+                    <DialogHeader>
+                      <DialogTitle>Submit a Support Request</DialogTitle>
+                      <DialogDescription>
+                        Fill out the form below and we'll get back to you as soon as possible.
+                      </DialogDescription>
+                    </DialogHeader>
+                    
+                    <Form {...supportForm}>
+                      <form onSubmit={supportForm.handleSubmit(onSubmitSupport)} className="space-y-4">
+                        <FormField
+                          control={supportForm.control}
+                          name="contactEmail"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Your Email Address</FormLabel>
+                              <FormControl>
+                                <Input 
+                                  placeholder="your.email@example.com" 
+                                  {...field} 
+                                  data-testid="input-support-email"
+                                />
+                              </FormControl>
+                              <FormDescription>
+                                We'll use this to respond to your request
+                              </FormDescription>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        
+                        <FormField
+                          control={supportForm.control}
+                          name="orderId"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Order ID (Optional)</FormLabel>
+                              <FormControl>
+                                <Input 
+                                  placeholder="e.g., abc123def456" 
+                                  {...field} 
+                                  data-testid="input-support-order-id"
+                                />
+                              </FormControl>
+                              <FormDescription>
+                                If your issue is about a specific order, provide the Order ID
+                              </FormDescription>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        
+                        <FormField
+                          control={supportForm.control}
+                          name="description"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Description</FormLabel>
+                              <FormControl>
+                                <Textarea 
+                                  placeholder="Please describe your issue in detail..." 
+                                  className="min-h-[120px]"
+                                  {...field} 
+                                  data-testid="textarea-support-description"
+                                />
+                              </FormControl>
+                              <FormDescription>
+                                Minimum 10 characters
+                              </FormDescription>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        
+                        <div>
+                          <Label htmlFor="file-upload">Attachments (Optional)</Label>
+                          <div className="mt-2">
+                            <Input
+                              id="file-upload"
+                              type="file"
+                              accept="image/png,image/jpeg,image/webp,application/pdf"
+                              multiple
+                              onChange={handleFileChange}
+                              className="cursor-pointer"
+                              data-testid="input-support-attachments"
+                            />
+                            <p className="text-xs text-muted-foreground mt-1">
+                              PNG, JPEG, WEBP, or PDF. Max 3 files, 5MB each.
+                            </p>
+                          </div>
+                          
+                          {selectedFiles.length > 0 && (
+                            <div className="mt-3 space-y-2">
+                              {selectedFiles.map((file, index) => (
+                                <div 
+                                  key={index} 
+                                  className="flex items-center justify-between p-2 bg-muted rounded-md"
+                                  data-testid={`file-item-${index}`}
+                                >
+                                  <div className="flex items-center gap-2">
+                                    <FileText className="w-4 h-4 text-muted-foreground" />
+                                    <span className="text-sm truncate max-w-[300px]">
+                                      {file.name}
+                                    </span>
+                                    <span className="text-xs text-muted-foreground">
+                                      ({(file.size / 1024).toFixed(1)} KB)
+                                    </span>
+                                  </div>
+                                  <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={() => removeFile(index)}
+                                    data-testid={`button-remove-file-${index}`}
+                                  >
+                                    <X className="w-4 h-4" />
+                                  </Button>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                        
+                        <DialogFooter>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            onClick={() => setSupportDialogOpen(false)}
+                            disabled={submitSupportTicket.isPending}
+                            data-testid="button-cancel-support"
+                          >
+                            Cancel
+                          </Button>
+                          <Button 
+                            type="submit" 
+                            disabled={submitSupportTicket.isPending}
+                            data-testid="button-submit-support"
+                          >
+                            {submitSupportTicket.isPending ? (
+                              <>
+                                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                Submitting...
+                              </>
+                            ) : (
+                              'Submit Request'
+                            )}
+                          </Button>
+                        </DialogFooter>
+                      </form>
+                    </Form>
+                  </DialogContent>
+                </Dialog>
               </div>
             </div>
           </Card>

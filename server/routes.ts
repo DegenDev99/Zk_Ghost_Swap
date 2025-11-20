@@ -1,11 +1,15 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { createExchangeSchema, createMixerOrderSchema, normalizeNetwork } from "@shared/schema";
+import { createExchangeSchema, createMixerOrderSchema, normalizeNetwork, createSupportTicketSchema, type AttachmentMetadata } from "@shared/schema";
 import type { Currency, ExchangeAmount, Exchange, MixerOrder } from "@shared/schema";
 import { Keypair } from "@solana/web3.js";
 import bs58 from "bs58";
 import CryptoJS from "crypto-js";
+import multer from "multer";
+import nodemailer from "nodemailer";
+import path from "path";
+import fs from "fs";
 
 const CHANGENOW_API_KEY = process.env.CHANGENOW_API_KEY;
 const CHANGENOW_API_URL = "https://api.changenow.io/v2";
@@ -53,6 +57,45 @@ function decryptPrivateKey(encryptedKey: string): string {
 if (!CHANGENOW_API_KEY) {
   console.error("⚠️  CHANGENOW_API_KEY is not set in environment variables");
 }
+
+// Configure multer for file uploads (support ticket attachments)
+const uploadDir = path.join(process.cwd(), 'server', 'uploads', 'support');
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
+
+const upload = multer({
+  storage: multer.diskStorage({
+    destination: uploadDir,
+    filename: (req, file, cb) => {
+      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+      cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
+    }
+  }),
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5MB max per file
+    files: 3, // Max 3 files
+  },
+  fileFilter: (req, file, cb) => {
+    const allowedMimes = ['image/png', 'image/jpeg', 'image/webp', 'application/pdf'];
+    if (allowedMimes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error('Invalid file type. Only PNG, JPEG, WEBP, and PDF are allowed.'));
+    }
+  }
+});
+
+// Configure nodemailer for email notifications
+const emailTransporter = nodemailer.createTransport({
+  host: process.env.SUPPORT_SMTP_HOST || 'smtp.gmail.com',
+  port: parseInt(process.env.SUPPORT_SMTP_PORT || '587'),
+  secure: false, // Use TLS
+  auth: {
+    user: process.env.SUPPORT_SMTP_USER,
+    pass: process.env.SUPPORT_SMTP_PASS,
+  },
+});
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // GET /api/swap/currencies - Fetch available currencies from ChangeNOW
@@ -519,6 +562,101 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error: any) {
       console.error("[Mixer] Error auto-closing order:", error);
       res.status(500).json({ message: error.message || "Failed to auto-close order" });
+    }
+  });
+
+  // POST /api/support/tickets - Create a new support ticket
+  app.post("/api/support/tickets", upload.array('attachments', 3), async (req, res) => {
+    const uploadedFiles: Express.Multer.File[] = (req.files as Express.Multer.File[]) || [];
+    
+    try {
+      // Parse form data
+      const { contactEmail, orderId, description } = req.body;
+
+      // Validate form data using zod schema
+      const validation = createSupportTicketSchema.safeParse({
+        contactEmail,
+        orderId: orderId || undefined,
+        description,
+      });
+
+      if (!validation.success) {
+        // Clean up uploaded files on validation failure
+        for (const file of uploadedFiles) {
+          fs.unlinkSync(file.path);
+        }
+        return res.status(400).json({ 
+          message: "Validation failed", 
+          errors: validation.error.errors 
+        });
+      }
+
+      // Build attachment metadata
+      const attachments: AttachmentMetadata[] = uploadedFiles.map(file => ({
+        originalName: file.originalname,
+        storedName: file.filename,
+        size: file.size,
+        mimeType: file.mimetype,
+      }));
+
+      // Store ticket in database
+      const ticket = await storage.createSupportTicket(
+        validation.data.contactEmail,
+        validation.data.orderId,
+        validation.data.description,
+        attachments
+      );
+
+      // Send email notification (non-blocking)
+      if (process.env.SUPPORT_SMTP_USER && process.env.SUPPORT_SMTP_PASS) {
+        emailTransporter.sendMail({
+          from: process.env.SUPPORT_SMTP_USER,
+          to: 'support@zkghostswap.tech',
+          subject: `New Support Request #${ticket.id}${orderId ? ` - Order ${orderId}` : ''}`,
+          html: `
+            <h2>New Support Request</h2>
+            <p><strong>Ticket ID:</strong> ${ticket.id}</p>
+            <p><strong>Contact Email:</strong> ${validation.data.contactEmail}</p>
+            ${orderId ? `<p><strong>Order ID:</strong> ${orderId}</p>` : ''}
+            <p><strong>Description:</strong></p>
+            <p>${validation.data.description.replace(/\n/g, '<br>')}</p>
+            ${attachments.length > 0 ? `
+              <p><strong>Attachments:</strong></p>
+              <ul>
+                ${attachments.map(a => `<li>${a.originalName} (${(a.size / 1024).toFixed(2)} KB)</li>`).join('')}
+              </ul>
+            ` : ''}
+            <p><em>Submitted at: ${new Date().toISOString()}</em></p>
+          `,
+          attachments: uploadedFiles.map(file => ({
+            filename: file.originalname,
+            path: file.path,
+          })),
+        }).catch(emailError => {
+          console.error('[Support] Failed to send email notification:', emailError);
+        });
+      }
+
+      console.log(`[Support] Ticket created: #${ticket.id} from ${validation.data.contactEmail}`);
+
+      res.status(201).json({ 
+        success: true, 
+        ticketId: ticket.id,
+        message: "Support request submitted successfully" 
+      });
+    } catch (error: any) {
+      console.error("[Support] Error creating ticket:", error);
+      
+      // Clean up uploaded files on error
+      for (const file of uploadedFiles) {
+        try {
+          fs.unlinkSync(file.path);
+        } catch (unlinkError) {
+          console.error('[Support] Failed to clean up file:', file.path);
+        }
+      }
+      
+      res.status(500).json({ message: error.message || "Failed to create support ticket" });
     }
   });
 
