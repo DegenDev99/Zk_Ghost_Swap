@@ -82,6 +82,11 @@ Preferred communication style: Simple, everyday language.
     - `POST /api/mixer/order` - Create custodial mixer order (generates deposit address with encrypted private key)
     - `GET /api/mixer/deposit/:orderId` - Check deposit status via Solana RPC polling
     - `POST /api/mixer/auto-close/:id` - Permanently cancel/close a mixer order
+  - **Support Endpoints:**
+    - `POST /api/support/tickets` - Submit support request with file attachments (max 3 files, 5MB each)
+  - **Chat Endpoints:**
+    - `POST /api/chat/message` - Send message to AI chatbot and receive response
+    - `GET /api/chat/history/:sessionId` - Retrieve chat conversation history
 - Request/response logging middleware for debugging and monitoring
 - Raw body preservation for webhook verification scenarios
 
@@ -105,6 +110,8 @@ Preferred communication style: Simple, everyday language.
   - `exchanges` table for swap orders
   - `mixerOrders` table for confidential transfer orders with order IDs, token info, and expiry timestamps
   - `rateHistory` table for exchange rate tracking
+  - `supportTickets` table for support requests with contact email, order ID, description, and file attachment metadata
+  - `chatSessions` table for AI chatbot conversation history with messages stored as jsonb
 - Migration system ready (`drizzle-kit`) with migrations output to `./migrations`
 - **Neon Database** serverless Postgres driver included
 - Database credentials expected via `DATABASE_URL` environment variable
@@ -128,6 +135,19 @@ Preferred communication style: Simple, everyday language.
 - Error handling for API failures with status code propagation
 - **Network Parameter Format**: Networks are passed as separate parameters (e.g., `fromCurrency=bnb&fromNetwork=bsc`) rather than appended to ticker (not `bnb_bsc`)
 
+**OpenAI Integration (AI Chatbot)**
+- **Replit AI Integrations** for OpenAI access without requiring own API key
+- Uses OpenAI GPT-5 model for chatbot assistance
+- Environment variables: `AI_INTEGRATIONS_OPENAI_BASE_URL` and `AI_INTEGRATIONS_OPENAI_API_KEY`
+- Charges billed to Replit credits
+- Chatbot capabilities:
+  - Answers platform questions (how swaps work, privacy features, timelines)
+  - Automatic order ID detection from conversation (regex pattern matching)
+  - Order status lookup from exchanges/mixerOrders tables
+  - Comprehensive platform context including FAQ and privacy guarantees
+  - Redirects complex issues to support request submission
+  - Conversation history persisted in chat_sessions table
+
 **Third-Party UI Libraries**
 - **Radix UI** primitives (20+ components) for accessible, unstyled UI foundations
 - **Lucide React** for consistent iconography across the application
@@ -136,6 +156,8 @@ Preferred communication style: Simple, everyday language.
 - **date-fns** for date manipulation and formatting
 - **class-variance-authority** for component variant management
 - **clsx** and **tailwind-merge** for conditional className composition
+- **nodemailer** for email notifications (support tickets)
+- **multer** for file upload handling (support ticket attachments)
 
 **Development Tools**
 - **Replit-specific plugins**: Cartographer (mapping), Dev Banner, Runtime Error Modal
@@ -146,6 +168,7 @@ Preferred communication style: Simple, everyday language.
 - Static assets served from `attached_assets` directory
 - Vite alias configuration for `@assets` path resolution
 - Custom fonts loaded from Google Fonts (Space Grotesk, JetBrains Mono)
+- File upload storage for support ticket attachments in `server/uploads/support`
 
 ### Documentation
 
