@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { ArrowDownUp, Clock, Copy, Check, AlertCircle, Loader2, ChevronsUpDown, Shield, Lock, Zap, Globe, Home, X } from "lucide-react";
+import { ArrowDownUp, Clock, Copy, Check, AlertCircle, Loader2, ChevronsUpDown, Shield, Lock, Zap, Globe, Home, X, Mail } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
@@ -1078,6 +1078,40 @@ export default function SwapPage() {
           </div>
         </div>
       </Card>
+
+          {/* Customer Support Box */}
+          <Card className="w-full p-6 bg-gradient-to-r from-primary/10 to-secondary/10 border-primary/20 backdrop-blur-sm">
+            <div className="space-y-4">
+              <div className="flex items-center gap-3">
+                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-primary/20 border border-primary/30">
+                  <Mail className="w-5 h-5 text-primary" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-foreground">Need Help?</h3>
+                  <p className="text-sm text-muted-foreground">Our support team is here for you</p>
+                </div>
+              </div>
+              
+              <div className="space-y-2">
+                <p className="text-sm text-muted-foreground">
+                  Having issues with your order? Contact our support team for assistance.
+                </p>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-sm font-semibold text-foreground">Email:</span>
+                  <a
+                    href="mailto:support@zkghostswap.tech"
+                    className="text-sm text-primary hover:text-primary/80 font-mono font-semibold underline-offset-4 hover:underline"
+                    data-testid="link-support-email"
+                  >
+                    support@zkghostswap.tech
+                  </a>
+                </div>
+                <p className="text-xs text-muted-foreground/80 italic">
+                  💡 Tip: Include your Order ID in your email for faster assistance
+                </p>
+              </div>
+            </div>
+          </Card>
 
           {/* Privacy Panel - Zero-Knowledge Privacy */}
           <Card className="lg:sticky lg:top-8 p-6 sm:p-8 bg-card/60 backdrop-blur-sm border-primary/30 relative overflow-hidden">
